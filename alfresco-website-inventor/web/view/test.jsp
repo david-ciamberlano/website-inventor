@@ -5,6 +5,6 @@
     <title></title>
 </head>
 <body>
-    ${hello} - <i>${bean}</i>
+    ${hello} - <i>${test}</i>
 </body>
 </html>

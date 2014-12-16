@@ -22,22 +22,19 @@ public class AlfrescoRemoteConnection implements RemoteConnection {
     private String password;
     private String alfrescoUrl;
     private String cmisEntryPoint;
-    private String accessToken;
+    private String alfrescoHomepage;
 
-    private Session session;
+    private Session session = null;
 
 
     @Override
-    public boolean openSession() {
-
+    public void openSession() {
         Map<String, String> parameter = new HashMap<String, String>();
 
-        parameter.put(SessionParameter.ATOMPUB_URL, cmisEntryPoint);
-        parameter.put(SessionParameter.BINDING_TYPE, BindingType.ATOMPUB.value());
-        parameter.put(SessionParameter.AUTH_HTTP_BASIC, "false");
-        parameter.put(SessionParameter.HEADER + ".0", "Authorization:Bearer " + accessToken);
-        parameter.put(SessionParameter.OBJECT_FACTORY_CLASS, "org.alfresco.cmis.client.impl.AlfrescoObjectFactoryImpl");
-
+        parameter.put(SessionParameter.BROWSER_URL, alfrescoUrl+cmisEntryPoint);
+        parameter.put(SessionParameter.BINDING_TYPE, BindingType.BROWSER.value());
+        parameter.put(SessionParameter.USER,username);
+        parameter.put(SessionParameter.PASSWORD,password);
 
         //parameter.put(SessionParameter.OBJECT_FACTORY_CLASS, "org.alfresco.cmis.client.impl.AlfrescoObjectFactoryImpl");
 
@@ -49,42 +46,22 @@ public class AlfrescoRemoteConnection implements RemoteConnection {
             //todo
             logger.debug("Exception"+ ex.getMessage());
         }
-        return false;
+
     }
 
-    @Override
-    public String test() {
-        return username;
-    }
 
-    // getter & setter
 
-    public String getUsername() {
-        return username;
-    }
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
     }
 
     public void setPassword(String password) {
         this.password = password;
     }
 
-    public String getAlfrescoUrl() {
-        return alfrescoUrl;
-    }
-
     public void setAlfrescoUrl(String alfrescoUrl) {
         this.alfrescoUrl = alfrescoUrl;
-    }
-
-    public String getCmisEntryPoint() {
-        return cmisEntryPoint;
     }
 
     public void setCmisEntryPoint(String cmisEntryPoint) {
@@ -95,7 +72,7 @@ public class AlfrescoRemoteConnection implements RemoteConnection {
         return session;
     }
 
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
+    public void setAlfrescoHomepage(String alfrescoHomepage) {
+        this.alfrescoHomepage = alfrescoHomepage;
     }
 }

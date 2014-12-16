@@ -17,14 +17,15 @@
         <property name="suffix" value=".jsp"/>
     </bean>
 
-
-
     <bean class="it.alfrescoinaction.lab.awsi.service.AlfrescoRemoteConnection" init-method="openSession">
         <property name="username" value="${alf.username}"/>
         <property name="password" value="${alf.password}"/>
         <property name="alfrescoUrl" value="${alf.alfresco_url}"/>
         <property name="cmisEntryPoint" value="${alf.cmis_entrypoint}"/>
-        <property name="accessToken" value="${alf.accesstoken}"/>
+        <property name="alfrescoHomepage" value="${alf.homepage}"/>
+    </bean>
+
+    <bean id="alfrescoCmisRepository" class="it.alfrescoinaction.lab.awsi.service.repository.AlfrescoCmisRepository" >
     </bean>
 
 </beans>

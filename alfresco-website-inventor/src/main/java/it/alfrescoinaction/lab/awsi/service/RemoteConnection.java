@@ -1,9 +1,11 @@
 package it.alfrescoinaction.lab.awsi.service;
 
+
+import org.apache.chemistry.opencmis.client.api.Session;
+
 public interface RemoteConnection {
 
-    public boolean openSession ();
+    public void openSession ();
 
-    public String test ();
-
+    public Session getSession();
 }
