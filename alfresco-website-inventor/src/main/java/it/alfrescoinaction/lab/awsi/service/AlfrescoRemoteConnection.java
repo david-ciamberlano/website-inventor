@@ -36,8 +36,6 @@ public class AlfrescoRemoteConnection implements RemoteConnection {
         parameter.put(SessionParameter.USER,username);
         parameter.put(SessionParameter.PASSWORD,password);
 
-        //parameter.put(SessionParameter.OBJECT_FACTORY_CLASS, "org.alfresco.cmis.client.impl.AlfrescoObjectFactoryImpl");
-
         try {
             SessionFactory factory = SessionFactoryImpl.newInstance();
             session = factory.getRepositories(parameter).get(0).createSession();

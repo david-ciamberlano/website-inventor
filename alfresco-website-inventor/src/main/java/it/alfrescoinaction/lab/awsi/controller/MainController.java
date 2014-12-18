@@ -12,6 +12,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -24,22 +26,24 @@ public class MainController {
     @Autowired
     AlfrescoCmisRepository alfrescoCmisRepository;
 
-    @RequestMapping("/test")
-    public String test (Model model) {
+    @RequestMapping("/")
+    public String homepage (Model model) {
 
-        WebPage wp = alfrescoCmisRepository.buildWebPage("/Sites/lab/documentLibrary/homepage");
-        model.addAttribute("hello",wp.getTitle());
-        model.addAttribute("test", wp.getPath() );
+        // the parent of / is itself
+        WebPage wp = alfrescoCmisRepository.buildWebPage("/");
+        model.addAttribute("webPage", wp);
 
-        return "test";
+        return "page";
     }
 
-    @RequestMapping("/p/{path}")
-    public String page (Model model, @PathVariable("path") String path) {
+    @RequestMapping(value = "/p", method = RequestMethod.GET)
+    public String page (Model model, @RequestParam("path") String path) {
 
-        model.addAttribute(path);
+        WebPage wp = alfrescoCmisRepository.buildWebPage(path);
+        model.addAttribute("childPages", wp.getChildPages());
+        model.addAttribute("parentPath", wp.getParentPath());
 
-        return "test";
+        return "page";
     }
 
 

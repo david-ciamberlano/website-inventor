@@ -13,7 +13,7 @@
     <context:component-scan base-package="it.alfrescoinaction.lab.awsi.controller"/>
 
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver" >
-        <property name="prefix" value="view/"/>
+        <property name="prefix" value="/view/"/>
         <property name="suffix" value=".jsp"/>
     </bean>
 
@@ -22,10 +22,11 @@
         <property name="password" value="${alf.password}"/>
         <property name="alfrescoUrl" value="${alf.alfresco_url}"/>
         <property name="cmisEntryPoint" value="${alf.cmis_entrypoint}"/>
-        <property name="alfrescoHomepage" value="${alf.homepage}"/>
+
     </bean>
 
     <bean id="alfrescoCmisRepository" class="it.alfrescoinaction.lab.awsi.service.repository.AlfrescoCmisRepository" >
+        <property name="alfrescoHomePath" value="${alf.homepage}"/>
     </bean>
 
 </beans>

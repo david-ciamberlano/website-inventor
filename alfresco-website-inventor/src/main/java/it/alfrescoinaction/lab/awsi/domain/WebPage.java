@@ -10,18 +10,23 @@ public class WebPage {
 
     private String path;
     private String title;
-    private List<Folder> subPages = new ArrayList<>();
+    private String parentPath;
+    private List<Folder> childPages = new ArrayList<>();
     private List<String> content = new ArrayList<>();
 
 
-    public void addPage (String name, String path) {
+    public void addPage (String name, String parentPath) {
 
         Folder folder = new Folder();
 
-        folder.setPath(path);
+        folder.setPath(path + "/" + name);
         folder.setName(name);
 
-        subPages.add(folder);
+        childPages.add(folder);
+    }
+
+    public void addContent (String name, String path) {
+
     }
 
     //===== getter/setter =====
@@ -41,12 +46,12 @@ public class WebPage {
         this.title = title;
     }
 
-    public List<Folder> getSubPages() {
-        return subPages;
+    public List<Folder> getChildPages() {
+        return childPages;
     }
 
-    public void setSubPages(List<Folder> subPages) {
-        this.subPages = subPages;
+    public void setChildPages(List<Folder> childPages) {
+        this.childPages = childPages;
     }
 
     public List<String> getContent() {
@@ -55,5 +60,13 @@ public class WebPage {
 
     public void setContent(List<String> content) {
         this.content = content;
+    }
+
+    public String getParentPath() {
+        return parentPath;
+    }
+
+    public void setParentPath(String parentPath) {
+        this.parentPath = parentPath;
     }
 }
