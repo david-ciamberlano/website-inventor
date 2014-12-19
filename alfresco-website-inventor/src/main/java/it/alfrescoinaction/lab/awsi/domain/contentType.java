@@ -5,6 +5,6 @@ public enum contentType {
 
     TEXT,
     IMAGE,
-    FILE;
+    ATTACHMENT
 
 }
