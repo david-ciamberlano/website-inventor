@@ -1,10 +1,10 @@
 package it.alfrescoinaction.lab.awsi.domain;
 
 
-public class Folder {
+public class AlfFolder {
 
     private String name;
-    private String path;
+    private String id;
 
     public String getName() {
         return name;
@@ -14,12 +14,12 @@ public class Folder {
         this.name = name;
     }
 
-    public String getPath() {
-        return path;
+    public String getId() {
+        return id;
     }
 
-    public void setPath(String path) {
-        this.path = path;
+    public void setId(String id) {
+        this.id = id;
     }
 
     @Override

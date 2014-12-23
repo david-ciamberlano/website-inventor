@@ -1,7 +1,7 @@
 package it.alfrescoinaction.lab.awsi.domain;
 
 
-public class Content {
+public class AlfContent {
 
     private String title;
     private ContentType type = ContentType.ATTACHMENT;
