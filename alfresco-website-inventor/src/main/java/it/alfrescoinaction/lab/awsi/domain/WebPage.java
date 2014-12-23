@@ -8,34 +8,49 @@ import java.util.List;
  */
 public class WebPage {
 
-    private String path;
+    private String id;
     private String title;
-    private String parentPath;
-    private List<Folder> childPages = new ArrayList<>();
-    private List<String> content = new ArrayList<>();
+    private String parentId;
+    private List<AlfFolder> childPages = new ArrayList<>();
+    private List<AlfContent> contents = new ArrayList<>();
 
 
-    public void addPage (String name, String parentPath) {
+    public void addPage (String pageName, String pageId) {
 
-        Folder folder = new Folder();
+        AlfFolder alfFolder = new AlfFolder();
 
-        folder.setPath(path + "/" + name);
-        folder.setName(name);
+        alfFolder.setId(pageId);
+        alfFolder.setName(pageName);
 
-        childPages.add(folder);
+        childPages.add(alfFolder);
     }
 
-    public void addContent (String name, String path) {
+    public void addContent (String name, String id) {
+        AlfContent alfContent = new AlfContent();
+
+        alfContent.setTitle(name);
+
+        contents.add(alfContent);
 
     }
 
     //===== getter/setter =====
-    public String getPath() {
-        return path;
+
+
+    public String getParentId() {
+        return parentId;
     }
 
-    public void setPath(String path) {
-        this.path = path;
+    public void setParentId(String parentId) {
+        this.parentId = parentId;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getTitle() {
@@ -46,27 +61,19 @@ public class WebPage {
         this.title = title;
     }
 
-    public List<Folder> getChildPages() {
+    public List<AlfFolder> getChildPages() {
         return childPages;
     }
 
-    public void setChildPages(List<Folder> childPages) {
+    public void setChildPages(List<AlfFolder> childPages) {
         this.childPages = childPages;
     }
 
-    public List<String> getContent() {
-        return content;
+    public List<AlfContent> getContents() {
+        return contents;
     }
 
-    public void setContent(List<String> content) {
-        this.content = content;
-    }
-
-    public String getParentPath() {
-        return parentPath;
-    }
-
-    public void setParentPath(String parentPath) {
-        this.parentPath = parentPath;
+    public void setContents(List<AlfContent> contents) {
+        this.contents = contents;
     }
 }

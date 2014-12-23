@@ -22,7 +22,6 @@ public class AlfrescoRemoteConnection implements RemoteConnection {
     private String password;
     private String alfrescoUrl;
     private String cmisEntryPoint;
-    private String alfrescoHomepage;
 
     private Session session = null;
 
@@ -70,7 +69,4 @@ public class AlfrescoRemoteConnection implements RemoteConnection {
         return session;
     }
 
-    public void setAlfrescoHomepage(String alfrescoHomepage) {
-        this.alfrescoHomepage = alfrescoHomepage;
-    }
 }

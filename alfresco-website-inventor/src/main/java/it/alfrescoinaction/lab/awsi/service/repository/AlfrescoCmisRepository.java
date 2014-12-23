@@ -3,17 +3,11 @@ package it.alfrescoinaction.lab.awsi.service.repository;
 import it.alfrescoinaction.lab.awsi.domain.WebPage;
 import it.alfrescoinaction.lab.awsi.service.AlfrescoRemoteConnection;
 import it.alfrescoinaction.lab.awsi.service.RemoteConnection;
-import org.apache.chemistry.opencmis.client.api.CmisObject;
-import org.apache.chemistry.opencmis.client.api.Folder;
-import org.apache.chemistry.opencmis.client.api.ItemIterable;
-import org.apache.chemistry.opencmis.client.api.Session;
+import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 @Repository
 public class AlfrescoCmisRepository implements CmisRepository {
@@ -25,26 +19,29 @@ public class AlfrescoCmisRepository implements CmisRepository {
 
     /**
      * Build the domain object representing a webpage
-     * @param path the path of the page to build
+     * @param id the id of the page to build
      * @return the WebPage object
      * @throws CmisObjectNotFoundException
      */
-    public WebPage buildWebPage (String path) throws CmisObjectNotFoundException{
+    public WebPage buildWebPage (String id) throws CmisObjectNotFoundException{
 
         WebPage wp = new WebPage();
 
         Session session = connection.getSession();
 
-        CmisObject obj = session.getObjectByPath(alfrescoHomePath + path);
+        if (id.equals("home")) {
+            id = session.getObjectByPath(alfrescoHomePath).getId();
+        }
+
+        CmisObject obj = session.getObject(id);
 
         if (obj.getType().getId().equals("cmis:folder")){
 
             Folder folder = (Folder)obj;
-            wp.setPath(path);
+            wp.setId(id);
 
-            // retrieve the parent path
-            String ppath = Paths.get (path).getParent().toString().replace("\\","/");
-            wp.setParentPath(ppath);
+            // retrieve the parent id
+            wp.setParentId(folder.getParentId());
 
             wp.setTitle(obj.getName());
             ItemIterable<CmisObject> children = folder.getChildren();
@@ -52,10 +49,12 @@ public class AlfrescoCmisRepository implements CmisRepository {
                 // path relative to the homepage
 
                 if (cmiso.getType().getId().equals("cmis:folder")) {
-                    wp.addPage(cmiso.getName(), wp.getPath()+ cmiso.getName());
+                    wp.addPage(cmiso.getName(),cmiso.getId());
                 }
                 else if (cmiso.getType().getId().equals("cmis:document")) {
-
+                    Document doc = (Document)cmiso;
+                    //cmis:contentStreamMimeType;
+                    wp.addContent(cmiso.getName(),cmiso.getId());
                 }
 
 

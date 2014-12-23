@@ -22,7 +22,6 @@
         <property name="password" value="${alf.password}"/>
         <property name="alfrescoUrl" value="${alf.alfresco_url}"/>
         <property name="cmisEntryPoint" value="${alf.cmis_entrypoint}"/>
-
     </bean>
 
     <bean id="alfrescoCmisRepository" class="it.alfrescoinaction.lab.awsi.service.repository.AlfrescoCmisRepository" >
