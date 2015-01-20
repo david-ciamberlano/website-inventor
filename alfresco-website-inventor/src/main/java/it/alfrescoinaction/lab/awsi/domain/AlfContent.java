@@ -4,7 +4,7 @@ package it.alfrescoinaction.lab.awsi.domain;
 public class AlfContent {
 
     private String title;
-    private ContentType type = ContentType.ATTACHMENT;
+    private AlfContentType type = AlfContentType.ATTACHMENT;
     private String text;
     private String imgUrl;
 
@@ -16,11 +16,11 @@ public class AlfContent {
         this.title = title;
     }
 
-    public ContentType getType() {
+    public AlfContentType getType() {
         return type;
     }
 
-    public void setType(ContentType type) {
+    public void setType(AlfContentType type) {
         this.type = type;
     }
 

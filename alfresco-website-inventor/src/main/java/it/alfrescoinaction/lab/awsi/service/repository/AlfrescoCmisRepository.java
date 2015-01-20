@@ -54,7 +54,7 @@ public class AlfrescoCmisRepository implements CmisRepository {
                 else if (cmiso.getType().getId().equals("cmis:document")) {
                     Document doc = (Document)cmiso;
                     //cmis:contentStreamMimeType;
-                    wp.addContent(cmiso.getName(),cmiso.getId());
+                    wp.addContent(doc);
                 }
 
 

@@ -19,7 +19,11 @@
     <h2>Contenuti</h2>
     <ul>
         <c:forEach items="${contents}" var="content">
-            <li>${content.getTitle()}</li>
+            <li>
+                <h1>${content.getTitle()}</h1>
+                <p>${content.getText()}</p>
+
+            </li>
         </c:forEach>
     </ul>
 </body>

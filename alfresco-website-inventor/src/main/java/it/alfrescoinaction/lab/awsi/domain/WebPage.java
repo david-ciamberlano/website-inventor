@@ -1,5 +1,13 @@
 package it.alfrescoinaction.lab.awsi.domain;
 
+import org.apache.chemistry.opencmis.client.api.Document;
+import org.apache.chemistry.opencmis.commons.impl.IOUtils;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,10 +33,37 @@ public class WebPage {
         childPages.add(alfFolder);
     }
 
-    public void addContent (String name, String id) {
+    public void addContent (Document doc) {
+
         AlfContent alfContent = new AlfContent();
 
-        alfContent.setTitle(name);
+        alfContent.setTitle( doc.getName());
+
+        switch (doc.getContentStreamMimeType()) {
+
+            case "text/plain":
+
+                alfContent.setType(AlfContentType.TEXT);
+
+                try (InputStream in =  doc.getContentStream().getStream()) {
+
+                    String text = IOUtils.readAllLines(in);
+                    alfContent.setText(text);
+                }
+                catch (Exception ioe) {
+                    //TODO log
+                }
+                break;
+
+            case "image/jpeg":
+
+                alfContent.setType(AlfContentType.IMAGE);
+
+
+
+                break;
+        }
+
 
         contents.add(alfContent);
 
