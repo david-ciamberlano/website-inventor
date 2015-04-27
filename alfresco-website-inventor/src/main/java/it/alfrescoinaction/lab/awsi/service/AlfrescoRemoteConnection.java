@@ -1,5 +1,6 @@
 package it.alfrescoinaction.lab.awsi.service;
 
+import it.alfrescoinaction.lab.awsi.exceptions.CmisConnectionException;
 import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.chemistry.opencmis.client.api.SessionFactory;
 import org.apache.chemistry.opencmis.client.runtime.SessionFactoryImpl;
@@ -13,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class AlfrescoRemoteConnection implements RemoteConnection {
 
@@ -28,7 +30,7 @@ public class AlfrescoRemoteConnection implements RemoteConnection {
 
     @Override
     public void openSession() {
-        Map<String, String> parameter = new HashMap<String, String>();
+        Map<String, String> parameter = new HashMap<>();
 
         parameter.put(SessionParameter.BROWSER_URL, alfrescoUrl+cmisEntryPoint);
         parameter.put(SessionParameter.BINDING_TYPE, BindingType.BROWSER.value());
@@ -40,8 +42,8 @@ public class AlfrescoRemoteConnection implements RemoteConnection {
             session = factory.getRepositories(parameter).get(0).createSession();
         }
         catch (CmisBaseException ex) {
-            //todo
             logger.debug("Exception"+ ex.getMessage());
+            throw new CmisConnectionException();
         }
 
     }
@@ -65,8 +67,19 @@ public class AlfrescoRemoteConnection implements RemoteConnection {
         this.cmisEntryPoint = cmisEntryPoint;
     }
 
-    public Session getSession() {
-        return session;
+    public Optional<Session> getSession() {
+
+        if (session == null) {
+
+            try {
+                openSession();
+            }
+            catch (CmisBaseException e) {
+                return Optional.empty();
+            }
+        }
+
+        return Optional.of (session);
     }
 
 }

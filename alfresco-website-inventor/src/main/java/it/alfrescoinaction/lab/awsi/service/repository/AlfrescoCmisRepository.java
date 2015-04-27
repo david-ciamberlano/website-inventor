@@ -8,6 +8,8 @@ import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundExcept
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 
 @Repository
 public class AlfrescoCmisRepository implements CmisRepository {
@@ -27,13 +29,17 @@ public class AlfrescoCmisRepository implements CmisRepository {
 
         WebPage wp = new WebPage();
 
-        Session session = connection.getSession();
+        Optional<Session> session = connection.getSession();
 
-        if (id.equals("home")) {
-            id = session.getObjectByPath(alfrescoHomePath).getId();
+        if (!session.isPresent()) {
+            throw new CmisObjectNotFoundException();
         }
 
-        CmisObject obj = session.getObject(id);
+        if (id.equals("home")) {
+            id = session.get().getObjectByPath(alfrescoHomePath).getId();
+        }
+
+        CmisObject obj = session.get().getObject(id);
 
         if (obj.getType().getId().equals("cmis:folder")){
 
