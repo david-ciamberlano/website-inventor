@@ -3,10 +3,19 @@ package it.alfrescoinaction.lab.awsi.domain;
 
 public class AlfContent {
 
+    private String id;
     private String title;
     private AlfContentType type = AlfContentType.ATTACHMENT;
     private String text;
     private String imgUrl;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getTitle() {
         return title;

@@ -22,7 +22,6 @@
             <li>
                 <h1>${content.getTitle()}</h1>
                 <p>${content.getText()}</p>
-
             </li>
         </c:forEach>
     </ul>
