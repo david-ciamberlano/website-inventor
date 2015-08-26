@@ -1,10 +1,10 @@
 package it.alfrescoinaction.lab.awsi.domain;
 
 
-public enum AlfContentType {
+public enum ContentType {
 
     TEXT,
     IMAGE,
-    ATTACHMENT
+    GENERIC
 
 }

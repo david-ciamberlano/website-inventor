@@ -16,54 +16,24 @@ public class WebPage {
     private String id;
     private String title;
     private String parentId;
-    private List<AlfFolder> childPages = new ArrayList<>();
-    private List<AlfContent> contents = new ArrayList<>();
+    private List<Link> links = new ArrayList<>();
+    private List<Content> contents = new ArrayList<>();
 
 
-    public void addPage (String pageName, String pageId) {
+    public void addLinks(String pageName, String pageId) {
 
-        AlfFolder alfFolder = new AlfFolder();
+        Link link = new Link();
 
-        alfFolder.setId(pageId);
-        alfFolder.setName(pageName);
+        link.setId(pageId);
+        link.setName(pageName);
 
-        childPages.add(alfFolder);
+        links.add(link);
     }
 
     public void addContent (Document doc) {
 
-        AlfContent alfContent = new AlfContent();
-
-        alfContent.setId(doc.getId());
-        alfContent.setTitle( doc.getName());
-
-        switch (doc.getContentStreamMimeType()) {
-
-            case "text/plain":
-
-                alfContent.setType(AlfContentType.TEXT);
-
-                try (InputStream in =  doc.getContentStream().getStream()) {
-
-                    String text = IOUtils.readAllLines(in);
-                    alfContent.setText(text);
-                }
-                catch (Exception ioe) {
-                    //TODO log
-                }
-                break;
-
-            case "image/jpeg":
-
-                alfContent.setType(AlfContentType.IMAGE);
-
-                List<Rendition> renditions = doc.getRenditions();
-
-                break;
-        }
-
-
-        contents.add(alfContent);
+        ContentFactory contentFactory = new ContentFactory();
+        contents.add(contentFactory.buildContent(doc));
 
     }
 
@@ -94,19 +64,19 @@ public class WebPage {
         this.title = title;
     }
 
-    public List<AlfFolder> getChildPages() {
-        return childPages;
+    public List<Link> getLinks() {
+        return links;
     }
 
-    public void setChildPages(List<AlfFolder> childPages) {
-        this.childPages = childPages;
+    public void setLinks(List<Link> links) {
+        this.links = links;
     }
 
-    public List<AlfContent> getContents() {
+    public List<Content> getContents() {
         return contents;
     }
 
-    public void setContents(List<AlfContent> contents) {
+    public void setContents(List<Content> contents) {
         this.contents = contents;
     }
 }

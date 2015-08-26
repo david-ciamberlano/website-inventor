@@ -17,10 +17,10 @@ public class MainController {
     AlfrescoCmisRepository alfrescoCmisRepository;
 
     @RequestMapping(value="/", method = RequestMethod.GET)
-    public String homepage (Model model) {
+    public String homepage(Model model) {
 
         WebPage wp = alfrescoCmisRepository.buildWebPage("home");
-        model.addAttribute("childPages", wp.getChildPages());
+        model.addAttribute("links", wp.getLinks());
         model.addAttribute("parentPath", wp.getParentId());
 
         return "page";
@@ -30,13 +30,24 @@ public class MainController {
     public String page (Model model, @PathVariable("id") String id) {
 
         WebPage wp = alfrescoCmisRepository.buildWebPage(id);
-        model.addAttribute("childPages", wp.getChildPages());
+        model.addAttribute("childPages", wp.getLinks());
         model.addAttribute("contents", wp.getContents());
         model.addAttribute("parentId", wp.getParentId());
 
         return "page";
     }
 
+
+//    @RequestMapping(value = "user/avatar/{userId}", method = RequestMethod.GET)
+//    @ResponseBody
+//    public ResponseEntity<InputStreamResource> downloadUserAvatarImage(@PathVariable Long userId) {
+//        GridFSDBFile gridFsFile = fileService.findUserAccountAvatarById(userId);
+//
+//        return ResponseEntity.ok()
+//                .contentLength(gridFsFile.getLength())
+//                .contentType(MediaType.parseMediaType(gridFsFile.getContentType()))
+//                .body(new InputStreamResource(gridFsFile.getInputStream()));
+//    }
 
 
 }

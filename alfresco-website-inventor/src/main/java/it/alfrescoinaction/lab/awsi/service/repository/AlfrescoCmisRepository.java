@@ -29,18 +29,19 @@ public class AlfrescoCmisRepository implements CmisRepository {
 
         WebPage wp = new WebPage();
 
-        Optional<Session> session = connection.getSession();
+        Session session = connection.getSession();
 
-        if (!session.isPresent()) {
+        if (session != null) {
             throw new CmisObjectNotFoundException();
         }
 
         if (id.equals("home")) {
-            id = session.get().getObjectByPath(alfrescoHomePath).getId();
+            id = session.getObjectByPath(alfrescoHomePath).getId();
         }
 
-        CmisObject obj = session.get().getObject(id);
+        CmisObject obj = session.getObject(id);
 
+        // procceed only if the node is a folder
         if (obj.getType().getId().equals("cmis:folder")){
 
             Folder folder = (Folder)obj;
@@ -48,24 +49,22 @@ public class AlfrescoCmisRepository implements CmisRepository {
 
             // retrieve the parent id
             wp.setParentId(folder.getParentId());
-
             wp.setTitle(obj.getName());
-            ItemIterable<CmisObject> children = folder.getChildren();
+
+            OperationContext oc = session.createOperationContext();
+            oc.setRenditionFilterString("*");
+            ItemIterable<CmisObject> children = folder.getChildren(oc);
+
             for (CmisObject cmiso : children) {
                 // path relative to the homepage
-
                 if (cmiso.getType().getId().equals("cmis:folder")) {
-                    wp.addPage(cmiso.getName(),cmiso.getId());
+                    wp.addLinks(cmiso.getName(), cmiso.getId());
                 }
                 else if (cmiso.getType().getId().equals("cmis:document")) {
                     Document doc = (Document)cmiso;
-                    //cmis:contentStreamMimeType;
                     wp.addContent(doc);
                 }
-
-
             }
-
         }
 
         return wp;

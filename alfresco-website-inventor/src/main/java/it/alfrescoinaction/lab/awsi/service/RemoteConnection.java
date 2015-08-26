@@ -9,5 +9,5 @@ public interface RemoteConnection {
 
     void openSession ();
 
-    Optional<Session> getSession();
+    Session getSession();
 }

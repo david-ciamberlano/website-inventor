@@ -11,8 +11,8 @@
     <h2>Pagine:</h2>
     <ul>
         <li><a href="<spring:url value="/p/${parentId}" />">..</a></li>
-        <c:forEach items="${childPages}" var="child">
-            <li><a href="<spring:url value="/p/${child.getId()}" />">${child.getName()}</a></li>
+        <c:forEach items="${links}" var="link">
+            <li><a href="<spring:url value="/p/${link.getId()}" />">${link.getName()}</a></li>
         </c:forEach>
     </ul>
 

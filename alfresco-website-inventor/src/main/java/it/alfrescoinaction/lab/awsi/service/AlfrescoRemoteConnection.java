@@ -1,6 +1,7 @@
 package it.alfrescoinaction.lab.awsi.service;
 
 import it.alfrescoinaction.lab.awsi.exceptions.CmisConnectionException;
+import org.apache.chemistry.opencmis.client.api.OperationContext;
 import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.chemistry.opencmis.client.api.SessionFactory;
 import org.apache.chemistry.opencmis.client.runtime.SessionFactoryImpl;
@@ -67,7 +68,7 @@ public class AlfrescoRemoteConnection implements RemoteConnection {
         this.cmisEntryPoint = cmisEntryPoint;
     }
 
-    public Optional<Session> getSession() {
+    public Session getSession() {
 
         if (session == null) {
 
@@ -75,11 +76,11 @@ public class AlfrescoRemoteConnection implements RemoteConnection {
                 openSession();
             }
             catch (CmisBaseException e) {
-                return Optional.empty();
+                return null;
             }
         }
 
-        return Optional.of (session);
+        return session;
     }
 
 }

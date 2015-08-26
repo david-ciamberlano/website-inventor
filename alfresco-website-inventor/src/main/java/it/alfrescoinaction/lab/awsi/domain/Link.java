@@ -1,10 +1,10 @@
 package it.alfrescoinaction.lab.awsi.domain;
 
 
-public class AlfFolder {
+public class Link {
 
-    private String name;
-    private String id;
+    private String id = "";
+    private String name = "";
 
     public String getName() {
         return name;
