@@ -28,4 +28,7 @@
         <property name="alfrescoHomePath" value="${alf.homepage}"/>
     </bean>
 
+    <bean id="service" class="it.alfrescoinaction.lab.awsi.service.Service" >
+    </bean>
+
 </beans>

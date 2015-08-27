@@ -46,11 +46,23 @@ public class AlfrescoRemoteConnection implements RemoteConnection {
             logger.debug("Exception"+ ex.getMessage());
             throw new CmisConnectionException();
         }
-
     }
 
 
+    public Session getSession() {
 
+        if (session == null) {
+
+            try {
+                openSession();
+            }
+            catch (CmisBaseException e) {
+                return null;
+            }
+        }
+
+        return session;
+    }
 
     public void setUsername(String username) {
         this.username = username;
@@ -66,21 +78,6 @@ public class AlfrescoRemoteConnection implements RemoteConnection {
 
     public void setCmisEntryPoint(String cmisEntryPoint) {
         this.cmisEntryPoint = cmisEntryPoint;
-    }
-
-    public Session getSession() {
-
-        if (session == null) {
-
-            try {
-                openSession();
-            }
-            catch (CmisBaseException e) {
-                return null;
-            }
-        }
-
-        return session;
     }
 
 }

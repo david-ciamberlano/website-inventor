@@ -36,8 +36,8 @@ public class ContentFactory {
             }
 
             case "image/png": {
-
-                break;
+                Image imageContent = new Image(doc.getId(),doc.getName(),doc.getDescription(),doc.getContentStreamMimeType());
+                return imageContent;
             }
 
             default: {
@@ -47,6 +47,5 @@ public class ContentFactory {
             }
         }
 
-        return null;
     }
 }

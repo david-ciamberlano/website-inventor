@@ -1,11 +1,20 @@
 package it.alfrescoinaction.lab.awsi.service.repository;
 
 
-import it.alfrescoinaction.lab.awsi.domain.WebPage;
+import org.apache.chemistry.opencmis.client.api.CmisObject;
+import org.apache.chemistry.opencmis.client.api.Document;
+import org.apache.chemistry.opencmis.client.api.Folder;
+import org.apache.chemistry.opencmis.client.api.ItemIterable;
+
+import java.util.NoSuchElementException;
 
 
 public interface CmisRepository {
 
-    WebPage buildWebPage (String path);
+    Folder getFolderById(String id) throws NoSuchElementException;
+
+    ItemIterable<CmisObject> getChildren (Folder folder);
+
+    Document getDocumentById(String id) throws NoSuchElementException;
 
 }

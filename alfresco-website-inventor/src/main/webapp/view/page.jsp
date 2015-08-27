@@ -8,6 +8,8 @@
     <title></title>
 </head>
 <body>
+    <h1></h1>
+
     <h2>Pagine:</h2>
     <ul>
         <li><a href="<spring:url value="/p/${parentId}" />">..</a></li>
@@ -19,9 +21,12 @@
     <h2>Contenuti</h2>
     <ul>
         <c:forEach items="${contents}" var="content">
-            <li>
-                <h1>${content.getTitle()}</h1>
+                <h1>${content.getName()}</h1>
                 <p>${content.getText()}</p>
+                <p>${content.getUrl()}</p>
+                <c:if test="${content.getType2() == 'IMAGE'}">
+                    <img src="/proxy/${content.getId()}"/>
+                </c:if>
             </li>
         </c:forEach>
     </ul>

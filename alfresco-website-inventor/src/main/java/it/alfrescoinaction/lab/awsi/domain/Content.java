@@ -1,6 +1,6 @@
 package it.alfrescoinaction.lab.awsi.domain;
 
-interface Content {
+public interface Content {
 
     String getId();
     String getName();
@@ -10,5 +10,6 @@ interface Content {
     String getThumbnail();
     String getUrl();
     ContentType getType();
+    String getType2();
 
 }
