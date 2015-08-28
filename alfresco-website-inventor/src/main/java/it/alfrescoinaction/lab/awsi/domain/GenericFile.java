@@ -9,7 +9,7 @@ public class GenericFile implements Content {
     private String mimeType;
     private String thumbnail = "";
     private String url = "";
-    private ContentType type;
+    private ContentType type = ContentType.GENERIC;
 
     public GenericFile (String id, String name, String description, String mimeType) {
 
@@ -82,7 +82,7 @@ public class GenericFile implements Content {
         return type;
     }
 
-    public void setType(ContentType type) {
-        this.type = type;
+    public String getType2() {
+        return "GENERIC";
     }
 }

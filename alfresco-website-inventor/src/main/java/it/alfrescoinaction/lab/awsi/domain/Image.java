@@ -8,7 +8,7 @@ public class Image implements Content {
     private String mimeType;
     private String thumbnail;
     private String url;
-    private ContentType type;
+    private ContentType type  = ContentType.IMAGE;
 
     public Image (String id, String name, String description, String mimeType) {
 
@@ -82,7 +82,7 @@ public class Image implements Content {
         return type;
     }
 
-    public void setType(ContentType type) {
-        this.type = type;
+    public String getType2() {
+        return "IMAGE";
     }
 }
