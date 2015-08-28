@@ -14,7 +14,6 @@ public class ContentFactory {
         switch (doc.getContentStreamMimeType()) {
 
             case "text/plain": {
-
                 Text textContent = new Text(doc.getId(),doc.getName(),doc.getDescription(),doc.getContentStreamMimeType());
 
                 try (InputStream in =  doc.getContentStream().getStream()) {
@@ -29,16 +28,15 @@ public class ContentFactory {
                return textContent;
             }
 
-            case "image/jpeg": {
-                Image imageContent = new Image(doc.getId(),doc.getName(),doc.getDescription(),doc.getContentStreamMimeType());
-
-                return imageContent;
-            }
-
+            case "image/jpeg":
             case "image/png": {
                 Image imageContent = new Image(doc.getId(),doc.getName(),doc.getDescription(),doc.getContentStreamMimeType());
+
+                imageContent.setThumbnailId(doc.getRenditions().get(0).getStreamId());
+
                 return imageContent;
             }
+
 
             default: {
                 // caso di file generico

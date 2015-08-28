@@ -6,29 +6,40 @@
 <html>
 <head>
     <title></title>
+    <link rel="stylesheet" href="/resource/bootstrap-3.3.5-dist/css/bootstrap.css">
 </head>
 <body>
     <h1></h1>
 
     <h2>Pagine:</h2>
-    <ul>
-        <li><a href="<spring:url value="/p/${parentId}" />">..</a></li>
+    <nav>
+        <div><a href="<spring:url value="/p/${parentId}" />">..</a></div>
         <c:forEach items="${links}" var="link">
-            <li><a href="<spring:url value="/p/${link.getId()}" />">${link.getName()}</a></li>
+            <div><a href="<spring:url value="/p/${link.getId()}" />">${link.getName()}</a></div>
         </c:forEach>
-    </ul>
+    </nav>
 
     <h2>Contenuti</h2>
-    <ul>
+    <section>
         <c:forEach items="${contents}" var="content">
-                <h1>${content.getName()}</h1>
-                <p>${content.getText()}</p>
-                <p>${content.getUrl()}</p>
-                <c:if test="${content.getType2() == 'IMAGE'}">
-                    <img src="/proxy/${content.getId()}"/>
-                </c:if>
-            </li>
+            <c:if test="${content.getType2() == 'IMAGE'}">
+                <figure style="display: inline-block">
+                    <a href="<spring:url value="/proxy/${content.id}" />" >
+                        <img src="<spring:url value="/proxy/${content.getThumbnailId()}" />" alt="${content.getName()}"/>
+                    </a>
+                    <figcaption>${content.getName()}</figcaption>
+                </figure>
+            </c:if>
+            <c:if test="${content.getType2() != 'IMAGE'}">
+                <article>
+                    <a href="<spring:url value="/proxy/${content.id}" />" >
+                        <h2>${content.getName()}</h2>
+                    </a>
+                    <p>${content.getText()}</p>
+                </article>
+            </c:if>
+
         </c:forEach>
-    </ul>
+    </section>
 </body>
 </html>

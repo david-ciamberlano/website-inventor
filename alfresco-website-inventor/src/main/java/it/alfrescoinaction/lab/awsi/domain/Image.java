@@ -6,7 +6,7 @@ public class Image implements Content {
     private String name;
     private String description;
     private String mimeType;
-    private String thumbnail;
+    private String thumbnailId;
     private String url;
     private ContentType type  = ContentType.IMAGE;
 
@@ -60,12 +60,12 @@ public class Image implements Content {
     }
 
     @Override
-    public String getThumbnail() {
-        return thumbnail;
+    public String getThumbnailId() {
+        return thumbnailId;
     }
 
-    public void setThumbnail(String thumbnail) {
-        this.thumbnail = thumbnail;
+    public void setThumbnailId(String thumbnailId) {
+        this.thumbnailId = thumbnailId;
     }
 
     @Override

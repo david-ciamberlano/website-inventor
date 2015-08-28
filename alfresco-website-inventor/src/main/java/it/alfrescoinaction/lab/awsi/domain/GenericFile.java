@@ -7,7 +7,7 @@ public class GenericFile implements Content {
     private String name;
     private String description;
     private String mimeType;
-    private String thumbnail = "";
+    private String thumbnailId = "";
     private String url = "";
     private ContentType type = ContentType.GENERIC;
 
@@ -61,12 +61,13 @@ public class GenericFile implements Content {
         this.text = text;
     }
 
-    public String getThumbnail() {
-        return this.thumbnail;
+    @Override
+    public String getThumbnailId() {
+        return thumbnailId;
     }
 
-    public void setThumbnail(String thumbnail) {
-        this.thumbnail = thumbnail;
+    public void setThumbnailId(String thumbnailId) {
+        this.thumbnailId = thumbnailId;
     }
 
     public String getUrl() {

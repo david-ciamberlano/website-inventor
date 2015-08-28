@@ -7,7 +7,7 @@ public interface Content {
     String getDescription();
     String getMimeType();
     String getText();
-    String getThumbnail();
+    String getThumbnailId();
     String getUrl();
     ContentType getType();
     String getType2();

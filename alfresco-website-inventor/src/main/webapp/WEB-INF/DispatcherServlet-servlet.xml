@@ -16,6 +16,7 @@
         <property name="prefix" value="/view/"/>
         <property name="suffix" value=".jsp"/>
     </bean>
+    <mvc:resources mapping="/resource/**" location="/resources/" />
 
     <bean class="it.alfrescoinaction.lab.awsi.service.AlfrescoRemoteConnection" init-method="openSession">
         <property name="username" value="${alf.username}"/>

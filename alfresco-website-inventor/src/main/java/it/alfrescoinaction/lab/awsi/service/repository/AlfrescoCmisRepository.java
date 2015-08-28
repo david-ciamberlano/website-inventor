@@ -41,7 +41,7 @@ public class AlfrescoCmisRepository implements CmisRepository {
 
         CmisObject obj = session.getObject(id);
 
-        if (obj.getType().getId().equals("cmis:document")){
+        if (obj.getType().getId().equals("cmis:document") || obj.getType().getId().equals("D:cm:thumbnail")){
             Document doc = (Document)obj;
             return doc;
         }
@@ -51,7 +51,6 @@ public class AlfrescoCmisRepository implements CmisRepository {
     }
 
     public ItemIterable<CmisObject> getChildren (Folder folder) {
-
         Session session = connection.getSession();
         OperationContext oc = session.createOperationContext();
         oc.setRenditionFilterString("*");
