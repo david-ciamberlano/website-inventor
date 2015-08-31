@@ -1,25 +1,24 @@
 package it.alfrescoinaction.lab.awsi.domain;
 
-public class GenericFile implements Content {
+public class ContentImpl implements Content{
 
-    private String text = "";
+    private String text;
     private String id;
     private String name;
     private String description;
     private String mimeType;
-    private String thumbnailId = "";
-    private String url = "";
-    private ContentType type = ContentType.GENERIC;
+    private String thumbnailId;
+    private ContentType type;
 
-    public GenericFile (String id, String name, String description, String mimeType) {
-
+    public ContentImpl(String id, String name, String description, String mimeType, ContentType type) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.mimeType = mimeType;
+        this.type = type;
     }
 
-
+    @Override
     public String getId() {
         return id;
     }
@@ -28,6 +27,7 @@ public class GenericFile implements Content {
         this.id = id;
     }
 
+    @Override
     public String getName() {
         return this.name;
     }
@@ -36,7 +36,7 @@ public class GenericFile implements Content {
         this.name = name;
     }
 
-
+    @Override
     public String getDescription() {
         return this.description;
     }
@@ -45,6 +45,7 @@ public class GenericFile implements Content {
         this.description = description;
     }
 
+    @Override
     public String getMimeType() {
         return this.mimeType;
     }
@@ -53,10 +54,12 @@ public class GenericFile implements Content {
         this.mimeType = mimeType;
     }
 
+    @Override
     public String getText() {
         return this.text;
     }
 
+    @Override
     public void setText(String text) {
         this.text = text;
     }
@@ -66,16 +69,9 @@ public class GenericFile implements Content {
         return thumbnailId;
     }
 
+    @Override
     public void setThumbnailId(String thumbnailId) {
         this.thumbnailId = thumbnailId;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
     }
 
     @Override
@@ -83,7 +79,5 @@ public class GenericFile implements Content {
         return type;
     }
 
-    public String getType2() {
-        return "GENERIC";
-    }
+
 }

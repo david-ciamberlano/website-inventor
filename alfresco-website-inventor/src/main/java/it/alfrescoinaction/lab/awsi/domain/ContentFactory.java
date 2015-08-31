@@ -1,11 +1,9 @@
 package it.alfrescoinaction.lab.awsi.domain;
 
 import org.apache.chemistry.opencmis.client.api.Document;
-import org.apache.chemistry.opencmis.client.api.Rendition;
 import org.apache.chemistry.opencmis.commons.impl.IOUtils;
 
 import java.io.InputStream;
-import java.util.List;
 
 public class ContentFactory {
 
@@ -14,7 +12,7 @@ public class ContentFactory {
         switch (doc.getContentStreamMimeType()) {
 
             case "text/plain": {
-                Text textContent = new Text(doc.getId(),doc.getName(),doc.getDescription(),doc.getContentStreamMimeType());
+                Content textContent = new ContentImpl(doc.getId(),doc.getName(),doc.getDescription(),doc.getContentStreamMimeType(), ContentType.TEXT);
 
                 try (InputStream in =  doc.getContentStream().getStream()) {
                     String text = IOUtils.readAllLines(in);
@@ -30,18 +28,24 @@ public class ContentFactory {
 
             case "image/jpeg":
             case "image/png": {
-                Image imageContent = new Image(doc.getId(),doc.getName(),doc.getDescription(),doc.getContentStreamMimeType());
+                // caso di file generico
+                Content content = new ContentImpl(doc.getId(),doc.getName(),doc.getDescription(),doc.getContentStreamMimeType(),ContentType.IMAGE);
+                if (doc.getRenditions().size() > 0) {
+                    content.setThumbnailId(doc.getRenditions().get(0).getStreamId());
+                }
 
-                imageContent.setThumbnailId(doc.getRenditions().get(0).getStreamId());
-
-                return imageContent;
+                return content;
             }
 
 
             default: {
                 // caso di file generico
-                GenericFile genericFile = new GenericFile(doc.getId(),doc.getName(),doc.getDescription(),doc.getContentStreamMimeType());
-                return genericFile;
+                Content content = new ContentImpl(doc.getId(),doc.getName(),doc.getDescription(),doc.getContentStreamMimeType(), ContentType.GENERIC);
+                if (doc.getRenditions().size() > 0) {
+                    content.setThumbnailId(doc.getRenditions().get(0).getStreamId());
+                }
+
+                return content;
             }
         }
 
