@@ -1,11 +1,12 @@
 package it.alfrescoinaction.lab.awsi.domain;
 
+
 public class ContentImpl implements Content{
 
-    private String text;
     private String id;
     private String name;
     private String description;
+    private String text;
     private String mimeType;
     private String thumbnailId;
     private ContentType type;

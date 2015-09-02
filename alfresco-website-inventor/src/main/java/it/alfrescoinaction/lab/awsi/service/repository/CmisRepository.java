@@ -17,4 +17,6 @@ public interface CmisRepository {
 
     Document getDocumentById(String id) throws NoSuchElementException;
 
+    ItemIterable<CmisObject> getCategories();
+
 }

@@ -5,6 +5,7 @@ public enum ContentType {
 
     TEXT,
     IMAGE,
-    GENERIC;
+    GENERIC,
+    TEXT_HEADER
 
 }
