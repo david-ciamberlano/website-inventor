@@ -34,7 +34,9 @@
         <aside class="col-sm-3">
             <nav>
                 <ul  class="nav nav-pills nav-stacked">
-                    <li role="presentation"><a href="<spring:url value="/p/${parentId}" />"><span class="glyphicon glyphicon-circle-arrow-up"></span></a></li>
+                    <li role="presentation"><a href="<spring:url value="/p/${parentId}" />">
+                        <span class="glyphicon glyphicon-circle-arrow-up"></span></a>
+                    </li>
                     <c:forEach items="${links}" var="link">
                         <li role="presentation"><a href="<spring:url value="/p/${link.getId()}" />">${link.getName()}</a></li>
                     </c:forEach>

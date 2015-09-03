@@ -29,7 +29,7 @@ public class WebPageManager {
         Folder folder = repository.getFolderById(id);
         boolean isHomepage = alfrescoHomePath.equals(folder.getPath());
 
-        WebPage wp = new WebPage(id, folder.getParentId(),folder.getName(),isHomepage);
+        WebPage wp = new WebPage(id, folder.getName(), folder.getParentId(), isHomepage);
 
         ItemIterable<CmisObject> children = repository.getChildren(folder);
         for (CmisObject cmiso : children) {
