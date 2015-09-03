@@ -29,6 +29,7 @@ public class MainController {
 
         WebPage wp = service.buildWebPage("home");
         model.addAttribute("links", wp.getLinks());
+        model.addAttribute("categories", wp.getCategories());
         model.addAttribute("parentPath", wp.getParentId());
 
         return "page";
@@ -40,8 +41,10 @@ public class MainController {
         WebPage wp = service.buildWebPage(id);
         model.addAttribute("title",wp.getTitle());
         model.addAttribute("links", wp.getLinks());
+        model.addAttribute("categories", wp.getCategories());
         model.addAttribute("contents", wp.getContents());
         model.addAttribute("parentId", wp.getParentId());
+        model.addAttribute("specialContent", wp.getSpecialContent());
 
         return "page";
     }
@@ -52,6 +55,7 @@ public class MainController {
         Downloadable downloadable = service.getDownloadable(id);
 
         return ResponseEntity.ok()
+            .header("content-disposition", "attachment; filename=\"" + downloadable.getName() + "\"")
             .contentLength(downloadable.getContentLength())
             .contentType(MediaType.parseMediaType(downloadable.getMimeType()))
             .body(new InputStreamResource(downloadable.getStream()));

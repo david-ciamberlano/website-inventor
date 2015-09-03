@@ -1,7 +1,6 @@
 package it.alfrescoinaction.lab.awsi.service;
 
 import it.alfrescoinaction.lab.awsi.exceptions.CmisConnectionException;
-import org.apache.chemistry.opencmis.client.api.OperationContext;
 import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.chemistry.opencmis.client.api.SessionFactory;
 import org.apache.chemistry.opencmis.client.runtime.SessionFactoryImpl;
@@ -15,7 +14,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 public class AlfrescoRemoteConnection implements RemoteConnection {
 

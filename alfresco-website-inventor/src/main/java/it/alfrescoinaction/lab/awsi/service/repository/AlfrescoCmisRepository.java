@@ -17,6 +17,22 @@ public class AlfrescoCmisRepository implements CmisRepository {
 
     private String alfrescoHomePath;
 
+    public ItemIterable<CmisObject> getCategories() {
+        Session session = connection.getSession();
+        CmisObject obj = session.getObjectByPath(alfrescoHomePath);
+
+        // procceed only if the node is a folder
+        if (obj.getType().getId().equals("cmis:folder")){
+            Folder folder = (Folder)obj;
+            ItemIterable<CmisObject> children = folder.getChildren();
+
+            return children;
+        }
+        else {
+            throw new NoSuchElementException("Home folder not found: " + alfrescoHomePath);
+        }
+    }
+
     public Folder getFolderById(String id) throws NoSuchElementException {
         Session session = connection.getSession();
 

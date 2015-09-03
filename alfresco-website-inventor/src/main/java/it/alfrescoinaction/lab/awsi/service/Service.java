@@ -32,13 +32,30 @@ public class Service {
         ItemIterable<CmisObject> children = repository.getChildren(folder);
         for (CmisObject cmiso : children) {
             // path relative to the homepage
-            if (cmiso.getType().getId().equals("cmis:folder")) {
-                wp.addLinks(cmiso.getName(), cmiso.getId());
+            switch(cmiso.getType().getId()) {
+                case "cmis:folder": {
+                    wp.addLinks(cmiso.getName(), cmiso.getId());
+                    break;
+                }
+
+                case "cmis:document": {
+                    Document doc = (Document)cmiso;
+                    switch (doc.getName()) {
+                        case ".header.txt": {
+                            wp.addSpecialContent("text_header", doc);
+                            break;
+                        }
+                        default:{
+                            wp.addContent(doc);
+                        }
+                    }
+                }
             }
-            else if (cmiso.getType().getId().equals("cmis:document")) {
-                Document doc = (Document)cmiso;
-                wp.addContent(doc);
-            }
+        }
+
+        ItemIterable<CmisObject> categories = repository.getCategories();
+        for (CmisObject cmiso : categories) {
+            wp.addCategory(cmiso.getName(), cmiso.getId());
         }
 
         return wp;
@@ -48,7 +65,7 @@ public class Service {
 
         Document doc = repository.getDocumentById(id);
 
-        return new Downloadable(doc.getContentStream().getStream(),doc.getContentStreamLength(),doc.getContentStreamMimeType());
+        return new Downloadable(doc.getName(),doc.getContentStream().getStream(),doc.getContentStreamLength(),doc.getContentStreamMimeType());
 
     }
 }
