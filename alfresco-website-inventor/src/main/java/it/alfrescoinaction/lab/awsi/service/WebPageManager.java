@@ -6,11 +6,17 @@ import it.alfrescoinaction.lab.awsi.service.repository.CmisRepository;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
-public class Service {
+@Service
+public class WebPageManager {
 
     @Autowired
     CmisRepository repository;
+
+    @Value("${alf.homepage}")
+    private String alfrescoHomePath;
 
     /**
      * Build the domain object representing a webpage
@@ -21,13 +27,9 @@ public class Service {
     public WebPage buildWebPage(String id) throws CmisObjectNotFoundException{
 
         Folder folder = repository.getFolderById(id);
+        boolean isHomepage = alfrescoHomePath.equals(folder.getPath());
 
-        WebPage wp = new WebPage();
-
-        wp.setId(id);
-        // retrieve the parent id
-        wp.setParentId(folder.getParentId());
-        wp.setTitle(folder.getName());
+        WebPage wp = new WebPage(id, folder.getParentId(),folder.getName(),isHomepage);
 
         ItemIterable<CmisObject> children = repository.getChildren(folder);
         for (CmisObject cmiso : children) {

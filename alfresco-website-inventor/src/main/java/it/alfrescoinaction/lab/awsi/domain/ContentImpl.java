@@ -1,5 +1,6 @@
 package it.alfrescoinaction.lab.awsi.domain;
 
+
 public class ContentImpl implements Content{
 
     private String id;

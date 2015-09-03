@@ -4,6 +4,7 @@ import it.alfrescoinaction.lab.awsi.service.AlfrescoRemoteConnection;
 import it.alfrescoinaction.lab.awsi.service.RemoteConnection;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import java.util.NoSuchElementException;
@@ -15,6 +16,7 @@ public class AlfrescoCmisRepository implements CmisRepository {
     @Autowired
     private RemoteConnection connection;
 
+    @Value("${alf.homepage}")
     private String alfrescoHomePath;
 
     public ItemIterable<CmisObject> getCategories() {

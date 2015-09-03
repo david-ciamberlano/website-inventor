@@ -1,5 +1,8 @@
-package it.alfrescoinaction.lab.awsi.domain;
+package it.alfrescoinaction.lab.awsi.service;
 
+import it.alfrescoinaction.lab.awsi.domain.Content;
+import it.alfrescoinaction.lab.awsi.domain.ContentImpl;
+import it.alfrescoinaction.lab.awsi.domain.ContentType;
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.commons.impl.IOUtils;
 

@@ -11,6 +11,7 @@
 
     <mvc:annotation-driven />
     <context:component-scan base-package="it.alfrescoinaction.lab.awsi.controller"/>
+    <context:component-scan base-package="it.alfrescoinaction.lab.awsi.service"/>
 
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver" >
         <property name="prefix" value="/view/"/>
@@ -25,12 +26,14 @@
         <property name="cmisEntryPoint" value="${alf.cmis_entrypoint}"/>
     </bean>
 
-    <bean id="alfrescoCmisRepository" class="it.alfrescoinaction.lab.awsi.service.repository.AlfrescoCmisRepository" >
-        <property name="alfrescoHomePath" value="${alf.homepage}"/>
-    </bean>
+    <!--<bean id="alfrescoCmisRepository" class="it.alfrescoinaction.lab.awsi.service.repository.AlfrescoCmisRepository" >-->
+        <!--<property name="alfrescoHomePath" value="${alf.homepage}"/>-->
+    <!--</bean>-->
 
-    <bean id="service" class="it.alfrescoinaction.lab.awsi.service.Service" >
-    </bean>
+    <!--<bean id="service" class="it.alfrescoinaction.lab.awsi.service.WebPageManager" >-->
+    <!--</bean>-->
+
+    <!--<bean id="contentFactory" class="it.alfrescoinaction.lab.awsi.service.ContentFactory"></bean>-->
 
     <bean id="contentFactory" class="it.alfrescoinaction.lab.awsi.domain.ContentFactory"></bean>
 

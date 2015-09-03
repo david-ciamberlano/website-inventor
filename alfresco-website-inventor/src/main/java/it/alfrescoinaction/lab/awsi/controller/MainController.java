@@ -3,7 +3,7 @@ package it.alfrescoinaction.lab.awsi.controller;
 
 import it.alfrescoinaction.lab.awsi.domain.Downloadable;
 import it.alfrescoinaction.lab.awsi.domain.WebPage;
-import it.alfrescoinaction.lab.awsi.service.Service;
+import it.alfrescoinaction.lab.awsi.service.WebPageManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
@@ -22,24 +22,24 @@ import java.io.IOException;
 public class MainController {
 
     @Autowired
-    Service service;
+    WebPageManager webPageManager;
 
     @RequestMapping(value="/", method = RequestMethod.GET)
     public String homepage(Model model) {
-
-        WebPage wp = service.buildWebPage("home");
+        WebPage wp = webPageManager.buildWebPage("home");
         model.addAttribute("links", wp.getLinks());
         model.addAttribute("categories", wp.getCategories());
         model.addAttribute("parentPath", wp.getParentId());
+        model.addAttribute("isHomePage",wp.isHomePage());
 
         return "page";
     }
 
     @RequestMapping(value="/p/{id}", method = RequestMethod.GET)
     public String page(Model model, @PathVariable("id") String id) {
-
-        WebPage wp = service.buildWebPage(id);
+        WebPage wp = webPageManager.buildWebPage(id);
         model.addAttribute("title",wp.getTitle());
+        model.addAttribute("isHomePage",wp.isHomePage());
         model.addAttribute("links", wp.getLinks());
         model.addAttribute("categories", wp.getCategories());
         model.addAttribute("contents", wp.getContents());
@@ -52,7 +52,7 @@ public class MainController {
     @RequestMapping(value = "proxy/{id}", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<InputStreamResource> get(ServletResponse response, @PathVariable("id") String id) throws IOException {
-        Downloadable downloadable = service.getDownloadable(id);
+        Downloadable downloadable = webPageManager.getDownloadable(id);
 
         return ResponseEntity.ok()
             .header("content-disposition", "attachment; filename=\"" + downloadable.getName() + "\"")

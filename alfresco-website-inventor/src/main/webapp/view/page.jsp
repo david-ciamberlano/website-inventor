@@ -14,10 +14,20 @@
 
     </header>
     <nav>
-        <ul class="nav nav-tabs">
-        <c:forEach items="${categories}" var="category">
-            <li role="presentation"><a href="<spring:url value="/p/${category.getId()}" />">${category.getName()}</a></li>
-        </c:forEach>
+        <ul class="nav nav-pills">
+            <li role="presentation">
+                <c:choose>
+                    <c:when test="${isHomePage}">
+                        Home
+                    </c:when>
+                    <c:otherwise>
+                        <a href="<spring:url value="/" />">Home</a>
+                    </c:otherwise>
+                </c:choose>
+            </li>
+            <c:forEach items="${categories}" var="category">
+                <li role="presentation"><a href="<spring:url value="/p/${category.getId()}" />">${category.getName()}</a></li>
+            </c:forEach>
         </ul>
     </nav>
    <div class="row">
