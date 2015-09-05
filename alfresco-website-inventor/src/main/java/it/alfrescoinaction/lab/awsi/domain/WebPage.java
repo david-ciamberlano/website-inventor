@@ -2,6 +2,8 @@ package it.alfrescoinaction.lab.awsi.domain;
 
 import it.alfrescoinaction.lab.awsi.service.ContentFactory;
 import org.apache.chemistry.opencmis.client.api.Document;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,6 +22,8 @@ public class WebPage {
     private List<Link> categories = new ArrayList<>(10);
     private List<Link> links = new ArrayList<>(10);
     private List<Content> contents = new ArrayList<>(20);
+
+    @Autowired
     private ContentFactory contentFactory;
 
     public WebPage(String id, String title, String parentId, boolean homepage) {

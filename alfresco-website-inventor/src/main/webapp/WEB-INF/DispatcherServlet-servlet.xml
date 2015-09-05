@@ -33,7 +33,7 @@
     <!--<bean id="service" class="it.alfrescoinaction.lab.awsi.service.WebPageManager" >-->
     <!--</bean>-->
 
-    <!--<bean id="contentFactory" class="it.alfrescoinaction.lab.awsi.service.ContentFactory"></bean>-->
+    <bean id="contentFactory" class="it.alfrescoinaction.lab.awsi.service.ContentFactory"></bean>
 
     <bean id="contentFactory" class="it.alfrescoinaction.lab.awsi.service.ContentFactory"></bean>
 

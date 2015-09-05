@@ -1,6 +1,5 @@
 package it.alfrescoinaction.lab.awsi.controller;
 
-
 import it.alfrescoinaction.lab.awsi.domain.Downloadable;
 import it.alfrescoinaction.lab.awsi.domain.WebPage;
 import it.alfrescoinaction.lab.awsi.service.WebPageManager;
@@ -27,11 +26,12 @@ public class MainController {
     @RequestMapping(value="/", method = RequestMethod.GET)
     public String homepage(Model model) {
         WebPage wp = webPageManager.buildWebPage("home");
-        model.addAttribute("id",wp.getId());
-        model.addAttribute("links", wp.getLinks());
-        model.addAttribute("categories", wp.getCategories());
-        model.addAttribute("parentPath", wp.getParentId());
-        model.addAttribute("isHomePage",wp.isHomepage());
+//        model.addAttribute("id",wp.getId());
+//        model.addAttribute("links", wp.getLinks());
+//        model.addAttribute("categories", wp.getCategories());
+//        model.addAttribute("parentPath", wp.getParentId());
+//        model.addAttribute("isHomePage",wp.isHomepage());
+        model.addAttribute("webpage",wp);
 
         return "page";
     }
@@ -39,14 +39,15 @@ public class MainController {
     @RequestMapping(value="/p/{id}", method = RequestMethod.GET)
     public String page(Model model, @PathVariable("id") String id) {
         WebPage wp = webPageManager.buildWebPage(id);
-        model.addAttribute("id",wp.getId());
-        model.addAttribute("title",wp.getTitle());
-        model.addAttribute("isHomePage",wp.isHomepage());
-        model.addAttribute("links", wp.getLinks());
-        model.addAttribute("categories", wp.getCategories());
-        model.addAttribute("contents", wp.getContents());
-        model.addAttribute("parentId", wp.getParentId());
-        model.addAttribute("specialContent", wp.getSpecialContent());
+//        model.addAttribute("id",wp.getId());
+//        model.addAttribute("title",wp.getTitle());
+//        model.addAttribute("isHomePage",wp.isHomepage());
+//        model.addAttribute("links", wp.getLinks());
+//        model.addAttribute("categories", wp.getCategories());
+//        model.addAttribute("contents", wp.getContents());
+//        model.addAttribute("parentId", wp.getParentId());
+//        model.addAttribute("specialContent", wp.getSpecialContent());
+        model.addAttribute("webpage",wp);
 
         return "page";
     }
