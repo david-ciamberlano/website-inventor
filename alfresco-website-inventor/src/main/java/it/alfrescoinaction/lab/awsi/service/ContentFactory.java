@@ -40,7 +40,7 @@ public class ContentFactory {
 
             case "image/jpeg":
             case "image/png": {
-                // caso di file generico
+                // image file
                 Content content = new ContentImpl(doc.getId(),doc.getName(),doc.getDescription(),doc.getContentStreamMimeType(),ContentType.IMAGE);
                 if (doc.getRenditions().size() > 0) {
                     content.setThumbnailId(doc.getRenditions().get(0).getStreamId());
@@ -51,7 +51,7 @@ public class ContentFactory {
 
 
             default: {
-                // caso di file generico
+                // generic file
                 Content content = new ContentImpl(doc.getId(),doc.getName(),doc.getDescription(),doc.getContentStreamMimeType(), ContentType.GENERIC);
                 if (doc.getRenditions().size() > 0) {
                     content.setThumbnailId(doc.getRenditions().get(0).getStreamId());
