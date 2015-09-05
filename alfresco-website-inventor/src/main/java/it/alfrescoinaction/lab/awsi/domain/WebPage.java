@@ -2,7 +2,6 @@ package it.alfrescoinaction.lab.awsi.domain;
 
 import it.alfrescoinaction.lab.awsi.service.ContentFactory;
 import org.apache.chemistry.opencmis.client.api.Document;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,19 +15,18 @@ public class WebPage {
     private String id;
     private String title;
     private String parentId;
-    private boolean homePage;
+    private boolean homepage;
     private Map<String,Content> specialContent = new HashMap<>(6);
     private List<Link> categories = new ArrayList<>(10);
     private List<Link> links = new ArrayList<>(10);
     private List<Content> contents = new ArrayList<>(20);
-
     private ContentFactory contentFactory;
 
-    public WebPage(String id, String title, String parentId, boolean homePage) {
+    public WebPage(String id, String title, String parentId, boolean homepage) {
         this.id = id;
         this.title = title;
         this.parentId = parentId;
-        this.homePage = homePage;
+        this.homepage = homepage;
     }
 
     public void addLinks(String pageName, String pageId) {
@@ -61,24 +59,12 @@ public class WebPage {
         return parentId;
     }
 
-    public void setParentId(String parentId) {
-        this.parentId = parentId;
-    }
-
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
     public String getTitle() {
         return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
     }
 
     public List<Link> getLinks() {
@@ -89,9 +75,6 @@ public class WebPage {
         return contents;
     }
 
-    public void setContents(List<Content> contents) {
-        this.contents = contents;
-    }
 
     public List<Link> getCategories(){
         return categories;
@@ -101,7 +84,8 @@ public class WebPage {
         return this.specialContent;
     }
 
-    public boolean isHomePage() {
-        return homePage;
+    public boolean isHomepage() {
+        return homepage;
     }
+
 }

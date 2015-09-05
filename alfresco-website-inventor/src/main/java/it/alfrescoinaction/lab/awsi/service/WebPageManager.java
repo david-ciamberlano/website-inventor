@@ -16,7 +16,7 @@ public class WebPageManager {
     CmisRepository repository;
 
     @Value("${alf.homepage}")
-    private String alfrescoHomePath;
+    String homePagePath;
 
     /**
      * Build the domain object representing a webpage
@@ -27,9 +27,9 @@ public class WebPageManager {
     public WebPage buildWebPage(String id) throws CmisObjectNotFoundException{
 
         Folder folder = repository.getFolderById(id);
-        boolean isHomepage = alfrescoHomePath.equals(folder.getPath());
+        boolean isHomepage = homePagePath.equals(folder.getPath());
 
-        WebPage wp = new WebPage(id, folder.getName(), folder.getParentId(), isHomepage);
+        WebPage wp = new WebPage(id,folder.getName(),folder.getParentId(),isHomepage);
 
         ItemIterable<CmisObject> children = repository.getChildren(folder);
         for (CmisObject cmiso : children) {

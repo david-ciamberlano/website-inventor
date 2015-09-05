@@ -35,4 +35,6 @@
 
     <!--<bean id="contentFactory" class="it.alfrescoinaction.lab.awsi.service.ContentFactory"></bean>-->
 
+    <bean id="contentFactory" class="it.alfrescoinaction.lab.awsi.service.ContentFactory"></bean>
+
 </beans>
