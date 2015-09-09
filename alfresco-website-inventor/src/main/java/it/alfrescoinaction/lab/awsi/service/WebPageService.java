@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
-public class WebPageManager {
+public class WebPageService {
 
     @Autowired
     CmisRepository repository;
@@ -74,9 +74,7 @@ public class WebPageManager {
     }
 
     public Downloadable getDownloadable(String id) {
-
         Document doc = repository.getDocumentById(id);
-
         return new Downloadable(doc.getName(),doc.getContentStream().getStream(),doc.getContentStreamLength(),doc.getContentStreamMimeType());
 
     }
