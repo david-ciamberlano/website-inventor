@@ -13,6 +13,8 @@ public interface CmisRepository {
 
     Folder getFolderById(String id) throws NoSuchElementException;
 
+    String getFolderIdByPath(String path) throws NoSuchElementException;
+
     ItemIterable<CmisObject> getChildren (Folder folder);
 
     Document getDocumentById(String id) throws NoSuchElementException;

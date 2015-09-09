@@ -24,12 +24,16 @@ public class WebPageManager {
      * @return the WebPage object
      * @throws CmisObjectNotFoundException
      */
-    public WebPage buildWebPage(String id) throws CmisObjectNotFoundException{
-
+    public WebPage buildWebPage(String id) throws CmisObjectNotFoundException {
         Folder folder = repository.getFolderById(id);
-        boolean isHomepage = homePagePath.equals(folder.getPath());
 
-        WebPage wp = new WebPage(id,folder.getName(),folder.getParentId(),isHomepage);
+        String folderPath = folder.getPath();
+        boolean isHomepage = homePagePath.equals(folderPath);
+
+        WebPage wp = new WebPage(id, folder.getName(), folder.getParentId(), isHomepage);
+
+        String relativeFolderPath = folderPath.replaceFirst(homePagePath+"/","");
+        wp.buildBreadCrumbs(relativeFolderPath);
 
         ItemIterable<CmisObject> children = repository.getChildren(folder);
         for (CmisObject cmiso : children) {
@@ -61,6 +65,12 @@ public class WebPageManager {
         }
 
         return wp;
+    }
+
+    public String getPageIdByPath(String path) {
+        String folderId = repository.getFolderIdByPath(homePagePath+path);
+
+        return folderId;
     }
 
     public Downloadable getDownloadable(String id) {

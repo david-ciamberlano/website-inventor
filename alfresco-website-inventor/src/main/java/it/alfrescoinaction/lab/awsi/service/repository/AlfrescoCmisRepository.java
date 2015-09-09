@@ -19,6 +19,7 @@ public class AlfrescoCmisRepository implements CmisRepository {
     @Value("${alf.homepage}")
     private String alfrescoHomePath;
 
+    @Override
     public ItemIterable<CmisObject> getCategories() {
         Session session = connection.getSession();
         CmisObject obj = session.getObjectByPath(alfrescoHomePath);
@@ -35,6 +36,7 @@ public class AlfrescoCmisRepository implements CmisRepository {
         }
     }
 
+    @Override
     public Folder getFolderById(String id) throws NoSuchElementException {
         Session session = connection.getSession();
 
@@ -54,6 +56,23 @@ public class AlfrescoCmisRepository implements CmisRepository {
         }
     }
 
+    @Override
+    public String getFolderIdByPath(String path) throws NoSuchElementException {
+        Session session = connection.getSession();
+
+        CmisObject obj = session.getObjectByPath(path);
+
+        // procceed only if the node is a folder
+        if (obj.getType().getId().equals("cmis:folder")){
+            return obj.getId();
+        }
+        else {
+            throw new NoSuchElementException("Folder not found: "  + path);
+        }
+
+    }
+
+    @Override
     public Document getDocumentById(String id) throws NoSuchElementException {
         Session session = connection.getSession();
 
@@ -68,6 +87,7 @@ public class AlfrescoCmisRepository implements CmisRepository {
         }
     }
 
+    @Override
     public ItemIterable<CmisObject> getChildren (Folder folder) {
         Session session = connection.getSession();
         OperationContext oc = session.createOperationContext();

@@ -1,22 +1,25 @@
 package it.alfrescoinaction.lab.awsi.domain;
 
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class ContentImpl implements Content{
 
     private String id;
     private String name;
-    private String description;
-    private String text;
     private String mimeType;
     private String thumbnailId;
     private ContentType type;
+    private Map<String,String> properties;
 
-    public ContentImpl(String id, String name, String description, String mimeType, ContentType type) {
+    public ContentImpl(String id, String name, String mimeType, ContentType type) {
         this.id = id;
         this.name = name;
-        this.description = description;
         this.mimeType = mimeType;
         this.type = type;
+
+        this.properties = new HashMap<>();
     }
 
     @Override
@@ -38,31 +41,12 @@ public class ContentImpl implements Content{
     }
 
     @Override
-    public String getDescription() {
-        return this.description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    @Override
     public String getMimeType() {
         return this.mimeType;
     }
 
     public void setMimeType(String mimeType) {
         this.mimeType = mimeType;
-    }
-
-    @Override
-    public String getText() {
-        return this.text;
-    }
-
-    @Override
-    public void setText(String text) {
-        this.text = text;
     }
 
     @Override
@@ -80,5 +64,17 @@ public class ContentImpl implements Content{
         return type;
     }
 
+    @Override
+    public Map<String, String> getProperties() {
+        // defensive copy
+        Map<String,String> props = new HashMap<>();
+        props.putAll(this.properties);
+        return props;
+    }
 
+    @Override
+    public void setProperties(Map<String, String> props) {
+        // defensive copy
+        this.properties.putAll(props);
+    }
 }

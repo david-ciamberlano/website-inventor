@@ -37,7 +37,7 @@ public class MainController {
     }
 
     @RequestMapping(value="/p/{id}", method = RequestMethod.GET)
-    public String page(Model model, @PathVariable("id") String id) {
+    public String pageById(Model model, @PathVariable("id") String id) {
         WebPage wp = webPageManager.buildWebPage(id);
         model.addAttribute("id",wp.getId());
         model.addAttribute("title",wp.getTitle());
@@ -47,8 +47,18 @@ public class MainController {
         model.addAttribute("contents", wp.getContents());
         model.addAttribute("parentId", wp.getParentId());
         model.addAttribute("specialContent", wp.getSpecialContent());
+        model.addAttribute("breadcrumbs", wp.getBreadcrumbs());
 
         return "page";
+    }
+
+    @RequestMapping(value = "/b/{path}", method = RequestMethod.GET)
+    public String pageByPath(Model model, @PathVariable("path") String path) {
+
+        String decodedPath = path.replaceAll("\\|","/");
+        String pageId = webPageManager.getPageIdByPath(decodedPath);
+
+        return "forward:/p/" + pageId;
     }
 
     @RequestMapping(value = "proxy/{id}", method = RequestMethod.GET)

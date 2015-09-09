@@ -2,10 +2,9 @@ package it.alfrescoinaction.lab.awsi.domain;
 
 import it.alfrescoinaction.lab.awsi.service.ContentFactory;
 import org.apache.chemistry.opencmis.client.api.Document;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.*;
 
 /**
  * WebPage
@@ -20,6 +19,7 @@ public class WebPage {
     private List<Link> categories = new ArrayList<>(10);
     private List<Link> links = new ArrayList<>(10);
     private List<Content> contents = new ArrayList<>(20);
+    private Map<String,String> breadcrumbs = new LinkedHashMap<>(10);
     private ContentFactory contentFactory;
 
     public WebPage(String id, String title, String parentId, boolean homepage) {
@@ -46,6 +46,16 @@ public class WebPage {
         link.setId(pageId);
         link.setName(categoryName);
         categories.add(link);
+    }
+
+    public void buildBreadCrumbs(String path) {
+        String[] pathItems = path.split("/");
+
+        String pathAcc = "";
+        for (String pathItem : pathItems) {
+            pathAcc += "|" + pathItem;
+            breadcrumbs.put(pathItem, pathAcc);
+        }
     }
 
     public void addSpecialContent(String type, Document doc) {
@@ -75,7 +85,6 @@ public class WebPage {
         return contents;
     }
 
-
     public List<Link> getCategories(){
         return categories;
     }
@@ -86,6 +95,10 @@ public class WebPage {
 
     public boolean isHomepage() {
         return homepage;
+    }
+
+    public Map<String,String> getBreadcrumbs() {
+        return breadcrumbs;
     }
 
 }

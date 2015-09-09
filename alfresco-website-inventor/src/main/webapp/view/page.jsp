@@ -18,7 +18,7 @@
 <nav class="navbar navbar-default">
     <div class="container-fluid">
         <div class="navbar-header">
-            <a class="navbar-brand" href="#">AWSI</a>
+            <a class="navbar-brand" href="#">LOGO</a>
         </div>
         <div>
             <ul class="nav navbar-nav">
@@ -49,6 +49,14 @@
     </div>
 </nav>
 
+<div class="container-fluid">
+    <ol class="breadcrumb">
+        <c:forEach items="${breadcrumbs}" var="bcEntry">
+            <li><a href="<spring:url value="/b/${bcEntry.value}" />">${bcEntry.key}</a></li>
+        </c:forEach>
+    </ol>
+</div>
+
 <div class="row">
     <aside class="col-sm-3">
         <div class="panel panel-default">
@@ -70,26 +78,34 @@
             <div class="panel-body">
                 <c:if test="${specialContent.containsKey('text_header')}">
                     <header class="jumbotron">
-                            ${specialContent.get('text_header').text}
+                            ${specialContent.get('text_header').properties['text']}
                     </header>
                 </c:if>
 
                 <h2>Contenuti</h2>
                 <c:forEach items="${contents}" var="content">
                     <c:choose>
-                        <c:when test="${content.getType() == 'IMAGE'}">
-                            <figure class="media" class="center">
-                                <a class="media-left" href="<spring:url value="/proxy/${content.id}" />" >
-                                    <img class="img-thumbnail media-object" src="<spring:url value="/proxy/${content.getThumbnailId()}" />" alt="${content.getName()}"/>
-                                </a>
-                                <figcaption class="media-body media-middle">${content.getName()}</figcaption>
-                            </figure>
-                        </c:when>
+                        <%--TEXT--%>
                         <c:when test="${content.getType() == 'TEXT'}">
                             <article>
-                                <p>${content.getText()}</p>
+                                <p>${content.properties['text']}</p>
                             </article>
                         </c:when>
+                        <%--IMAGE--%>
+                        <c:when test="${content.getType() == 'IMAGE'}">
+                            <figure class="media" class="center">
+                                <a href="<spring:url value="/proxy/${content.id}" />" >
+									<span class="media-left">
+										<img class="img-thumbnail media-object " src="<spring:url value="/proxy/${content.getThumbnailId()}" />" alt="${content.getName()}"/>
+									</span>
+                                    <figcaption class="media-body media-middle">
+                                        <p>${content.getName()}</p>
+                                        <p>${content.properties['width']} x ${content.properties['height']}</p>
+                                    </figcaption>
+                                </a>
+                            </figure>
+                        </c:when>
+                        <%--GENERIC--%>
                         <c:otherwise>
                             <!-- default: generic file, contentType="GENERIC" -->
                             <article class="media">
@@ -97,7 +113,10 @@
                                     <div class="media-left media-middle">
                                         <img class="img-thumbnail media-object" src="<spring:url value="/proxy/${content.getThumbnailId()}" />" alt="${content.getName()}"/>
                                     </div>
-                                    <p class="media-body media-middle">${content.mimeType}</p>
+                                    <div class="media-body media-middle">
+                                        <p>${content.name}</p>
+                                        <p>${content.mimeType}</p>
+                                    </div>
                                 </a>
                             </article>
                         </c:otherwise>
