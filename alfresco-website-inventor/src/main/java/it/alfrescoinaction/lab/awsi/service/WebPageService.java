@@ -6,7 +6,6 @@ import it.alfrescoinaction.lab.awsi.service.repository.CmisRepository;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,26 +14,28 @@ public class WebPageService {
     @Autowired
     CmisRepository repository;
 
-    @Value("${alf.homepage}")
-    String homePagePath;
-
     /**
      * Build the domain object representing a webpage
      * @param id the id of the page to build
      * @return the WebPage object
      * @throws CmisObjectNotFoundException
      */
-    public WebPage buildWebPage(String id) throws CmisObjectNotFoundException {
+    public WebPage buildWebPage(String siteName, String id) throws CmisObjectNotFoundException {
+
+        repository.setSiteName(siteName);
+
         Folder folder = repository.getFolderById(id);
 
-        String folderPath = folder.getPath();
-        boolean isHomepage = homePagePath.equals(folderPath);
+//        String folderPath = folder.getPath();
+//        boolean isHomepage = homePagePath.equals(folderPath);
+        boolean isHomepage = false;
 
         WebPage wp = new WebPage(id, folder.getName(), folder.getParentId(), isHomepage);
 
-        String relativeFolderPath = folderPath.replaceFirst(homePagePath+"/","");
-        wp.buildBreadCrumbs(relativeFolderPath);
+//        String relativeFolderPath = folderPath.replaceFirst(homePagePath+"/","");
+//        wp.buildBreadCrumbs(relativeFolderPath);
 
+        // links
         ItemIterable<CmisObject> children = repository.getChildren(folder);
         for (CmisObject cmiso : children) {
             // path relative to the homepage
@@ -59,6 +60,7 @@ public class WebPageService {
             }
         }
 
+        // categories
         ItemIterable<CmisObject> categories = repository.getCategories();
         for (CmisObject cmiso : categories) {
             wp.addCategory(cmiso.getName(), cmiso.getId());
@@ -68,7 +70,7 @@ public class WebPageService {
     }
 
     public String getPageIdByPath(String path) {
-        String folderId = repository.getFolderIdByPath(homePagePath+path);
+        String folderId = repository.getFolderIdByPath(path);
 
         return folderId;
     }

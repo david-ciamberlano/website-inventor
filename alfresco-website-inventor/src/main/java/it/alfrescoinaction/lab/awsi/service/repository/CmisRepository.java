@@ -21,4 +21,6 @@ public interface CmisRepository {
 
     ItemIterable<CmisObject> getCategories();
 
+    void setSiteName(String site);
+
 }

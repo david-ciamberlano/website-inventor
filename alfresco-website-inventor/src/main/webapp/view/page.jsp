@@ -29,17 +29,17 @@
                         </li>
                     </c:when>
                     <c:otherwise>
-                    <li><a href="<spring:url value="/" />">Home</a><li>
+                    <li><a href="<spring:url value="/${site}" />">Home</a><li>
                     </c:otherwise>
                 </c:choose>
 
                 <c:forEach items="${categories}" var="category">
                     <c:choose>
                         <c:when test="${category.id.equals(id)}">
-                            <li role="presentation" class="active"><a href="<spring:url value="/p/${category.getId()}" />">${category.getName()}</a></li>
+                            <li role="presentation" class="active"><a href="<spring:url value="/${site}/o/${category.getId()}" />">${category.getName()}</a></li>
                         </c:when>
                         <c:otherwise>
-                            <li role="presentation"><a href="<spring:url value="/p/${category.getId()}" />">${category.getName()}</a></li>
+                            <li role="presentation"><a href="<spring:url value="/${site}/o/${category.getId()}" />">${category.getName()}</a></li>
                         </c:otherwise>
                     </c:choose>
 
@@ -52,7 +52,7 @@
 <div class="container-fluid">
     <ol class="breadcrumb">
         <c:forEach items="${breadcrumbs}" var="bcEntry">
-            <li><a href="<spring:url value="/b/${bcEntry.value}" />">${bcEntry.key}</a></li>
+            <li><a href="<spring:url value="/p/${bcEntry.value}" />">${bcEntry.key}</a></li>
         </c:forEach>
     </ol>
 </div>
@@ -65,9 +65,9 @@
             </div>
             <nav class="panel-body">
                 <ul  class="nav nav-pills nav-stacked">
-                    <li role="presentation"><a href="<spring:url value="/p/${parentId}" />"><span class="glyphicon glyphicon-circle-arrow-up"></span></a></li>
+                    <li role="presentation"><a href="<spring:url value="/${site}/o/${parentId}" />"><span class="glyphicon glyphicon-circle-arrow-up"></span></a></li>
                     <c:forEach items="${links}" var="link">
-                        <li role="presentation"><a href="<spring:url value="/p/${link.getId()}" />">${link.getName()}</a></li>
+                        <li role="presentation"><a href="<spring:url value="/${site}/o/${link.getId()}" />">${link.getName()}</a></li>
                     </c:forEach>
                 </ul>
             </nav>

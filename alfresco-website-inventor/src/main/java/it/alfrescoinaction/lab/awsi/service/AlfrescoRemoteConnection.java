@@ -46,7 +46,6 @@ public class AlfrescoRemoteConnection implements RemoteConnection {
         }
     }
 
-
     public Session getSession() {
 
         if (session == null) {

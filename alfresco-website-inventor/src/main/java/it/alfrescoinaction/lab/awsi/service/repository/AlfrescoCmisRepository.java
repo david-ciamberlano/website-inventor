@@ -1,10 +1,8 @@
 package it.alfrescoinaction.lab.awsi.service.repository;
 
-import it.alfrescoinaction.lab.awsi.service.AlfrescoRemoteConnection;
 import it.alfrescoinaction.lab.awsi.service.RemoteConnection;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import java.util.NoSuchElementException;
@@ -16,12 +14,14 @@ public class AlfrescoCmisRepository implements CmisRepository {
     @Autowired
     private RemoteConnection connection;
 
-    @Value("${alf.homepage}")
-    private String alfrescoHomePath;
+    private String siteName;
+
 
     @Override
     public ItemIterable<CmisObject> getCategories() {
         Session session = connection.getSession();
+
+        String alfrescoHomePath = "/Sites/" + siteName + "/documentLibrary";
         CmisObject obj = session.getObjectByPath(alfrescoHomePath);
 
         // procceed only if the node is a folder
@@ -41,6 +41,7 @@ public class AlfrescoCmisRepository implements CmisRepository {
         Session session = connection.getSession();
 
         if (id.equals("home")) {
+            String alfrescoHomePath = "/Sites/" + siteName + "/documentLibrary";
             id = session.getObjectByPath(alfrescoHomePath).getId();
         }
 
@@ -60,7 +61,8 @@ public class AlfrescoCmisRepository implements CmisRepository {
     public String getFolderIdByPath(String path) throws NoSuchElementException {
         Session session = connection.getSession();
 
-        CmisObject obj = session.getObjectByPath(path);
+        String fullPath = "/Sites/" + siteName + "/documentLibrary/" +path;
+        CmisObject obj = session.getObjectByPath(fullPath);
 
         // procceed only if the node is a folder
         if (obj.getType().getId().equals("cmis:folder")){
@@ -99,20 +101,8 @@ public class AlfrescoCmisRepository implements CmisRepository {
 
 
     //***** getter/setter *****
-
-    public RemoteConnection getConnection() {
-        return connection;
-    }
-
-    public void setConnection(AlfrescoRemoteConnection connection) {
-        this.connection = connection;
-    }
-
-    public String getAlfrescoHomePath() {
-        return alfrescoHomePath;
-    }
-
-    public void setAlfrescoHomePath(String alfrescoHomePath) {
-        this.alfrescoHomePath = alfrescoHomePath;
+    @Override
+    public void setSiteName(String siteName) {
+        this.siteName = siteName;
     }
 }

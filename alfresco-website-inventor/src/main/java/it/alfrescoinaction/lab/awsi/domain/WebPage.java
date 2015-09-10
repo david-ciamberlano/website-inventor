@@ -29,9 +29,9 @@ public class WebPage {
         this.homepage = homepage;
     }
 
-    public void addLinks(String pageName, String pageId) {
+    public void addLinks(String pageName, String id) {
         Link link = new Link();
-        link.setId(pageId);
+        link.setId(id);
         link.setName(pageName);
         links.add(link);
     }
@@ -41,9 +41,9 @@ public class WebPage {
         contents.add(contentFactory.buildContent(doc));
     }
 
-    public void addCategory(String categoryName, String pageId) {
+    public void addCategory(String categoryName, String id) {
         Link link = new Link();
-        link.setId(pageId);
+        link.setId(id);
         link.setName(categoryName);
         categories.add(link);
     }
