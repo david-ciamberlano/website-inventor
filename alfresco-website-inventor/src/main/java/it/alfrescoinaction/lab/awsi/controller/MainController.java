@@ -32,19 +32,15 @@ public class MainController {
     @RequestMapping(value="/{sitename}/o/{id}", method = RequestMethod.GET)
     public String pageById(Model model, @PathVariable("sitename") String siteName, @PathVariable("id") String id) {
         WebPage wp = webPageService.buildWebPage(siteName, id);
-
-        model.addAttribute("id",wp.getId());
+        model.addAttribute("page", wp);
         model.addAttribute("site", siteName);
-        model.addAttribute("title",wp.getTitle());
-        model.addAttribute("isHomePage",wp.isHomepage());
-        model.addAttribute("links", wp.getLinks());
-        model.addAttribute("categories", wp.getCategories());
-        model.addAttribute("contents", wp.getContents());
-        model.addAttribute("parentId", wp.getParentId());
-        model.addAttribute("specialContent", wp.getSpecialContent());
-        model.addAttribute("breadcrumbs", wp.getBreadcrumbs());
 
-        return "page";
+        String view = "genericpage";
+        if (wp.isHomepage()) {
+//            view = "homepage";
+        }
+
+        return view;
     }
 
 //    @RequestMapping(value = "/{sitename}/p/{path}", method = RequestMethod.GET)

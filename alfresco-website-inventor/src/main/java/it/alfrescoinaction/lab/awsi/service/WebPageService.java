@@ -8,6 +8,9 @@ import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundExcept
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 @Service
 public class WebPageService {
 
@@ -25,15 +28,33 @@ public class WebPageService {
         repository.setSiteName(siteName);
 
         Folder folder = repository.getFolderById(id);
+        String folderPath = folder.getPath();
+        String basePath = "/Sites/" + siteName + "/documentLibrary/";
 
-//        String folderPath = folder.getPath();
-//        boolean isHomepage = homePagePath.equals(folderPath);
-        boolean isHomepage = false;
+        // the final / in folderPath is necessary to match basepath
+        boolean isHomepage = basePath.equals(folderPath + "/");
 
         WebPage wp = new WebPage(id, folder.getName(), folder.getParentId(), isHomepage);
 
-//        String relativeFolderPath = folderPath.replaceFirst(homePagePath+"/","");
-//        wp.buildBreadCrumbs(relativeFolderPath);
+        if (!isHomepage) {
+            // breadcrumbs
+            String relativeFolderPath = folderPath.replace(basePath, "");
+            String[] pathItems = relativeFolderPath.split("(?=/)");
+
+            String pathAcc = "";
+            Map<String, String> breadCrumbs = new LinkedHashMap<>();
+            for (String pathItem : pathItems) {
+                pathAcc += pathItem;
+                String bcName = pathItem.startsWith("/") ? pathItem.substring(1) : pathItem;
+                String currentPathId = repository.getFolderIdByPath(pathAcc);
+                breadCrumbs.put(bcName, currentPathId);
+            }
+
+            // the last item is not part of breadcrumbs
+            String lastItem = pathItems[pathItems.length - 1].startsWith("/") ? pathItems[pathItems.length - 1].substring(1) : pathItems[pathItems.length - 1];
+            breadCrumbs.remove(lastItem);
+            wp.addBreadCrumbs(breadCrumbs);
+        }
 
         // links
         ItemIterable<CmisObject> children = repository.getChildren(folder);

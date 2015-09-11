@@ -9,7 +9,7 @@ import java.util.NoSuchElementException;
 
 
 @Repository
-public class AlfrescoCmisRepository implements CmisRepository {
+public class AlfrescoCmis11Repository implements CmisRepository {
 
     @Autowired
     private RemoteConnection connection;
@@ -57,11 +57,17 @@ public class AlfrescoCmisRepository implements CmisRepository {
         }
     }
 
+    /**
+     *
+     * @param realtivePath: in the form F1/F2/F3 (no initial /)
+     * @return
+     * @throws NoSuchElementException
+     */
     @Override
-    public String getFolderIdByPath(String path) throws NoSuchElementException {
+    public String getFolderIdByPath(String realtivePath) throws NoSuchElementException {
         Session session = connection.getSession();
 
-        String fullPath = "/Sites/" + siteName + "/documentLibrary/" +path;
+        String fullPath = "/Sites/" + siteName + "/documentLibrary/" +realtivePath;
         CmisObject obj = session.getObjectByPath(fullPath);
 
         // procceed only if the node is a folder
@@ -69,7 +75,7 @@ public class AlfrescoCmisRepository implements CmisRepository {
             return obj.getId();
         }
         else {
-            throw new NoSuchElementException("Folder not found: "  + path);
+            throw new NoSuchElementException("Folder not found: "  + fullPath);
         }
 
     }

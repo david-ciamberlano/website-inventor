@@ -48,14 +48,8 @@ public class WebPage {
         categories.add(link);
     }
 
-    public void buildBreadCrumbs(String path) {
-        String[] pathItems = path.split("/");
-
-        String pathAcc = "";
-        for (String pathItem : pathItems) {
-            pathAcc += "|" + pathItem;
-            breadcrumbs.put(pathItem, pathAcc);
-        }
+    public void addBreadCrumbs(Map<String,String> bc) {
+        this.breadcrumbs.putAll(bc);
     }
 
     public void addSpecialContent(String type, Document doc) {
