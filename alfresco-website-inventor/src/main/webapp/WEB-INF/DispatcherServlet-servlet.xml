@@ -12,40 +12,13 @@
     <mvc:annotation-driven />
     <context:component-scan base-package="it.alfrescoinaction.lab.awsi.controller"/>
     <context:component-scan base-package="it.alfrescoinaction.lab.awsi.service"/>
+    <context:component-scan base-package="it.alfrescoinaction.lab.awsi.repository"/>
 
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver" >
         <property name="prefix" value="/WEB-INF/views/"/>
         <property name="suffix" value=".jsp"/>
     </bean>
 
-    <!--<bean id="freemarkerConfig" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">-->
-        <!--<property name="templateLoaderPath" value="/WEB-INF/views/"/>-->
-    <!--</bean>-->
-    <!-- -->
-    <!--<bean id="viewResolver" class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">-->
-        <!--<property name="cache" value="true"/>-->
-        <!--<property name="prefix" value=""/>-->
-        <!--<property name="suffix" value=".ftl"/>-->
-    <!--</bean>-->
-
     <mvc:resources mapping="/resource/**" location="/WEB-INF/resources/" />
-
-    <bean class="it.alfrescoinaction.lab.awsi.service.AlfrescoRemoteConnection" init-method="openSession">
-        <property name="username" value="${alf.username}"/>
-        <property name="password" value="${alf.password}"/>
-        <property name="alfrescoUrl" value="${alf.alfresco_url}"/>
-        <property name="cmisEntryPoint" value="${alf.cmis_entrypoint}"/>
-    </bean>
-
-    <!--<bean id="alfrescoCmisRepository" class="it.alfrescoinaction.lab.awsi.service.repository.AlfrescoCmisRepository" >-->
-        <!--<property name="alfrescoHomePath" value="${alf.homepage}"/>-->
-    <!--</bean>-->
-
-    <!--<bean id="service" class="it.alfrescoinaction.lab.awsi.service.WebPageManager" >-->
-    <!--</bean>-->
-
-    <!--<bean id="contentFactory" class="it.alfrescoinaction.lab.awsi.service.ContentFactory"></bean>-->
-
-    <!--<bean id="contentFactory" class="it.alfrescoinaction.lab.awsi.service.ContentFactory"></bean>-->
 
 </beans>

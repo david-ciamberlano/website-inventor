@@ -20,11 +20,25 @@
         <div class="navbar-header">
             <a class="navbar-brand" href="#">LOGO</a>
         </div>
+        <div>
+            <ul class="nav navbar-nav">
+                <c:forEach items="${page.categories}" var="category">
+                    <c:choose>
+                        <c:when test="${category.id.equals(id)}">
+                            <li role="presentation" class="active"><a href="<spring:url value="/${site}/o/${category.getId()}" />">${category.getName()}</a></li>
+                        </c:when>
+                        <c:otherwise>
+                            <li role="presentation"><a href="<spring:url value="/${site}/o/${category.getId()}" />">${category.getName()}</a></li>
+                        </c:otherwise>
+                    </c:choose>
+
+                </c:forEach>
+            </ul>
+        </div>
     </div>
 </nav>
 
-<div class="row">
-    <%--breadcrumbs--%>
+<div class="container-fluid">
     <ol class="breadcrumb">
         <c:choose>
             <c:when test="${page.homepage}">
@@ -55,9 +69,11 @@
             <nav class="panel-body">
                 <ul  class="nav nav-pills nav-stacked">
                     <li role="presentation"><a href="<spring:url value="/${site}/o/${page.parentId}" />"><span class="glyphicon glyphicon-circle-arrow-up"></span></a></li>
-                    <c:forEach items="${page.links}" var="link">
-                        <li role="presentation"><a href="<spring:url value="/${site}/o/${link.getId()}" />">${link.getName()}</a></li>
-                    </c:forEach>
+                    <c:if test="${page.contents.size() > 0}">
+                        <c:forEach items="${page.links}" var="link">
+                            <li role="presentation"><a href="<spring:url value="/${site}/o/${link.getId()}" />">${link.getName()}</a></li>
+                        </c:forEach>
+                    </c:if>
                 </ul>
             </nav>
         </div>
@@ -76,12 +92,12 @@
                 <%--contents--%>
                 <c:if test="${page.contents.size() == 0}">
                     <c:forEach items="${page.links}" var="link">
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <div class="thumbnail">
                                 <a href="<spring:url value="/${site}/o/${link.getId()}" />">
                                     <img src="<spring:url value="/resource/icons/container.png" />" alt="Library">
-                                    <div class="caption centered">
-                                        ${link.getName()}
+                                    <div class="caption">
+                                        <h3>${link.getName()}</h3>
                                     </div>
                                 </a>
                             </div>

@@ -1,4 +1,4 @@
-package it.alfrescoinaction.lab.awsi.service.repository;
+package it.alfrescoinaction.lab.awsi.repository;
 
 
 import org.apache.chemistry.opencmis.client.api.CmisObject;
@@ -21,6 +21,10 @@ public interface CmisRepository {
 
     ItemIterable<CmisObject> getCategories();
 
-    void setSiteName(String site);
+    boolean isHomePage(String path);
+
+    String getAlfrescoHomePath();
+
+    void setSiteName(String siteName);
 
 }

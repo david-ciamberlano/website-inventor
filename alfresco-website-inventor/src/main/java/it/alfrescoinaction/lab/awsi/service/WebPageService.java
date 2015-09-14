@@ -2,7 +2,7 @@ package it.alfrescoinaction.lab.awsi.service;
 
 import it.alfrescoinaction.lab.awsi.domain.Downloadable;
 import it.alfrescoinaction.lab.awsi.domain.WebPage;
-import it.alfrescoinaction.lab.awsi.service.repository.CmisRepository;
+import it.alfrescoinaction.lab.awsi.repository.CmisRepository;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,16 +29,14 @@ public class WebPageService {
 
         Folder folder = repository.getFolderById(id);
         String folderPath = folder.getPath();
-        String basePath = "/Sites/" + siteName + "/documentLibrary/";
 
-        // the final / in folderPath is necessary to match basepath
-        boolean isHomepage = basePath.equals(folderPath + "/");
+        boolean isHomepage = repository.isHomePage(folderPath);
 
         WebPage wp = new WebPage(id, folder.getName(), folder.getParentId(), isHomepage);
 
         if (!isHomepage) {
             // breadcrumbs
-            String relativeFolderPath = folderPath.replace(basePath, "");
+            String relativeFolderPath = folderPath.replace(repository.getAlfrescoHomePath(), "");
             String[] pathItems = relativeFolderPath.split("(?=/)");
 
             String pathAcc = "";
@@ -60,7 +58,7 @@ public class WebPageService {
         ItemIterable<CmisObject> children = repository.getChildren(folder);
         for (CmisObject cmiso : children) {
             // path relative to the homepage
-            switch(cmiso.getType().getId()) {
+            switch(cmiso.getBaseTypeId().value()) {
                 case "cmis:folder": {
                     wp.addLinks(cmiso.getName(), cmiso.getId());
                     break;

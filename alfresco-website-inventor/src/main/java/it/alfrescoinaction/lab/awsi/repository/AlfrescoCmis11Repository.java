@@ -1,10 +1,13 @@
-package it.alfrescoinaction.lab.awsi.service.repository;
+package it.alfrescoinaction.lab.awsi.repository;
 
 import it.alfrescoinaction.lab.awsi.service.RemoteConnection;
 import org.apache.chemistry.opencmis.client.api.*;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
+import java.text.MessageFormat;
 import java.util.NoSuchElementException;
 
 
@@ -14,18 +17,18 @@ public class AlfrescoCmis11Repository implements CmisRepository {
     @Autowired
     private RemoteConnection connection;
 
-    private String siteName;
-
+    @Value("${alf.basePath}")
+    private String alfrescoHomePathTemplate;
+    private String alfrescoHomePath;
 
     @Override
     public ItemIterable<CmisObject> getCategories() {
         Session session = connection.getSession();
 
-        String alfrescoHomePath = "/Sites/" + siteName + "/documentLibrary";
         CmisObject obj = session.getObjectByPath(alfrescoHomePath);
 
         // procceed only if the node is a folder
-        if (obj.getType().getId().equals("cmis:folder")){
+        if (obj.getBaseTypeId().value().equals("cmis:folder")){
             Folder folder = (Folder)obj;
             ItemIterable<CmisObject> children = folder.getChildren();
 
@@ -41,14 +44,13 @@ public class AlfrescoCmis11Repository implements CmisRepository {
         Session session = connection.getSession();
 
         if (id.equals("home")) {
-            String alfrescoHomePath = "/Sites/" + siteName + "/documentLibrary";
             id = session.getObjectByPath(alfrescoHomePath).getId();
         }
 
         CmisObject obj = session.getObject(id);
 
         // procceed only if the node is a folder
-        if (obj.getType().getId().equals("cmis:folder")){
+        if (obj.getBaseTypeId().value().equals("cmis:folder")){
             Folder folder = (Folder)obj;
             return folder;
         }
@@ -67,11 +69,11 @@ public class AlfrescoCmis11Repository implements CmisRepository {
     public String getFolderIdByPath(String realtivePath) throws NoSuchElementException {
         Session session = connection.getSession();
 
-        String fullPath = "/Sites/" + siteName + "/documentLibrary/" +realtivePath;
+        String fullPath = alfrescoHomePath + "/" + realtivePath;
         CmisObject obj = session.getObjectByPath(fullPath);
 
         // procceed only if the node is a folder
-        if (obj.getType().getId().equals("cmis:folder")){
+        if (obj.getBaseTypeId().value().equals("cmis:folder")){
             return obj.getId();
         }
         else {
@@ -84,9 +86,15 @@ public class AlfrescoCmis11Repository implements CmisRepository {
     public Document getDocumentById(String id) throws NoSuchElementException {
         Session session = connection.getSession();
 
-        CmisObject obj = session.getObject(id);
+        CmisObject obj;
+        try {
+             obj = session.getObject(id);
+        }
+        catch (CmisObjectNotFoundException e){
+            throw new NoSuchElementException("Document not found: "  + id);
+        }
 
-        if (obj.getType().getId().equals("cmis:document") || obj.getType().getId().equals("D:cm:thumbnail")){
+        if (obj.getBaseTypeId().value().equals("cmis:document") || obj.getBaseTypeId().value().equals("D:cm:thumbnail")){
             Document doc = (Document)obj;
             return doc;
         }
@@ -105,10 +113,22 @@ public class AlfrescoCmis11Repository implements CmisRepository {
         return children;
     }
 
+    @Override
+    public boolean isHomePage(String path) {
+        // the final / in folderPath is necessary to match basepath
+        return alfrescoHomePath.equals(path);
+    }
 
-    //***** getter/setter *****
     @Override
     public void setSiteName(String siteName) {
-        this.siteName = siteName;
+        this.alfrescoHomePath = MessageFormat.format(alfrescoHomePathTemplate,siteName);
     }
+
+    //------------- GETTERS/SETTERS
+
+    public String getAlfrescoHomePath() {
+        return alfrescoHomePath;
+    }
+
+
 }
