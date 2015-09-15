@@ -37,7 +37,7 @@ public class MainController {
 
         String view = "genericpage";
         if (wp.isHomepage()) {
-//            view = "homepage";
+            view = "homepage";
         }
 
         return view;

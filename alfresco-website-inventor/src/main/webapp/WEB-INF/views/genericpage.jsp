@@ -7,6 +7,7 @@
 <head>
     <title></title>
     <link rel="stylesheet" href="<spring:url value="/resource/bootstrap-3.3.5-dist/css/bootstrap.css" />">
+	<link rel="stylesheet" href="<spring:url value="/resource/custom.css" />">
     <script src="<spring:url value="/resource/jquery-1.11.3.min.js"/>"></script>
     <script src="<spring:url value="/resource/bootstrap-3.3.5-dist/js/bootstrap.min.js"/>"></script>
 </head>
@@ -15,28 +16,15 @@
 <header>
 
 </header>
-<nav class="navbar navbar-default">
-    <div class="container-fluid">
-        <div class="navbar-header">
-            <a class="navbar-brand" href="#">LOGO</a>
-        </div>
-    </div>
-</nav>
-
+<header class="page-header">
+    <h1>Site name <small>${page.title}</small></h1>
+</header>
+<!--
 <div class="row">
     <%--breadcrumbs--%>
     <ol class="breadcrumb">
-        <c:choose>
-            <c:when test="${page.homepage}">
-                <li class="disabled">
-                    <a>Home</a>
-                </li>
-            </c:when>
-            <c:otherwise>
-                <li><a href="<spring:url value="/${site}" />">Home</a></li>
-            </c:otherwise>
-        </c:choose>
 
+        <li><a href="<spring:url value="/${site}" />">Home</a></li>
         <c:forEach items="${page.breadcrumbs}" var="bcEntry">
             <li><a href="<spring:url value="/${site}/o/${bcEntry.value}" />">${bcEntry.key}</a></li>
         </c:forEach>
@@ -44,20 +32,22 @@
         <li>${page.title}</li>
     </ol>
 </div>
-
+-->
 <div class="row">
     <%--navigation--%>
-    <aside class="col-sm-3">
+     <aside class="col-md-3">
         <div class="panel panel-default">
             <div class="panel-heading">
                 Links
             </div>
             <nav class="panel-body">
-                <ul  class="nav nav-pills nav-stacked">
-                    <li role="presentation"><a href="<spring:url value="/${site}/o/${page.parentId}" />"><span class="glyphicon glyphicon-circle-arrow-up"></span></a></li>
-                    <c:forEach items="${page.links}" var="link">
-                        <li role="presentation"><a href="<spring:url value="/${site}/o/${link.getId()}" />">${link.getName()}</a></li>
-                    </c:forEach>
+                <ul class="nav nav-pills nav-stacked">
+					<li role="presentation">
+						<a href="<spring:url value="/${site}/o/${page.parentId}" />"><span class="glyphicon glyphicon-circle-arrow-up"></span></a>
+					</li>
+					<c:forEach items="${page.links}" var="link">
+						<li role="presentation"><a href="<spring:url value="/${site}/o/${link.getId()}" />">${link.getName()}</a></li>
+					</c:forEach>
                 </ul>
             </nav>
         </div>
@@ -66,21 +56,28 @@
     <%--body--%>
     <section class="col-sm-9">
         <div class="panel panel-default">
+			<div class="panel-heading">
+				<span><a href="<spring:url value="/${site}" />">Home</a></span>
+				<c:forEach items="${page.breadcrumbs}" var="bcEntry">
+					&nbsp;&raquo;&nbsp; <span><a href="<spring:url value="/${site}/o/${bcEntry.value}" />">${bcEntry.key}</a></span>
+				</c:forEach>
+				&nbsp;&raquo;&nbsp; <span>${page.title}</span>
+            </div>
             <div class="panel-body">
                 <c:if test="${page.specialContent.containsKey('text_header')}">
                     <header class="jumbotron">
-                            ${page.specialContent.get('text_header').properties['text']}
+                        ${page.specialContent.get('text_header').properties['text']}
                     </header>
                 </c:if>
 
                 <%--contents--%>
                 <c:if test="${page.contents.size() == 0}">
                     <c:forEach items="${page.links}" var="link">
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <div class="thumbnail">
                                 <a href="<spring:url value="/${site}/o/${link.getId()}" />">
                                     <img src="<spring:url value="/resource/icons/container.png" />" alt="Library">
-                                    <div class="caption centered">
+                                    <div class="caption text-center">
                                         ${link.getName()}
                                     </div>
                                 </a>

@@ -7,81 +7,63 @@
 <head>
     <title></title>
     <link rel="stylesheet" href="<spring:url value="/resource/bootstrap-3.3.5-dist/css/bootstrap.css" />">
+	<link rel="stylesheet" href="<spring:url value="/resource/custom.css" />">
     <script src="<spring:url value="/resource/jquery-1.11.3.min.js"/>"></script>
     <script src="<spring:url value="/resource/bootstrap-3.3.5-dist/js/bootstrap.min.js"/>"></script>
 </head>
+
 <body class="container">
 
-<header>
-
+<header class="page-header">
+    <h1>Archivio <small>home</small></h1>
 </header>
-<nav class="navbar navbar-default">
-    <div class="container-fluid">
-        <div class="navbar-header">
-            <a class="navbar-brand" href="#">LOGO</a>
-        </div>
-        <div>
-            <ul class="nav navbar-nav">
-                <c:forEach items="${page.categories}" var="category">
-                    <c:choose>
-                        <c:when test="${category.id.equals(id)}">
-                            <li role="presentation" class="active"><a href="<spring:url value="/${site}/o/${category.getId()}" />">${category.getName()}</a></li>
-                        </c:when>
-                        <c:otherwise>
-                            <li role="presentation"><a href="<spring:url value="/${site}/o/${category.getId()}" />">${category.getName()}</a></li>
-                        </c:otherwise>
-                    </c:choose>
-
-                </c:forEach>
-            </ul>
-        </div>
-    </div>
-</nav>
-
-<div class="container-fluid">
+<!--
+<div class="row">
+    <%--breadcrumbs--%>
     <ol class="breadcrumb">
-        <c:choose>
-            <c:when test="${page.homepage}">
-                <li class="disabled">
-                    <a>Home</a>
-                </li>
-            </c:when>
-            <c:otherwise>
-                <li><a href="<spring:url value="/${site}" />">Home</a></li>
-            </c:otherwise>
-        </c:choose>
-
-        <c:forEach items="${page.breadcrumbs}" var="bcEntry">
-            <li><a href="<spring:url value="/${site}/o/${bcEntry.value}" />">${bcEntry.key}</a></li>
-        </c:forEach>
-
-        <li>${page.title}</li>
+		<li class="disabled">
+			<a>Home</a>
+		</li>
     </ol>
 </div>
-
+-->
 <div class="row">
     <%--navigation--%>
+	<!--
     <aside class="col-sm-3">
+		<nav class="list-group">
+
+			<a class="list-group-item" href="<spring:url value="/${site}/o/${page.parentId}" />"><span class="glyphicon glyphicon-circle-arrow-up"></span></a>
+			<c:forEach items="${page.links}" var="link">
+				<a class="list-group-item" href="<spring:url value="/${site}/o/${link.getId()}" />">${link.getName()}</a>
+			</c:forEach>
+        </nav>
+    </aside>
+	-->
+	 <aside class="col-md-3">
         <div class="panel panel-default">
             <div class="panel-heading">
                 Links
             </div>
+			<div class="well well-sm">
+				Filtro: <input type="text" onkeyup="filter(this,'linkList')" />
+			</div>
             <nav class="panel-body">
-                <ul  class="nav nav-pills nav-stacked">
-                    <li role="presentation"><a href="<spring:url value="/${site}/o/${page.parentId}" />"><span class="glyphicon glyphicon-circle-arrow-up"></span></a></li>
-                    <c:if test="${page.contents.size() > 0}">
-                        <c:forEach items="${page.links}" var="link">
-                            <li role="presentation"><a href="<spring:url value="/${site}/o/${link.getId()}" />">${link.getName()}</a></li>
-                        </c:forEach>
-                    </c:if>
+                <ul class="nav nav-pills nav-stacked" id="linkList">
+					<c:forEach items="${page.links}" var="link">
+						<li role="presentation"><a href="<spring:url value="/${site}/o/${link.getId()}" />">${link.getName()}</a></li>
+					</c:forEach>
                 </ul>
             </nav>
         </div>
     </aside>
 
     <%--body--%>
-    <section class="col-sm-9">
+    <section class="col-md-9">
         <div class="panel panel-default">
+            <div class="panel-heading">
+                Archivio
+            </div>
             <div class="panel-body">
                 <c:if test="${page.specialContent.containsKey('text_header')}">
                     <header class="jumbotron">
@@ -92,12 +74,12 @@
                 <%--contents--%>
                 <c:if test="${page.contents.size() == 0}">
                     <c:forEach items="${page.links}" var="link">
-                        <div class="col-md-4">
+                        <div class="col-md-2">
                             <div class="thumbnail">
                                 <a href="<spring:url value="/${site}/o/${link.getId()}" />">
                                     <img src="<spring:url value="/resource/icons/container.png" />" alt="Library">
-                                    <div class="caption">
-                                        <h3>${link.getName()}</h3>
+                                    <div class="caption text-center">
+                                        <span>${link.getName()}</span>
                                     </div>
                                 </a>
                             </div>
@@ -149,5 +131,23 @@
         </div>
     </section>
 </div>
+
+<script type="text/javascript">
+
+function filter(element,what) {
+
+	var value = $(element).val();
+    value = value.toLowerCase().replace(/\b[a-z]/g, function(letter) {
+        return letter.toUpperCase();
+    });
+	what = '#'+what;
+    if(value == '')
+        $(what+' > li').show();
+    else{
+        $(what+' > li:not(:contains(' + value + '))').hide();
+        $(what+' > li:contains(' + value + ')').show();
+    }
+};
+</script>
 </body>
 </html>
