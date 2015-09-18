@@ -34,6 +34,24 @@
 </div>
 -->
 <div class="row">
+    <form:form modelAttribute="searchFilters" method="POST" action="${pageContext.request.contextPath}/${site}/s">
+        <fieldset>
+            <legend>Search</legend>
+            <div class="col-md-4">
+                <label for="dataUscita">Data uscita:</label>
+                <form:input  path="filter1" id="dataUscita" ></form:input>
+            </div>
+            <div class="col-md-4">
+                <label for="uscita">Uscita:</label>
+                <form:input path="filter2" id="uscita" ></form:input>
+            </div>
+            <div>
+                <input type="submit" value="Search"/>
+            </div>
+        </fieldset>
+    </form:form>
+</div>
+<div class="row">
     <%--navigation--%>
      <aside class="col-md-3">
         <div class="panel panel-default">
@@ -57,7 +75,7 @@
     <section class="col-sm-9">
         <div class="panel panel-default">
 			<div class="panel-heading">
-				<span><a href="<spring:url value="/${site}" />">Home</a></span>
+				<span><a href="<spring:url value="/${site}" />"><span class="glyphicon glyphicon-home"></span> Home</a></span>
 				<c:forEach items="${page.breadcrumbs}" var="bcEntry">
 					&nbsp;&raquo;&nbsp; <span><a href="<spring:url value="/${site}/o/${bcEntry.value}" />">${bcEntry.key}</a></span>
 				</c:forEach>

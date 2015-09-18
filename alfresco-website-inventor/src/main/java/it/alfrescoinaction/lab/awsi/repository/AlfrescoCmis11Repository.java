@@ -7,8 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
+import java.text.Format;
 import java.text.MessageFormat;
+import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 
 @Repository
@@ -20,6 +24,13 @@ public class AlfrescoCmis11Repository implements CmisRepository {
     @Value("${alf.basePath}")
     private String alfrescoHomePathTemplate;
     private String alfrescoHomePath;
+
+    @Value("${alf.search.filters}")
+    private String[] filterNames;
+
+    @Value("${alf.search.type}")
+    private String typeName;
+
 
     @Override
     public ItemIterable<CmisObject> getCategories() {
@@ -66,10 +77,18 @@ public class AlfrescoCmis11Repository implements CmisRepository {
      * @throws NoSuchElementException
      */
     @Override
-    public String getFolderIdByPath(String realtivePath) throws NoSuchElementException {
+    public String getFolderIdByRelativePath(String realtivePath) throws NoSuchElementException {
         Session session = connection.getSession();
 
-        String fullPath = alfrescoHomePath + "/" + realtivePath;
+        // delete initial /
+        String fullPath = alfrescoHomePath;
+        if (realtivePath.startsWith("/")) {
+            fullPath += realtivePath;
+        }
+        else {
+            fullPath += "/" + realtivePath;
+        }
+
         CmisObject obj = session.getObjectByPath(fullPath);
 
         // procceed only if the node is a folder
@@ -104,11 +123,52 @@ public class AlfrescoCmis11Repository implements CmisRepository {
     }
 
     @Override
-    public ItemIterable<CmisObject> getChildren (Folder folder) {
+    public ItemIterable<QueryResult> getSubFolders(Folder folder) {
+        String queryTemplate = "SELECT F.* FROM cmis:folder F WHERE IN_FOLDER('%s')";
+        String query = String.format(queryTemplate,folder.getId());
+
         Session session = connection.getSession();
         OperationContext oc = session.createOperationContext();
         oc.setRenditionFilterString("*");
-        ItemIterable<CmisObject> children = folder.getChildren(oc);
+        ItemIterable<QueryResult> children = session.query(query, false);
+
+        return children;
+    }
+
+    @Override
+    public ItemIterable<QueryResult> getSubDocuments(Folder folder, Map<String,String> filters) {
+        String queryFilterTemplate = "AND %s LIKE %%s% ";
+        String queryFilter = "";
+        for (String filter : filters.keySet()){
+            queryFilter += String.format(queryFilterTemplate,filter,filters.get(filter));
+        }
+        String query = "SELECT D.* FROM cmis:document D WHERE IN_FOLDER('" + folder.getId() + "') " + queryFilter;
+
+        Session session = connection.getSession();
+        OperationContext oc = session.createOperationContext();
+        oc.setRenditionFilterString("*");
+        ItemIterable<QueryResult> children = session.query(query, false);
+
+        return children;
+    }
+
+    @Override
+    public ItemIterable<QueryResult> search(String folderId, List<String> filters) {
+        String queryFilterTemplate = "AND %s LIKE '%%%s%%' ";
+        String queryFilter = "";
+
+        for (int i=0; i<filterNames.length; i++) {
+            if (!filters.get(i).isEmpty()) {
+                queryFilter += String.format(queryFilterTemplate,filterNames[i],filters.get(i));
+            }
+        }
+
+        String query = "SELECT * FROM " + typeName + " WHERE IN_TREE('workspace://SpacesStore/" + folderId + "') " + queryFilter;
+
+        Session session = connection.getSession();
+        OperationContext oc = session.createOperationContext();
+        oc.setRenditionFilterString("*");
+        ItemIterable<QueryResult> children = session.query(query, false);
 
         return children;
     }
@@ -124,7 +184,9 @@ public class AlfrescoCmis11Repository implements CmisRepository {
         this.alfrescoHomePath = MessageFormat.format(alfrescoHomePathTemplate,siteName);
     }
 
-    //------------- GETTERS/SETTERS
+
+
+    //-------------------------- GETTERS/SETTERS --------------------------
 
     public String getAlfrescoHomePath() {
         return alfrescoHomePath;
