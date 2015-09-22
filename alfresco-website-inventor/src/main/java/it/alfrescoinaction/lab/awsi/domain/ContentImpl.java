@@ -20,6 +20,7 @@ public class ContentImpl implements Content{
         this.type = type;
 
         this.properties = new HashMap<>();
+        this.thumbnailId = "";
     }
 
     @Override

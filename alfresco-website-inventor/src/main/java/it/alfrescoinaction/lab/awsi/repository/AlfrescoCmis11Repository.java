@@ -29,7 +29,7 @@ public class AlfrescoCmis11Repository implements CmisRepository {
     private String[] filterNames;
 
     @Value("${alf.search.type}")
-    private String typeName;
+    private String type;
 
 
     @Override
@@ -41,7 +41,9 @@ public class AlfrescoCmis11Repository implements CmisRepository {
         // procceed only if the node is a folder
         if (obj.getBaseTypeId().value().equals("cmis:folder")){
             Folder folder = (Folder)obj;
-            ItemIterable<CmisObject> children = folder.getChildren();
+            OperationContext oc = session.createOperationContext();
+            oc.setRenditionFilterString("*");
+            ItemIterable<CmisObject> children = folder.getChildren(oc);
 
             return children;
         }
@@ -55,7 +57,9 @@ public class AlfrescoCmis11Repository implements CmisRepository {
         Session session = connection.getSession();
 
         if (id.equals("home")) {
-            id = session.getObjectByPath(alfrescoHomePath).getId();
+            OperationContext oc = session.createOperationContext();
+            oc.setRenditionFilterString("*");
+            id = session.getObjectByPath(alfrescoHomePath, oc).getId();
         }
 
         CmisObject obj = session.getObject(id);
@@ -107,7 +111,9 @@ public class AlfrescoCmis11Repository implements CmisRepository {
 
         CmisObject obj;
         try {
-             obj = session.getObject(id);
+            OperationContext oc = session.createOperationContext();
+            oc.setRenditionFilterString("*");
+            obj = session.getObject(id,oc);
         }
         catch (CmisObjectNotFoundException e){
             throw new NoSuchElementException("Document not found: "  + id);
@@ -130,45 +136,69 @@ public class AlfrescoCmis11Repository implements CmisRepository {
         Session session = connection.getSession();
         OperationContext oc = session.createOperationContext();
         oc.setRenditionFilterString("*");
-        ItemIterable<QueryResult> children = session.query(query, false);
+        ItemIterable<QueryResult> children = session.query(query, false, oc);
 
         return children;
     }
 
     @Override
     public ItemIterable<QueryResult> getSubDocuments(Folder folder, Map<String,String> filters) {
-        String queryFilterTemplate = "AND %s LIKE %%s% ";
-        String queryFilter = "";
-        for (String filter : filters.keySet()){
-            queryFilter += String.format(queryFilterTemplate,filter,filters.get(filter));
-        }
-        String query = "SELECT D.* FROM cmis:document D WHERE IN_FOLDER('" + folder.getId() + "') " + queryFilter;
+
+        String query = "SELECT D.* FROM cmis:document D WHERE IN_FOLDER('" + folder.getId() + "') ";
 
         Session session = connection.getSession();
         OperationContext oc = session.createOperationContext();
         oc.setRenditionFilterString("*");
-        ItemIterable<QueryResult> children = session.query(query, false);
+        ItemIterable<QueryResult> children = session.query(query, false, oc);
 
         return children;
     }
 
     @Override
     public ItemIterable<QueryResult> search(String folderId, List<String> filters) {
-        String queryFilterTemplate = "AND %s LIKE '%%%s%%' ";
-        String queryFilter = "";
+        String queryFilters = "";
+        String queryFilterTemplateTEXT = "AND %s LIKE '%%%s%%' ";
+        String queryFilterTemplateDATEFROM = "AND %s > TIMESTAMP '%sT00:00:00.000+00:00' ";
+        String queryFilterTemplateDATETO = "AND %s < TIMESTAMP '%sT00:00:00.000+00:00' ";
+        String queryFilterTemplateDATE = "AND %s = TIMESTAMP '%sT00:00:00.000+00:00' ";
 
         for (int i=0; i<filterNames.length; i++) {
             if (!filters.get(i).isEmpty()) {
-                queryFilter += String.format(queryFilterTemplate,filterNames[i],filters.get(i));
+                String[] filterParts = filterNames[i].split("\\|");
+
+                String filterId = filterParts[1];
+                String filterType = filterParts[2];
+
+                switch (filterType) {
+                    case "TEXT": {
+                        queryFilters += String.format(queryFilterTemplateTEXT, filterId, filters.get(i));
+                        break;
+                    }
+
+                    case "DATE_FROM": {
+                        queryFilters += String.format(queryFilterTemplateDATEFROM, filterId, filters.get(i));
+                        break;
+                    }
+
+                    case "DATE_TO": {
+                        queryFilters += String.format(queryFilterTemplateDATETO, filterId, filters.get(i));
+                        break;
+                    }
+                }
             }
         }
 
-        String query = "SELECT * FROM " + typeName + " WHERE IN_TREE('workspace://SpacesStore/" + folderId + "') " + queryFilter;
+        String [] typeParts = type.split("\\|");
+        String typeName = typeParts[1];
+
+        String queryTemplate = "SELECT * FROM %s WHERE IN_TREE('workspace://SpacesStore/%s') %s";
+
+        String query = String.format(queryTemplate, typeName, folderId, queryFilters);
 
         Session session = connection.getSession();
         OperationContext oc = session.createOperationContext();
         oc.setRenditionFilterString("*");
-        ItemIterable<QueryResult> children = session.query(query, false);
+        ItemIterable<QueryResult> children = session.query(query, false, oc);
 
         return children;
     }
@@ -183,6 +213,8 @@ public class AlfrescoCmis11Repository implements CmisRepository {
     public void setSiteName(String siteName) {
         this.alfrescoHomePath = MessageFormat.format(alfrescoHomePathTemplate,siteName);
     }
+
+
 
 
 

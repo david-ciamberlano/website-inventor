@@ -7,7 +7,7 @@
 <head>
     <title></title>
     <link rel="stylesheet" href="<spring:url value="/resource/bootstrap-3.3.5-dist/css/bootstrap.css" />">
-	<link rel="stylesheet" href="<spring:url value="/resource/custom.css" />">
+    <link rel="stylesheet" href="<spring:url value="/resource/custom.css" />">
     <script src="<spring:url value="/resource/jquery-1.11.3.min.js"/>"></script>
     <script src="<spring:url value="/resource/bootstrap-3.3.5-dist/js/bootstrap.min.js"/>"></script>
 </head>
@@ -27,32 +27,61 @@
     </ol>
 </div>
 -->
+<%--SEARCH--%>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        Advanced Search
+    </div>
+    <div class="panel-body">
+        <form:form modelAttribute="searchFilters" method="POST" action="${pageContext.request.contextPath}/${site}/search" class="form-inline" role="form">
+            <div class="form-group">
+                <label for="biblioteca"> Biblioteca:</label>
+                <form:input class="form-control"  path="filter1" id="biblioteca" ></form:input>
+            </div>
+            <div class="form-group">
+                <label for="testata"> Testata:</label>
+                <form:input class="form-control" path="filter2" id="testata" ></form:input>
+            </div>
+            <div class="form-group">
+                <label for="dataUscitaDa"> Data Uscita da:</label>
+                <form:input class="form-control" path="filter3" id="dataUscitaDa" placeholder="yyyy-mm-dd"></form:input>
+            </div>
+            <div class="form-group">
+                <label for="dataUscitaA"> a:</label>
+                <form:input class="form-control" path="filter4" id="dataUscitaA" placeholder="yyyy-mm-dd"></form:input>
+            </div>
+            <button class="btn btn-default" type="submit">Cerca</button>
+            </fieldset>
+        </form:form>
+    </div>
+</div>
+
 <div class="row">
     <%--navigation--%>
-	<!--
+    <!--
     <aside class="col-sm-3">
 		<nav class="list-group">
 
-			<a class="list-group-item" href="<spring:url value="/${site}/o/${page.parentId}" />"><span class="glyphicon glyphicon-circle-arrow-up"></span></a>
+			<a class="list-group-item" href="<spring:url value="/${site}/page/${page.parentId}" />"><span class="glyphicon glyphicon-circle-arrow-up"></span></a>
 			<c:forEach items="${page.links}" var="link">
-				<a class="list-group-item" href="<spring:url value="/${site}/o/${link.getId()}" />">${link.getName()}</a>
+				<a class="list-group-item" href="<spring:url value="/${site}/page/${link.getId()}" />">${link.getName()}</a>
 			</c:forEach>
         </nav>
     </aside>
 	-->
-	 <aside class="col-md-3">
+    <aside class="col-md-3">
         <div class="panel panel-default">
             <div class="panel-heading">
                 Links
             </div>
-			<div class="well well-sm">
-				Filtro: <input type="text" onkeyup="filter(this,'linkList')" />
-			</div>
+            <div class="well well-sm">
+                Filtro: <input type="text" onkeyup="filter(this,'linkList')" />
+            </div>
             <nav class="panel-body">
                 <ul class="nav nav-pills nav-stacked" id="linkList">
-					<c:forEach items="${page.links}" var="link">
-						<li role="presentation"><a href="<spring:url value="/${site}/o/${link.getId()}" />">${link.getName()}</a></li>
-					</c:forEach>
+                    <c:forEach items="${page.links}" var="link">
+                        <li role="presentation"><a href="<spring:url value="/${site}/page/${link.getId()}" />">${link.getName()}</a></li>
+                    </c:forEach>
                 </ul>
             </nav>
         </div>
@@ -76,7 +105,7 @@
                     <c:forEach items="${page.links}" var="link">
                         <div class="col-md-2">
                             <div class="thumbnail">
-                                <a href="<spring:url value="/${site}/o/${link.getId()}" />">
+                                <a href="<spring:url value="/${site}/page/${link.getId()}" />">
                                     <img src="<spring:url value="/resource/icons/container.png" />" alt="Library">
                                     <div class="caption text-center">
                                         <span>${link.getName()}</span>
@@ -134,20 +163,20 @@
 
 <script type="text/javascript">
 
-function filter(element,what) {
+    function filter(element,what) {
 
-	var value = $(element).val();
-    value = value.toLowerCase().replace(/\b[a-z]/g, function(letter) {
-        return letter.toUpperCase();
-    });
-	what = '#'+what;
-    if(value == '')
-        $(what+' > li').show();
-    else{
-        $(what+' > li:not(:contains(' + value + '))').hide();
-        $(what+' > li:contains(' + value + ')').show();
-    }
-};
+        var value = $(element).val();
+        value = value.toLowerCase().replace(/\b[a-z]/g, function(letter) {
+            return letter.toUpperCase();
+        });
+        what = '#'+what;
+        if(value == '')
+            $(what+' > li').show();
+        else{
+            $(what+' > li:not(:contains(' + value + '))').hide();
+            $(what+' > li:contains(' + value + ')').show();
+        }
+    };
 </script>
 </body>
 </html>

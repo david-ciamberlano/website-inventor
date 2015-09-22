@@ -31,7 +31,7 @@
     <section class="col-md-9">
         <div class="panel panel-default">
             <div class="panel-heading">
-                <span><a href="<spring:url value="/${site}" />"><span class="glyphicon glyphicon-home"></span> Home</a></span> - Search result
+                <a href="<spring:url value="/${site}" />"><span class="glyphicon glyphicon-home"></span> Home</a>
             </div>
             <div class="panel-body">
                 <%--contents--%>
@@ -63,7 +63,14 @@
                             <article class="media">
                                 <a href="<spring:url value="/proxy/${content.id}" />" >
                                     <div class="media-left media-middle">
-                                        <img class="img-thumbnail media-object" src="<spring:url value="/proxy/${content.getThumbnailId()}" />" alt="${content.getName()}"/>
+                                        <c:choose>
+                                            <c:when test="${content.thumbnailId == 'default-generic'}">
+                                                <img class="img-thumbnail media-object" src="<spring:url value="/resource/icons/default-generic-icon.png" />" alt="${content.getName()}"/>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <img class="img-thumbnail media-object" src="<spring:url value="/proxy/${content.getThumbnailId()}" />" alt="${content.getName()}"/>
+                                            </c:otherwise>
+                                        </c:choose>
                                     </div>
                                     <div class="media-body media-middle">
                                         <p>${content.name}</p>

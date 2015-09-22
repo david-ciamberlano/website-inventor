@@ -26,13 +26,14 @@ public class MainController {
     @Autowired
     WebPageService webPageService;
 
-    @RequestMapping(value="/{sitename}", method = RequestMethod.GET)
+    @RequestMapping("/{sitename}")
     public String homepage(Model model, @PathVariable("sitename") String site) {
-        return "forward:/" + site + "/o/home";
+        return "forward:/" + site + "/page/home";
     }
 
-    @RequestMapping(value="/{sitename}/o/{id}", method = RequestMethod.GET)
-    public String pageById(Model model, @PathVariable("sitename") String siteName, @PathVariable("id") String id) {
+    @RequestMapping("/{sitename}/page/{id}")
+    public String pageById( @ModelAttribute("searchFilters") SearchFilters searchFilters, Model model,
+                            @PathVariable("sitename") String siteName, @PathVariable("id") String id) {
         WebPage wp = webPageService.buildWebPage(siteName, id);
         model.addAttribute("page", wp);
         model.addAttribute("site", siteName);
@@ -42,19 +43,19 @@ public class MainController {
             view = "homepage";
         }
 
-        SearchFilters searchFilters = new SearchFilters();
-        model.addAttribute("searchFilters",searchFilters);
-
         return view;
     }
 
-    @RequestMapping(value = "/{sitename}/s", method = RequestMethod.POST)
+    @RequestMapping(value = "/{sitename}/search", method = RequestMethod.POST)
     public String search( @ModelAttribute("searchFilters") SearchFilters searchFilters, Model model,
                           @PathVariable("sitename") String siteName) {
         List<String> filters = new ArrayList<>();
         filters.add(searchFilters.getFilter1());
         filters.add(searchFilters.getFilter2());
         filters.add(searchFilters.getFilter3());
+        filters.add(searchFilters.getFilter4());
+        filters.add(searchFilters.getFilter5());
+        filters.add(searchFilters.getFilter6());
 
         WebPage wp = webPageService.buildSearchResultPage(siteName, filters);
 

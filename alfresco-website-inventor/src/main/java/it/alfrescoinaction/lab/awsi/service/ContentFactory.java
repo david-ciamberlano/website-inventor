@@ -2,6 +2,7 @@ package it.alfrescoinaction.lab.awsi.service;
 
 import it.alfrescoinaction.lab.awsi.domain.*;
 import org.apache.chemistry.opencmis.client.api.Document;
+import org.apache.chemistry.opencmis.client.api.Rendition;
 import org.apache.chemistry.opencmis.commons.impl.IOUtils;
 
 import java.io.InputStream;
@@ -51,6 +52,7 @@ public class ContentFactory {
                 if (doc.getRenditions().size() > 0) {
                     imageContent.setThumbnailId(doc.getRenditions().get(0).getStreamId());
                 }
+                else imageContent.setThumbnailId("default-image");
 
                 Map<String,String> props = new HashMap<>();
 
@@ -70,8 +72,16 @@ public class ContentFactory {
             default: {
                 // caso di file generico
                 Content content = new ContentImpl(doc.getId(),doc.getName(),doc.getContentStreamMimeType(), ContentType.GENERIC);
-                if (doc.getRenditions().size() > 0) {
-                    content.setThumbnailId(doc.getRenditions().get(0).getStreamId());
+
+                // search for the correct rendition
+                for (Rendition rend : doc.getRenditions()) {
+                    if ("cmis:thumbnail".equals(rend.getKind())) {
+                        content.setThumbnailId(rend.getStreamId());
+                    }
+                }
+
+                if (content.getThumbnailId().isEmpty()) {
+                    content.setThumbnailId("default-generic");
                 }
 
                 return content;
