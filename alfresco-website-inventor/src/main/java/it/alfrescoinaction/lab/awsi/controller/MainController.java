@@ -38,9 +38,9 @@ public class MainController {
         model.addAttribute("page", wp);
         model.addAttribute("site", siteName);
 
-        String view = "genericpage";
+        String view = "themes/sena/genericpage";
         if (wp.isHomepage()) {
-            view = "homepage";
+            view = "themes/sena/homepage";
         }
 
         return view;
@@ -62,7 +62,7 @@ public class MainController {
         model.addAttribute("page", wp);
         model.addAttribute("site", siteName);
 
-        String view = "searchresult";
+        String view = "themes/sena/searchresult";
 
         return view;
     }

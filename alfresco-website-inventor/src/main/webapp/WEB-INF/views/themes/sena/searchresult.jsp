@@ -6,10 +6,10 @@
 <html>
 <head>
     <title></title>
-    <link rel="stylesheet" href="<spring:url value="/resource/bootstrap-3.3.5-dist/css/bootstrap.css" />">
-	<link rel="stylesheet" href="<spring:url value="/resource/custom.css" />">
-    <script src="<spring:url value="/resource/jquery-1.11.3.min.js"/>"></script>
-    <script src="<spring:url value="/resource/bootstrap-3.3.5-dist/js/bootstrap.min.js"/>"></script>
+    <link rel="stylesheet" href="<spring:url value="/resource/themes/sena/bootstrap-3.3.5-dist/css/bootstrap.css" />">
+	<link rel="stylesheet" href="<spring:url value="/resource/themes/sena/custom.css" />">
+    <script src="<spring:url value="/resource/themes/sena/jquery-1.11.3.min.js"/>"></script>
+    <script src="<spring:url value="/resource/themes/sena/bootstrap-3.3.5-dist/js/bootstrap.min.js"/>"></script>
 </head>
 
 <body class="container">
@@ -23,6 +23,9 @@
         <div class="panel panel-default">
             <div class="panel-heading">
                 Links
+            </div>
+            <div class="panel-body">
+                <span><a href="<spring:url value="/${site}" />"><span class="glyphicon glyphicon-home"></span> Home</a></span>
             </div>
         </div>
     </aside>
@@ -65,7 +68,7 @@
                                     <div class="media-left media-middle">
                                         <c:choose>
                                             <c:when test="${content.thumbnailId == 'default-generic'}">
-                                                <img class="img-thumbnail media-object" src="<spring:url value="/resource/icons/default-generic-icon.png" />" alt="${content.getName()}"/>
+                                                <img class="img-thumbnail media-object" src="<spring:url value="/resource/themes/sena/icons/default-generic-icon.png" />" alt="${content.getName()}"/>
                                             </c:when>
                                             <c:otherwise>
                                                 <img class="img-thumbnail media-object" src="<spring:url value="/proxy/${content.getThumbnailId()}" />" alt="${content.getName()}"/>

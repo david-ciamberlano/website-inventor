@@ -2,14 +2,15 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html>
 <head>
     <title></title>
-    <link rel="stylesheet" href="<spring:url value="/resource/bootstrap-3.3.5-dist/css/bootstrap.css" />">
-    <link rel="stylesheet" href="<spring:url value="/resource/custom.css" />">
-    <script src="<spring:url value="/resource/jquery-1.11.3.min.js"/>"></script>
-    <script src="<spring:url value="/resource/bootstrap-3.3.5-dist/js/bootstrap.min.js"/>"></script>
+    <link rel="stylesheet" href="<spring:url value="/resource/themes/sena/bootstrap-3.3.5-dist/css/bootstrap.css" />">
+    <link rel="stylesheet" href="<spring:url value="/resource/themes/sena/custom.css" />">
+    <script src="<spring:url value="/resource/themes/sena/jquery-1.11.3.min.js"/>"></script>
+    <script src="<spring:url value="/resource/themes/sena/bootstrap-3.3.5-dist/js/bootstrap.min.js"/>"></script>
 </head>
 
 <body class="container">
@@ -80,7 +81,7 @@
             <nav class="panel-body">
                 <ul class="nav nav-pills nav-stacked" id="linkList">
                     <c:forEach items="${page.links}" var="link">
-                        <li role="presentation"><a href="<spring:url value="/${site}/page/${link.getId()}" />">${link.getName()}</a></li>
+                        <li role="presentation"><a href="<spring:url value="/${site}/page/${link.getId()}" />">${fn:replace(link.name,'_',' ')}</a></li>
                     </c:forEach>
                 </ul>
             </nav>
@@ -101,14 +102,15 @@
                 </c:if>
 
                 <%--contents--%>
+                <%-- only links page --%>
                 <c:if test="${page.contents.size() == 0}">
                     <c:forEach items="${page.links}" var="link">
                         <div class="col-md-2">
                             <div class="thumbnail">
                                 <a href="<spring:url value="/${site}/page/${link.getId()}" />">
-                                    <img src="<spring:url value="/resource/icons/container.png" />" alt="Library">
+                                    <img src="<spring:url value="/resource/themes/sena/icons/container.png" />" alt="Library">
                                     <div class="caption text-center">
-                                        <span>${link.getName()}</span>
+                                        <span>${fn:replace(link.name,'_',' ')}</span>
                                     </div>
                                 </a>
                             </div>
@@ -163,20 +165,26 @@
 
 <script type="text/javascript">
 
-    function filter(element,what) {
 
-        var value = $(element).val();
-        value = value.toLowerCase().replace(/\b[a-z]/g, function(letter) {
-            return letter.toUpperCase();
-        });
-        what = '#'+what;
-        if(value == '')
-            $(what+' > li').show();
-        else{
-            $(what+' > li:not(:contains(' + value + '))').hide();
-            $(what+' > li:contains(' + value + ')').show();
+    function filter (element) {
+        var value = $(element).val().toLowerCase();
+
+        var links = $('#linkList > li');
+        if (value === '') {
+            links.show();
         }
-    };
+        else {
+            var linksToHide  = links.filter( function(){
+                return $(this).text().toLowerCase().indexOf(value) == -1;
+            });
+            var linksToShow = links.filter( function(){
+                return $(this).text().toLowerCase().indexOf(value) > -1;
+            });
+
+            linksToHide.hide();
+            linksToShow.show();
+        }
+    }
 </script>
 </body>
 </html>

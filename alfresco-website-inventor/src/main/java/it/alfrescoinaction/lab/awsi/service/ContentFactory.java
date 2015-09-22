@@ -2,12 +2,12 @@ package it.alfrescoinaction.lab.awsi.service;
 
 import it.alfrescoinaction.lab.awsi.domain.*;
 import org.apache.chemistry.opencmis.client.api.Document;
+import org.apache.chemistry.opencmis.client.api.Property;
 import org.apache.chemistry.opencmis.client.api.Rendition;
 import org.apache.chemistry.opencmis.commons.impl.IOUtils;
 
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class ContentFactory {
 
@@ -76,13 +76,42 @@ public class ContentFactory {
                 // search for the correct rendition
                 for (Rendition rend : doc.getRenditions()) {
                     if ("cmis:thumbnail".equals(rend.getKind())) {
-                        content.setThumbnailId(rend.getStreamId());
+                        content.setThumbnailId(rend.getStreamId()); break;
                     }
                 }
 
                 if (content.getThumbnailId().isEmpty()) {
                     content.setThumbnailId("default-generic");
                 }
+
+                // set all the properties as string---
+                // in this way I can use them in the view without casting
+                List<Property<?>> properties = doc.getProperties();
+
+                Map<String,String> props = new HashMap<>();
+                for (Property property : properties) {
+                    switch (property.getType().value()) {
+                        case "datetime": {
+                            GregorianCalendar propertyDate = (GregorianCalendar)property.getFirstValue();
+                            String propertyFormattedDate = propertyDate.get(Calendar.YEAR) + "-"
+                                    + (propertyDate.get(Calendar.MONTH)+1) + "-"
+                                    + (propertyDate.get(Calendar.DAY_OF_MONTH)+1) + " "
+                                    + propertyDate.get(Calendar.HOUR) + ":"
+                                    + propertyDate.get(Calendar.MINUTE) + ":"
+                                    + propertyDate.get(Calendar.SECOND);
+                            props.put(property.getLocalName(), propertyFormattedDate);
+                            break;
+                        }
+
+                        default:
+                            props.put(property.getLocalName(), property.getValueAsString());
+                    }
+
+
+
+                }
+
+                content.setProperties(props);
 
                 return content;
             }

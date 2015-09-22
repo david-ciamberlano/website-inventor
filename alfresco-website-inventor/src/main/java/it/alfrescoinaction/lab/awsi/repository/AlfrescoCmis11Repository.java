@@ -158,8 +158,8 @@ public class AlfrescoCmis11Repository implements CmisRepository {
     public ItemIterable<QueryResult> search(String folderId, List<String> filters) {
         String queryFilters = "";
         String queryFilterTemplateTEXT = "AND %s LIKE '%%%s%%' ";
-        String queryFilterTemplateDATEFROM = "AND %s > TIMESTAMP '%sT00:00:00.000+00:00' ";
-        String queryFilterTemplateDATETO = "AND %s < TIMESTAMP '%sT00:00:00.000+00:00' ";
+        String queryFilterTemplateDATEFROM = "AND %s >= TIMESTAMP '%sT00:00:00.000+00:00' ";
+        String queryFilterTemplateDATETO = "AND %s <= TIMESTAMP '%sT00:00:00.000+00:00' ";
         String queryFilterTemplateDATE = "AND %s = TIMESTAMP '%sT00:00:00.000+00:00' ";
 
         for (int i=0; i<filterNames.length; i++) {
