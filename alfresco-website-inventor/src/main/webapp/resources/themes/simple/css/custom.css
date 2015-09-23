@@ -1,0 +1,13 @@
+.form-control { width: auto;}
+
+.breadcrumb {
+    margin:26px 16px;
+    font-size: large;
+}
+
+.thumbnail {
+    min-height:150px;
+    height:150px;
+    border: none;
+    margin: 30px 2px;
+}

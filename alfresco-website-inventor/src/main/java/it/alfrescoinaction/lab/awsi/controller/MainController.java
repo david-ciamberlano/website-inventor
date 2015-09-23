@@ -38,9 +38,9 @@ public class MainController {
         model.addAttribute("page", wp);
         model.addAttribute("site", siteName);
 
-        String view = "themes/sena/genericpage";
+        String view = "index";
         if (wp.isHomepage()) {
-            view = "themes/sena/homepage";
+            view = "index";
         }
 
         return view;
