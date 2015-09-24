@@ -157,7 +157,7 @@ public class AlfrescoCmis11Repository implements CmisRepository {
     @Override
     public ItemIterable<QueryResult> search(String folderId, List<String> filters) {
         String queryFilters = "";
-        String queryFilterTemplateTEXT = "AND %s LIKE '%%%s%%' ";
+        String queryFilterTemplateTEXT = "AND %s LIKE '%s' ";
         String queryFilterTemplateDATEFROM = "AND %s >= TIMESTAMP '%sT00:00:00.000+00:00' ";
         String queryFilterTemplateDATETO = "AND %s <= TIMESTAMP '%sT00:00:00.000+00:00' ";
         String queryFilterTemplateDATE = "AND %s = TIMESTAMP '%sT00:00:00.000+00:00' ";
@@ -172,6 +172,21 @@ public class AlfrescoCmis11Repository implements CmisRepository {
                 switch (filterType) {
                     case "TEXT": {
                         queryFilters += String.format(queryFilterTemplateTEXT, filterId, filters.get(i));
+                        break;
+                    }
+
+                    case "%TEXT": {
+                        queryFilters += String.format(queryFilterTemplateTEXT, filterId, "%" + filters.get(i));
+                        break;
+                    }
+
+                    case "TEXT%": {
+                        queryFilters += String.format(queryFilterTemplateTEXT, filterId, filters.get(i) + "%");
+                        break;
+                    }
+
+                    case "%TEXT%": {
+                        queryFilters += String.format(queryFilterTemplateTEXT, filterId, "%" + filters.get(i) + "%");
                         break;
                     }
 

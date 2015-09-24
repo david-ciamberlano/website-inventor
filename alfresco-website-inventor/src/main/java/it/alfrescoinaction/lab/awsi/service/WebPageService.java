@@ -127,7 +127,7 @@ public class WebPageService {
     }
 
     public Downloadable getDownloadable(String id) {
-        Document doc = repository.getDocumentById(id);
+         Document doc = repository.getDocumentById(id);
         return new Downloadable(doc.getName(),doc.getContentStream().getStream(),doc.getContentStreamLength(),doc.getContentStreamMimeType());
     }
 

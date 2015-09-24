@@ -93,13 +93,9 @@ public class ContentFactory {
                     switch (property.getType().value()) {
                         case "datetime": {
                             GregorianCalendar propertyDate = (GregorianCalendar)property.getFirstValue();
-                            String propertyFormattedDate = propertyDate.get(Calendar.YEAR) + "-"
-                                    + (propertyDate.get(Calendar.MONTH)+1) + "-"
-                                    + (propertyDate.get(Calendar.DAY_OF_MONTH)+1) + " "
-                                    + propertyDate.get(Calendar.HOUR) + ":"
-                                    + propertyDate.get(Calendar.MINUTE) + ":"
-                                    + propertyDate.get(Calendar.SECOND);
-                            props.put(property.getLocalName(), propertyFormattedDate);
+                            if (propertyDate != null) {
+                                props.put(property.getLocalName(), String.valueOf(propertyDate.getTimeInMillis()));
+                            }
                             break;
                         }
 
