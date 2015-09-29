@@ -20,7 +20,6 @@ public class WebPage {
     private List<Link> links = new ArrayList<>(10);
     private List<Content> contents = new ArrayList<>(20);
     private Map<String,String> breadcrumbs = new LinkedHashMap<>(10);
-    private ContentFactory contentFactory;
 
     public WebPage(String id, String title, String parentId, boolean homepage) {
         this.id = id;
@@ -37,8 +36,7 @@ public class WebPage {
     }
 
     public void addContent(Document doc) {
-        contentFactory = new ContentFactory();
-        contents.add(contentFactory.buildContent(doc));
+        contents.add (ContentFactory.buildContent(doc));
     }
 
     public void addCategory(String categoryName, String id) {
@@ -53,8 +51,7 @@ public class WebPage {
     }
 
     public void addSpecialContent(String type, Document doc) {
-        contentFactory = new ContentFactory();
-        specialContent.put(type, contentFactory.buildContent(doc));
+        specialContent.put(type, ContentFactory.buildContent(doc));
     }
 
     //===== getters/setters =====

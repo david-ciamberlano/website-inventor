@@ -1,4 +1,4 @@
-package it.alfrescoinaction.lab.awsi.service;
+package it.alfrescoinaction.lab.awsi.repository;
 
 import it.alfrescoinaction.lab.awsi.exceptions.CmisConnectionException;
 import org.apache.chemistry.opencmis.client.api.Session;

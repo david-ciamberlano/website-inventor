@@ -59,7 +59,9 @@
                     Filtro: <input type="text" onkeyup="filter(this,'linkList')" />
                 </div>
                 <ul class="nav nav-stacked" id="sidebar">
-                    <li><a href="<spring:url value="/${site}/page/${page.parentId}" />"><span class="glyphicon glyphicon-circle-arrow-up"></span></a></li>
+                    <c:if test="${!page.homepage}">
+                        <li><a href="<spring:url value="/${site}/page/${page.parentId}" />"><span class="glyphicon glyphicon-circle-arrow-up"></span></a></li>
+                    </c:if>
                     <c:forEach items="${page.links}" var="link">
                         <li><a href="${contextPath}/${site}/page/${link.getId()}">${fn:replace(link.name,'_',' ')}</a></li>
                     </c:forEach>
@@ -72,10 +74,12 @@
             <div class="well">
                 <ul class="breadcrumb">
                     <li><a href="<spring:url value="/${site}" />"><span class="glyphicon glyphicon-home"></span> Home</a></li>
-                    <c:forEach items="${page.breadcrumbs}" var="bcEntry">
-                        <li><a href="<spring:url value="/${site}/page/${bcEntry.value}" />">${bcEntry.key}</a></li>
-                    </c:forEach>
-                    <li>${page.title}</li>
+                    <c:if test="${!page.homepage}">
+                        <c:forEach items="${page.breadcrumbs}" var="bcEntry">
+                            <li><a href="<spring:url value="/${site}/page/${bcEntry.value}" />">${bcEntry.key}</a></li>
+                        </c:forEach>
+                        <li>${page.title}</li>
+                    </c:if>
                 </ul>
             </div>
             <div class="well">
@@ -102,8 +106,9 @@
                         </c:forEach>
                     </c:if>
                     <c:if test="${page.contents.size() > 0}">
+
                         <c:forEach items="${page.contents}" var="content">
-                            <article>
+                            <article class="row">
                                 <c:choose>
                                     <%--TEXT--%>
                                     <c:when test="${content.getType() == 'TEXT'}">

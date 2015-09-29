@@ -11,7 +11,7 @@ import java.util.*;
 
 public class ContentFactory {
 
-    public Content buildContent(Document doc) {
+    public static Content buildContent(Document doc) {
 
         switch (doc.getContentStreamMimeType()) {
 
@@ -102,9 +102,6 @@ public class ContentFactory {
                         default:
                             props.put(property.getLocalName(), property.getValueAsString());
                     }
-
-
-
                 }
 
                 content.setProperties(props);

@@ -1,4 +1,4 @@
-package it.alfrescoinaction.lab.awsi.service;
+package it.alfrescoinaction.lab.awsi.repository;
 
 
 import org.apache.chemistry.opencmis.client.api.Session;

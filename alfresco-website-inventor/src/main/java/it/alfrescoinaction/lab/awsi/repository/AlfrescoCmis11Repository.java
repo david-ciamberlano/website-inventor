@@ -1,18 +1,15 @@
 package it.alfrescoinaction.lab.awsi.repository;
 
-import it.alfrescoinaction.lab.awsi.service.RemoteConnection;
+import it.alfrescoinaction.lab.awsi.exceptions.PageNotFoundException;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
-import java.text.Format;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
 
 
 @Repository
@@ -48,12 +45,12 @@ public class AlfrescoCmis11Repository implements CmisRepository {
             return children;
         }
         else {
-            throw new NoSuchElementException("Home folder not found: " + alfrescoHomePath);
+            throw new PageNotFoundException("Home folder not found: " + alfrescoHomePath);
         }
     }
 
     @Override
-    public Folder getFolderById(String id) throws NoSuchElementException {
+    public Folder getFolderById(String id) throws PageNotFoundException {
         Session session = connection.getSession();
 
         if (id.equals("home")) {
@@ -62,7 +59,13 @@ public class AlfrescoCmis11Repository implements CmisRepository {
             id = session.getObjectByPath(alfrescoHomePath, oc).getId();
         }
 
-        CmisObject obj = session.getObject(id);
+        CmisObject obj;
+        try {
+            obj = session.getObject(id);
+        }
+        catch(CmisObjectNotFoundException e) {
+            throw new PageNotFoundException(id);
+        }
 
         // procceed only if the node is a folder
         if (obj.getBaseTypeId().value().equals("cmis:folder")){
@@ -70,7 +73,7 @@ public class AlfrescoCmis11Repository implements CmisRepository {
             return folder;
         }
         else {
-            throw new NoSuchElementException("Folder not found: "  + id);
+            throw new PageNotFoundException("Folder not found: "  + id);
         }
     }
 
@@ -78,10 +81,10 @@ public class AlfrescoCmis11Repository implements CmisRepository {
      *
      * @param realtivePath: in the form F1/F2/F3 (no initial /)
      * @return
-     * @throws NoSuchElementException
+     * @throws PageNotFoundException
      */
     @Override
-    public String getFolderIdByRelativePath(String realtivePath) throws NoSuchElementException {
+    public String getFolderIdByRelativePath(String realtivePath) throws PageNotFoundException {
         Session session = connection.getSession();
 
         // delete initial /
@@ -100,13 +103,13 @@ public class AlfrescoCmis11Repository implements CmisRepository {
             return obj.getId();
         }
         else {
-            throw new NoSuchElementException("Folder not found: "  + fullPath);
+            throw new PageNotFoundException("Folder not found: "  + fullPath);
         }
 
     }
 
     @Override
-    public Document getDocumentById(String id) throws NoSuchElementException {
+    public Document getDocumentById(String id) throws PageNotFoundException {
         Session session = connection.getSession();
 
         CmisObject obj;
@@ -116,7 +119,7 @@ public class AlfrescoCmis11Repository implements CmisRepository {
             obj = session.getObject(id,oc);
         }
         catch (CmisObjectNotFoundException e){
-            throw new NoSuchElementException("Document not found: "  + id);
+            throw new PageNotFoundException("Document not found: "  + id);
         }
 
         if (obj.getBaseTypeId().value().equals("cmis:document") || obj.getBaseTypeId().value().equals("D:cm:thumbnail")){
@@ -124,7 +127,7 @@ public class AlfrescoCmis11Repository implements CmisRepository {
             return doc;
         }
         else {
-            throw new NoSuchElementException("Document not found: "  + id);
+            throw new PageNotFoundException("Document not found: "  + id);
         }
     }
 
@@ -187,6 +190,11 @@ public class AlfrescoCmis11Repository implements CmisRepository {
 
                     case "%TEXT%": {
                         queryFilters += String.format(queryFilterTemplateTEXT, filterId, "%" + filters.get(i) + "%");
+                        break;
+                    }
+
+                    case "DATE": {
+                        queryFilters += String.format(queryFilterTemplateDATE, filterId, filters.get(i));
                         break;
                     }
 

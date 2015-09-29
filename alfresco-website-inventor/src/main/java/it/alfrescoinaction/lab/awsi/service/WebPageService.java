@@ -38,7 +38,7 @@ public class WebPageService {
 
         if (!isHomepage) {
             // breadcrumbs
-            String relativeFolderPath = folderPath.replace(repository.getAlfrescoHomePath(), "");
+            String relativeFolderPath = folderPath.replace(repository.getAlfrescoHomePath() + "/", "");
             String[] pathItems = relativeFolderPath.split("(?=/)");
 
             String pathAcc = "";

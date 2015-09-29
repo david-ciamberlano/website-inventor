@@ -4,16 +4,21 @@ package it.alfrescoinaction.lab.awsi.controller;
 import it.alfrescoinaction.lab.awsi.domain.Downloadable;
 import it.alfrescoinaction.lab.awsi.domain.SearchFilters;
 import it.alfrescoinaction.lab.awsi.domain.WebPage;
+import it.alfrescoinaction.lab.awsi.exceptions.PageNotFoundException;
 import it.alfrescoinaction.lab.awsi.service.WebPageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,6 +30,12 @@ public class MainController {
 
     @Autowired
     WebPageService webPageService;
+
+    @Value("${theme.hometemplate}")
+    private String homeTheme;
+
+    @Value("${theme.pagetemplate}")
+    private String pageTheme;
 
     @RequestMapping("/{sitename}")
     public String homepage(Model model, @PathVariable("sitename") String site) {
@@ -38,11 +49,10 @@ public class MainController {
         model.addAttribute("page", wp);
         model.addAttribute("site", siteName);
 
-        String view = "index";
+        String view = pageTheme;
         if (wp.isHomepage()) {
-            view = "index";
+            view = homeTheme;
         }
-
         return view;
     }
 
@@ -87,6 +97,26 @@ public class MainController {
             .contentType(MediaType.parseMediaType(downloadable.getMimeType()))
             .body(new InputStreamResource(downloadable.getStream()));
     }
+
+    @ExceptionHandler(PageNotFoundException.class)
+    public ModelAndView handleError(HttpServletRequest req, PageNotFoundException exc) {
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("Invalid Page", exc.getPageId());
+        mav.addObject("exception", exc);
+        mav.addObject("utl",req.getRequestURL());
+        mav.setViewName("pageNotFound");
+
+        return mav;
+    }
+
+    //------------- GETTERS/SETTERS -------------
+//    public void setHomeTheme(String homeTheme) {
+//        this.homeTheme = homeTheme;
+//    }
+//
+//    public void setPageTheme(String pageTheme) {
+//        this.pageTheme = pageTheme;
+//    }
 
 
     //------------- PRIVATE -------------
