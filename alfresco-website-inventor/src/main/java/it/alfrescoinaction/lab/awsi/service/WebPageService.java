@@ -1,13 +1,16 @@
 package it.alfrescoinaction.lab.awsi.service;
 
 import it.alfrescoinaction.lab.awsi.domain.Downloadable;
+import it.alfrescoinaction.lab.awsi.domain.FileDownloadable;
 import it.alfrescoinaction.lab.awsi.domain.WebPage;
 import it.alfrescoinaction.lab.awsi.repository.CmisRepository;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
+import org.apache.http.HttpEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.*;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -97,7 +100,7 @@ public class WebPageService {
     public WebPage buildSearchResultPage(String siteName, List<String> filters) throws CmisObjectNotFoundException {
 
         repository.setSiteName(siteName);
-        // the homepage has a relative path= ""
+        // the homepage has a relative path = "/"
         String homePageId = repository.getFolderIdByRelativePath("/");
         WebPage wp = new WebPage("search-result", "Search result", homePageId, false);
 
@@ -128,7 +131,15 @@ public class WebPageService {
 
     public Downloadable getDownloadable(String id) {
          Document doc = repository.getDocumentById(id);
-        return new Downloadable(doc.getName(),doc.getContentStream().getStream(),doc.getContentStreamLength(),doc.getContentStreamMimeType());
+        return new FileDownloadable(doc.getName(),
+                doc.getContentStream().getStream(), doc.getContentStreamLength(), doc.getContentStreamMimeType());
+    }
+
+    public Downloadable getRendition(String type, String objectId) {
+        Document doc =  repository.getDocumentById(objectId);
+        Downloadable rendition = repository.getRendition(type, objectId, doc.getName());
+
+        return rendition;
     }
 
 }

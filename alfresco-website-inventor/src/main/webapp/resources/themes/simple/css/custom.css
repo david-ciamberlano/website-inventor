@@ -1,13 +1,22 @@
-.form-control { width: auto;}
+article {
+    margin: 1em 1em 2em 1em;
+}
 
 .breadcrumb {
     font-size: large;
-    margin: 0;
+    margin: 1em 0 2em 0;
 }
+
 
 .thumbnail {
     min-height:220px;
     height:150px;
     border: none;
-    margin: 30px 2px;
+    margin: 10px 2px;
 }
+
+.form-horizontal .form-group {
+    margin-left: 0;
+    margin-right: 0;
+}
+

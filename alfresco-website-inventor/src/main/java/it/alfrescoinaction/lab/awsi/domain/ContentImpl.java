@@ -6,12 +6,12 @@ import java.util.Map;
 
 public class ContentImpl implements Content{
 
-    private String id;
-    private String name;
-    private String mimeType;
-    private String thumbnailId;
-    private ContentType type;
+    private final String id;
+    private final String name;
+    private final String mimeType;
+    private final ContentType type;
     private Map<String,String> properties;
+    private Map<String,String> renditions;
 
     public ContentImpl(String id, String name, String mimeType, ContentType type) {
         this.id = id;
@@ -20,7 +20,7 @@ public class ContentImpl implements Content{
         this.type = type;
 
         this.properties = new HashMap<>();
-        this.thumbnailId = "";
+        this.renditions = new HashMap<>();
     }
 
     @Override
@@ -28,36 +28,14 @@ public class ContentImpl implements Content{
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
     @Override
     public String getName() {
         return this.name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     @Override
     public String getMimeType() {
         return this.mimeType;
-    }
-
-    public void setMimeType(String mimeType) {
-        this.mimeType = mimeType;
-    }
-
-    @Override
-    public String getThumbnailId() {
-        return thumbnailId;
-    }
-
-    @Override
-    public void setThumbnailId(String thumbnailId) {
-        this.thumbnailId = thumbnailId;
     }
 
     @Override
@@ -77,5 +55,25 @@ public class ContentImpl implements Content{
     public void setProperties(Map<String, String> props) {
         // defensive copy
         this.properties.putAll(props);
+    }
+
+
+    public Map<String, String> getRenditions() {
+        // defensive copy
+        Map<String,String> renditions = new HashMap<>();
+        renditions.putAll(this.renditions);
+        return renditions;
+    }
+
+    public String getRenditionStreamIdbyType(String type) {
+        if (renditions.containsKey(type)) {
+            return renditions.get(type);
+        }
+        else return renditions.get("default");
+    }
+
+    public void setRenditions(Map<String, String> renditions) {
+        // defensive copy
+        this.renditions.putAll(renditions);
     }
 }

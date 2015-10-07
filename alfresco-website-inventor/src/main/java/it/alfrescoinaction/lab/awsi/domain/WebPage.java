@@ -11,10 +11,10 @@ import java.util.*;
  */
 public class WebPage {
 
-    private String id;
-    private String title;
-    private String parentId;
-    private boolean homepage;
+    private final String id;
+    private final String title;
+    private final String parentId;
+    private final boolean homepage;
     private Map<String,Content> specialContent = new HashMap<>(6);
     private List<Link> categories = new ArrayList<>(10);
     private List<Link> links = new ArrayList<>(10);
@@ -29,9 +29,7 @@ public class WebPage {
     }
 
     public void addLinks(String pageName, String id) {
-        Link link = new Link();
-        link.setId(id);
-        link.setName(pageName);
+        Link link = new Link(id, pageName);
         links.add(link);
     }
 
@@ -40,9 +38,7 @@ public class WebPage {
     }
 
     public void addCategory(String categoryName, String id) {
-        Link link = new Link();
-        link.setId(id);
-        link.setName(categoryName);
+        Link link = new Link(id, categoryName);
         categories.add(link);
     }
 

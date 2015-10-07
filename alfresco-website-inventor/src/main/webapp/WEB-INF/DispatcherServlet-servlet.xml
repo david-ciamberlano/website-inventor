@@ -6,7 +6,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <property name="locations" value="file:${catalina.home}/conf/awsi.properties"/>
+        <property name="location" value="file:${catalina.home}/conf/awsi.properties" />
     </bean>
 
     <mvc:annotation-driven />
@@ -20,5 +20,18 @@
     </bean>
 
     <mvc:resources mapping="/resource/**" location="/resources/" />
+
+    <mvc:annotation-driven>
+        <mvc:message-converters>
+            <bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter">
+                <property name="supportedMediaTypes">
+                    <list>
+                        <value>image/jpeg</value>
+                        <value>image/png</value>
+                    </list>
+                </property>
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
 
 </beans>

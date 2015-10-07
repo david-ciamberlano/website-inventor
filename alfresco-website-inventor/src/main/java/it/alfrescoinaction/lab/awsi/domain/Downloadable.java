@@ -2,31 +2,16 @@ package it.alfrescoinaction.lab.awsi.domain;
 
 import java.io.InputStream;
 
-public class Downloadable {
+/**
+ * Created by david on 10/2/15.
+ */
+public interface Downloadable<T>  {
 
-    private String name;
-    private InputStream stream;
-    private long contentLength;
-    private String mimeType;
+    String getName();
 
-    public Downloadable(String name, InputStream stream, long contentLength, String mimeType) {
-        this.name = name;
-        this.stream = stream;
-        this.contentLength = contentLength;
-        this.mimeType = mimeType;
-    }
+    T getContent();
 
-    public String getName() {return name; }
+    long getContentLength();
 
-    public InputStream getStream() {
-        return stream;
-    }
-
-    public long getContentLength() {
-        return contentLength;
-    }
-
-    public String getMimeType() {
-        return mimeType;
-    }
+    String getMimeType();
 }
