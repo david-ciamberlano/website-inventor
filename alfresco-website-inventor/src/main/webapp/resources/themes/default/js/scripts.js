@@ -1,7 +1,9 @@
 var filter;
+var clearFilter;
 
 $(document).ready(function(){
-    filter = function (element) {
+
+    filter = function(element) {
         var value = $(element).val().toLowerCase();
 
         var links = $('#links > a');
@@ -19,5 +21,10 @@ $(document).ready(function(){
             linksToHide.hide();
             linksToShow.show();
         }
+    }
+
+    clearFilter = function(element) {
+        $(element).val('');
+        $('#links > a').show();
     }
 });

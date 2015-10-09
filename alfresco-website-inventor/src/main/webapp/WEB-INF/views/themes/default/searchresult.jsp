@@ -16,7 +16,6 @@
     <!--[if lt IE 9]>
     <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-    <link href="${contextPath}/resource/themes/simple/css/styles.css" rel="stylesheet">
     <link href="${contextPath}/resource/themes/simple/css/custom.css" rel="stylesheet">
 </head>
 <body>
@@ -34,23 +33,23 @@
 
         <%--LINKS--%>
         <div class="col-md-3">
-            <h2>Navigazione</h2>
-            <ul class="nav nav-tabs">
+            <ul class="nav nav-tabs voffset-big">
                 <li class="active"><a aria-expanded="true" href="#link-tab" data-toggle="tab">
-                    <span class="glyphicon glyphicon-th-list"></span> Navigation</a>
+                    <span class="glyphicon glyphicon-th-list"></span> Navigazione</a>
                 </li>
                 <li><a aria-expanded="false" href="#search-tab" data-toggle="tab">
-                    <span class="glyphicon glyphicon-search"></span> Search</a>
+                    <span class="glyphicon glyphicon-search"></span> Ricerca</a>
                 </li>
             </ul>
             <div id="myTabContent" class="tab-content">
-                <div class="tab-pane fade active in" id="link-tab">
+                <div class="tab-pane fade active in voffset-small" id="link-tab">
                     <fieldset>
-                        <legend>Giornali</legend>
+                        <legend>Giornali storici</legend>
                     </fieldset>
                     <div class="input-group">
                         <span class="input-group-addon">Filtro</span>
-                        <input class="form-control" type="text" onkeyup="filter(this,'linkList')" />
+                        <input class="form-control" type="text" onkeyup="filter(this,'linkList')" id="main-filter"/>
+                        <span class="input-group-addon" onclick="clearFilter('#main-filter')" ><span class="glyphicon glyphicon-remove" style="cursor: pointer"></span></span>
                     </div>
                     <br/>
                     <div id="links" class="list-group table-of-contents">
@@ -62,20 +61,29 @@
                         </c:forEach>
                     </div>
                 </div>
-                <div class="tab-pane fade" id="search-tab">
+                <div class="tab-pane fade in voffset-small" id="search-tab">
+                    <fieldset>
+                        <legend>Ricerca avanzata</legend>
+                    </fieldset>
                     <form:form modelAttribute="searchFilters" method="POST" action="${pageContext.request.contextPath}/${site}/search" class="form-horizontal">
-                        <fieldset>
-                            <legend>Search Form</legend>
-                        </fieldset>
+
                         <div class="form-group">
-                            <form:input class="form-control" path="filter1" id="biblioteca" placeholder="Biblioteca" ></form:input>
-                            <form:input class="form-control" path="filter2" id="testata" placeholder="Testata" ></form:input>
-                            <form:input class="form-control" path="filter3" id="uscita" placeholder="Uscita" size="3"></form:input>
-                            <form:input class="form-control" path="filter4" id="dataUscitaDa" placeholder="Data da (yyyy-mm-dd)" size="10"></form:input>
-                            <form:input class="form-control" path="filter5" id="dataUscitaA" placeholder="Data a (yyyy-mm-dd)" size="10"></form:input>
+                            <label for="testata">Testata</label>
+                            <form:input class="form-control" path="filter2" id="testata" ></form:input>
                         </div>
-                        <button type="reset" class="btn btn-default">Cancella</button>
-                        <button type="submit" class="btn btn-primary">Cerca</button>
+                        <div class="form-group">
+                            <label for="uscita">Numero uscita</label>
+                            <form:input class="form-control" path="filter3" id="uscita" size="3"></form:input>
+                        </div>
+                        <div class="form-group">
+                            <label for="dataUscitaDa">Data Uscita</label>
+                            <form:input class="form-control" path="filter4" id="dataUscitaDa" placeholder="Data da (yyyy-mm-dd)" size="10"></form:input>
+                            <form:input type="date" class="form-control" path="filter5" id="dataUscitaA" placeholder="Data a (yyyy-mm-dd)" size="10"></form:input>
+                        </div>
+                        <div class="text-right">
+                            <button type="reset" class="btn btn-default"><span class="glyphicon glyphicon-remove"></span> Cancella</button>
+                            <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-search"></span> Cerca</button>
+                        </div>
                     </form:form>
                 </div>
 
@@ -89,12 +97,15 @@
             <div class="row">
                 <div class="col-md-12">
                     <ul class="breadcrumb">
-                        <li><a href="${contextPath}/${site}"><span class="glyphicon glyphicon-home"></span> Home</a></li>
+                        <c:if test="${page.homepage}">
+                            <li class="active"><span class="glyphicon glyphicon-home"></span> Home</li>
+                        </c:if>
                         <c:if test="${!page.homepage}">
+                            <li><a href="${contextPath}/${site}"><span class="glyphicon glyphicon-home"></span> Home</a></li>
                             <c:forEach items="${page.breadcrumbs}" var="bcEntry">
-                                <li><a href="${contextPath}/${site}/page/${bcEntry.value}">${bcEntry.key}</a></li>
+                                <li><a href="${contextPath}/${site}/page/${bcEntry.value}">${fn:replace(bcEntry.key,'_',' ')}</a></li>
                             </c:forEach>
-                            <li class="active">${page.title}</li>
+                            <li class="active">${fn:replace(page.title,'_',' ')}</li>
                         </c:if>
                     </ul>
                 </div>
@@ -116,9 +127,9 @@
 
             <%-- CONTENT FOLDER-LIST --%>
             <c:if test="${page.contents.size() == 0}">
-                <div class="row">
+                <div class="row" id="main-links">
                     <c:forEach items="${page.links}" var="link">
-                        <div class="col-md-3">
+                        <div class="col-md-3 mlink">
                             <div class="thumbnail">
                                 <a href="${contextPath}/${site}/page/${link.getId()}">
                                     <img src="${contextPath}/resource/themes/simple/icons/container.png" alt="Library">
@@ -164,7 +175,7 @@
                             <c:otherwise>
                                 <div class="col-sm-2 col-md-2 col-md-offset-1">
                                     <a href="${contextPath}/proxy/d/${content.id}" >
-                                        <img class="img-thumbnail center-block" src="${contextPath}/proxy/r/doclib/${content.id}" alt="${content.getName()}"/>
+                                        <img class="img-thumbnail center-block" src="${contextPath}/proxy/r/doclib/${content.id}" alt=""/>
                                     </a>
                                 </div>
 
@@ -199,5 +210,6 @@
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
 <script src="${contextPath}/resource/themes/simple/js/bootstrap.min.js"></script>
 <script src="${contextPath}/resource/themes/simple/js/scripts.js"></script>
+<script src="${contextPath}/resource/themes/simple/js/validator.min.js"></script>
 </body>
 </html>

@@ -1,9 +1,5 @@
 package it.alfrescoinaction.lab.awsi.domain;
 
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-
 public class RenditionDownloadable implements Downloadable {
 
     private final String name;
@@ -23,10 +19,6 @@ public class RenditionDownloadable implements Downloadable {
     public String getName() {
         return name;
     }
-
-//    public InputStream getContent() {
-//        return new ByteArrayInputStream(content);
-//    }
 
     @Override
     public byte[] getContent() {
