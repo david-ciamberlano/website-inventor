@@ -2,6 +2,7 @@ package it.alfrescoinaction.lab.awsi.service;
 
 import it.alfrescoinaction.lab.awsi.domain.Downloadable;
 import it.alfrescoinaction.lab.awsi.domain.FileDownloadable;
+import it.alfrescoinaction.lab.awsi.domain.SearchFilters;
 import it.alfrescoinaction.lab.awsi.domain.WebPage;
 import it.alfrescoinaction.lab.awsi.repository.CmisRepository;
 import org.apache.chemistry.opencmis.client.api.*;
@@ -97,7 +98,7 @@ public class WebPageService {
     }
 
 
-    public WebPage buildSearchResultPage(String siteName, List<String> filters) throws CmisObjectNotFoundException {
+    public WebPage buildSearchResultPage(String siteName, SearchFilters filters) throws CmisObjectNotFoundException {
 
         repository.setSiteName(siteName);
         // the homepage has a relative path = "/"

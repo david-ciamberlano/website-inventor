@@ -2,13 +2,9 @@ package it.alfrescoinaction.lab.awsi.repository;
 
 
 import it.alfrescoinaction.lab.awsi.domain.Downloadable;
-import it.alfrescoinaction.lab.awsi.domain.RenditionDownloadable;
+import it.alfrescoinaction.lab.awsi.domain.SearchFilters;
 import org.apache.chemistry.opencmis.client.api.*;
-import org.apache.http.HttpEntity;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -29,7 +25,7 @@ public interface CmisRepository {
      * @param filters filters to apply to the search
      * @return
      */
-    ItemIterable<QueryResult> search(String folderId, List<String> filters);
+    ItemIterable<QueryResult> search(String folderId, SearchFilters filters);
 
     Document getDocumentById(String id) throws NoSuchElementException;
 

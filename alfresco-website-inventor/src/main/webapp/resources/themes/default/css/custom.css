@@ -9,8 +9,7 @@ article {
 
 
 .thumbnail {
-    min-height:220px;
-    height:150px;
+    height:180px;
     border: none;
     margin: 10px 2px;
 }
@@ -20,3 +19,7 @@ article {
     margin-right: 0;
 }
 
+.voffset-small { margin-top: 20px; }
+.voffset-normal { margin-top: 40px; }
+.voffset-big { margin-top: 80px; }
+.voffset-huge { margin-top: 100px; }

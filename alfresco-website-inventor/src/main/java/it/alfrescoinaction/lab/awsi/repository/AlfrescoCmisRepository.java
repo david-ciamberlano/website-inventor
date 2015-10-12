@@ -2,6 +2,8 @@ package it.alfrescoinaction.lab.awsi.repository;
 
 import it.alfrescoinaction.lab.awsi.domain.Downloadable;
 import it.alfrescoinaction.lab.awsi.domain.RenditionDownloadable;
+import it.alfrescoinaction.lab.awsi.domain.SearchFilterItem;
+import it.alfrescoinaction.lab.awsi.domain.SearchFilters;
 import it.alfrescoinaction.lab.awsi.exceptions.ObjectNotFoundException;
 import it.alfrescoinaction.lab.awsi.exceptions.PageNotFoundException;
 import org.apache.chemistry.opencmis.client.api.*;
@@ -16,13 +18,11 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
-import java.io.*;
 import java.net.URI;
 import java.text.MessageFormat;
 import java.util.List;
@@ -39,10 +39,10 @@ public class AlfrescoCmisRepository implements CmisRepository {
     @Value("${alfresco.serverUrl}") private String alfrescoServer;
     @Value("${alfresco.serviceEntryPoint}") private String alfrescoServiceEntryPoint;
     @Value("${alfresco.doclibBasePath}") private String alfrescoHomePathTemplate;
-    @Value("${alfresco.search.filters}") private String[] filterNames;
-    @Value("${alfresco.search.type}") private String type;
+    @Value("${alfresco.search.type}") private String searchType;
     @Value("${alfresco.username}") private String username;
     @Value("${alfresco.password}") private String password;
+
 
     private String alfrescoHomePath;
 
@@ -175,63 +175,69 @@ public class AlfrescoCmisRepository implements CmisRepository {
     }
 
     @Override
-    public ItemIterable<QueryResult> search(String folderId, List<String> filters) {
+    public ItemIterable<QueryResult> search(String folderId, SearchFilters filters) {
         String queryFilters = "";
         String queryFilterTemplateTEXT = "AND %s LIKE '%s' ";
         String queryFilterTemplateDATEFROM = "AND %s >= TIMESTAMP '%sT00:00:00.000+00:00' ";
         String queryFilterTemplateDATETO = "AND %s <= TIMESTAMP '%sT00:00:00.000+00:00' ";
         String queryFilterTemplateDATE = "AND %s = TIMESTAMP '%sT00:00:00.000+00:00' ";
+        String queryFilterTemplateNUM = "AND %s =  ";
+        String queryFilterTemplateNUM_MIN = "AND %s >=  ";
+        String queryFilterTemplateNUM_MAX = "AND %s <=  ";
+        String queryFilterTemplateFULLTEXT = "AND CONTAINS(%s)";
 
-        for (int i=0; i<filterNames.length; i++) {
-            if (!filters.get(i).isEmpty()) {
-                String[] filterParts = filterNames[i].split("\\|");
+        List <SearchFilterItem> filterItems = filters.getAsList();
 
-                String filterId = filterParts[1];
-                String filterType = filterParts[2];
+        for (SearchFilterItem filter : filterItems) {
 
-                switch (filterType) {
-                    case "TEXT": {
-                        queryFilters += String.format(queryFilterTemplateTEXT, filterId, filters.get(i));
-                        break;
-                    }
+            switch (filter.getType()) {
+                case "TEXT": {
+                    queryFilters += String.format(queryFilterTemplateTEXT, filter.getId(), filter.getContent());
+                    break;
+                }
 
-                    case "%TEXT": {
-                        queryFilters += String.format(queryFilterTemplateTEXT, filterId, "%" + filters.get(i));
-                        break;
-                    }
+                case "%TEXT": {
+                    queryFilters += String.format(queryFilterTemplateTEXT, filter.getId(), "%" + filter.getContent());
+                    break;
+                }
 
-                    case "TEXT%": {
-                        queryFilters += String.format(queryFilterTemplateTEXT, filterId, filters.get(i) + "%");
-                        break;
-                    }
+                case "TEXT%": {
+                    queryFilters += String.format(queryFilterTemplateTEXT, filter.getId(), filter.getContent() + "%");
+                    break;
+                }
 
-                    case "%TEXT%": {
-                        queryFilters += String.format(queryFilterTemplateTEXT, filterId, "%" + filters.get(i) + "%");
-                        break;
-                    }
+                case "%TEXT%": {
+                    queryFilters += String.format(queryFilterTemplateTEXT, filter.getId(), "%" + filter.getContent() + "%");
+                    break;
+                }
 
-                    case "DATE": {
-                        queryFilters += String.format(queryFilterTemplateDATE, filterId, filters.get(i));
-                        break;
-                    }
+                case "DATE": {
+                    queryFilters += String.format(queryFilterTemplateDATE, filter.getId(), filter.getContent());
+                    break;
+                }
 
-                    case "DATE_FROM": {
-                        queryFilters += String.format(queryFilterTemplateDATEFROM, filterId, filters.get(i));
-                        break;
-                    }
+                case "DATE_FROM": {
+                    queryFilters += String.format(queryFilterTemplateDATEFROM, filter.getId(), filter.getContent());
+                    break;
+                }
 
-                    case "DATE_TO": {
-                        queryFilters += String.format(queryFilterTemplateDATETO, filterId, filters.get(i));
-                        break;
-                    }
+                case "DATE_TO": {
+                    queryFilters += String.format(queryFilterTemplateDATETO, filter.getId(), filter.getContent());
+                    break;
+                }
+
+                // always the last item
+                case "FULLTEXT": {
+                    queryFilters += String.format(queryFilterTemplateFULLTEXT, filter.getContent());
                 }
             }
         }
 
-        String [] typeParts = type.split("\\|");
-        String typeName = typeParts[1];
+        String [] typeParts = searchType.split("\\|");
 
-        String queryTemplate = "SELECT * FROM %s WHERE IN_TREE('workspace://SpacesStore/%s') %s";
+        String typeName = typeParts[1] != null?typeParts[1]:"cmis:document";
+
+        String queryTemplate = "SELECT * FROM %s WHERE IN_TREE('workspace://SpacesStore/%s') %s and cmis:name <> '.%'";
 
         String query = String.format(queryTemplate, typeName, folderId, queryFilters);
 

@@ -12,12 +12,11 @@
     <title>${site}</title>
     <meta name="generator" content="Bootply" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <link href="${contextPath}/resource/themes/simple/css/bootstrap.min.css" rel="stylesheet">
+    <link href="${contextPath}/resource/themes/default/css/bootstrap.min.css" rel="stylesheet">
     <!--[if lt IE 9]>
     <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-    <link href="${contextPath}/resource/themes/simple/css/styles.css" rel="stylesheet">
-    <link href="${contextPath}/resource/themes/simple/css/custom.css" rel="stylesheet">
+    <link href="${contextPath}/resource/themes/default/css/custom.css" rel="stylesheet">
 </head>
 <body>
 
@@ -34,49 +33,71 @@
 
         <%--LINKS--%>
         <div class="col-md-3">
-            <h2>Navigazione</h2>
-            <ul class="nav nav-tabs">
+            <ul class="nav nav-tabs voffset-big">
                 <li class="active"><a aria-expanded="true" href="#link-tab" data-toggle="tab">
-                    <span class="glyphicon glyphicon-th-list"></span> Navigation</a>
+                    <span class="glyphicon glyphicon-th-list"></span> Navigazione</a>
                 </li>
                 <li><a aria-expanded="false" href="#search-tab" data-toggle="tab">
-                    <span class="glyphicon glyphicon-search"></span> Search</a>
+                    <span class="glyphicon glyphicon-search"></span> Ricerca</a>
                 </li>
             </ul>
             <div id="myTabContent" class="tab-content">
-                <div class="tab-pane fade active in" id="link-tab">
+                <div class="tab-pane fade active in voffset-small" id="link-tab">
                     <fieldset>
-                        <legend>Giornali</legend>
-                    </fieldset>
-                    <div class="input-group">
-                        <span class="input-group-addon">Filtro</span>
-                        <input class="form-control" type="text" onkeyup="filter(this,'linkList')" />
-                    </div>
-                    <br/>
-                    <div id="links" class="list-group table-of-contents">
-                        <c:if test="${!page.homepage}">
-                            <a class="list-group-item" href="${contextPath}/${site}/page/${page.parentId}"><span class="glyphicon glyphicon-circle-arrow-up"></span></a>
-                        </c:if>
-                        <c:forEach items="${page.links}" var="link">
-                            <a class="list-group-item" href="${contextPath}/${site}/page/${link.getId()}">${fn:replace(link.name,'_',' ')}</a>
-                        </c:forEach>
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="search-tab">
-                    <form:form modelAttribute="searchFilters" method="POST" action="${pageContext.request.contextPath}/${site}/search" class="form-horizontal">
-                        <fieldset>
-                            <legend>Search Form</legend>
-                        </fieldset>
-                        <div class="form-group">
-                            <form:input class="form-control" path="filter1" id="biblioteca" placeholder="Biblioteca" ></form:input>
-                            <form:input class="form-control" path="filter2" id="testata" placeholder="Testata" ></form:input>
-                            <form:input class="form-control" path="filter3" id="uscita" placeholder="Uscita" size="3"></form:input>
-                            <form:input class="form-control" path="filter4" id="dataUscitaDa" placeholder="Data da (yyyy-mm-dd)" size="10"></form:input>
-                            <form:input class="form-control" path="filter5" id="dataUscitaA" placeholder="Data a (yyyy-mm-dd)" size="10"></form:input>
+                        <legend>Giornali storici</legend>
+
+                        <div class="input-group">
+                            <span class="input-group-addon">Filtro</span>
+                            <input class="form-control" type="text" onkeyup="filter(this,'linkList')" id="main-filter"/>
+                            <span class="input-group-addon" onclick="clearFilter('#main-filter')" ><span class="glyphicon glyphicon-remove" style="cursor: pointer"></span></span>
                         </div>
-                        <button type="reset" class="btn btn-default">Cancella</button>
-                        <button type="submit" class="btn btn-primary">Cerca</button>
-                    </form:form>
+                        <br/>
+                        <div id="links" class="list-group table-of-contents">
+                            <c:if test="${!page.homepage}">
+                                <a class="list-group-item" href="${contextPath}/${site}/page/${page.parentId}"><span class="glyphicon glyphicon-circle-arrow-up"></span></a>
+                            </c:if>
+                            <c:forEach items="${page.links}" var="link">
+                                <a class="list-group-item" href="${contextPath}/${site}/page/${link.getId()}">${fn:replace(link.name,'_',' ')}</a>
+                            </c:forEach>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="tab-pane fade in voffset-small" id="search-tab">
+                    <fieldset>
+                        <legend>Ricerca avanzata</legend>
+
+                        <form:form modelAttribute="searchFilters" method="POST" action="${pageContext.request.contextPath}/${site}/search" class="form-horizontal">
+
+                            <c:if test="${not empty searchFilters.searchFilterItem1.name}">
+                                <div class="form-group">
+                                    <label for="filter1">${searchFilters.searchFilterItem1.name}</label>
+                                    <form:input class="form-control" path="searchFilterItem1.content" id="filter1"></form:input>
+                                </div>
+                            </c:if>
+                            <c:if test="${not empty searchFilters.searchFilterItem2.name}">
+                                <div class="form-group">
+                                    <label for="filter2">${searchFilters.searchFilterItem2.name}</label>
+                                    <form:input class="form-control" path="searchFilterItem2.content" id="filter2"></form:input>
+                                </div>
+                            </c:if>
+                            <%--<div class="form-group">--%>
+                            <%--<label for="filter3">Data Uscita</label>--%>
+                            <%--<form:input class="form-control" path="filter3" id="filter3"></form:input>--%>
+                            <%--</div>--%>
+                            <%--<div>--%>
+                            <%--<label for="filter4">Data Uscita</label>--%>
+                            <%--<form:input class="form-control" path="filter4" id="filter4"></form:input>--%>
+                            <%--</div>--%>
+                            <%--<div class="form-group">--%>
+                            <%--<label for="filter4">Testo contenuto</label>--%>
+                            <%--<form:input class="form-control" path="filter5" id="filter5" ></form:input>--%>
+                            <%--</div>--%>
+                            <div class="text-right">
+                                <button type="reset" class="btn btn-default"><span class="glyphicon glyphicon-remove"></span> Cancella</button>
+                                <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-search"></span> Cerca</button>
+                            </div>
+                        </form:form>
+                    </fieldset>
                 </div>
 
             </div>
@@ -89,12 +110,15 @@
             <div class="row">
                 <div class="col-md-12">
                     <ul class="breadcrumb">
-                        <li><a href="${contextPath}/${site}"><span class="glyphicon glyphicon-home"></span> Home</a></li>
+                        <c:if test="${page.homepage}">
+                            <li class="active"><span class="glyphicon glyphicon-home"></span> Home</li>
+                        </c:if>
                         <c:if test="${!page.homepage}">
+                            <li><a href="${contextPath}/${site}"><span class="glyphicon glyphicon-home"></span> Home</a></li>
                             <c:forEach items="${page.breadcrumbs}" var="bcEntry">
-                                <li><a href="${contextPath}/${site}/page/${bcEntry.value}">${bcEntry.key}</a></li>
+                                <li><a href="${contextPath}/${site}/page/${bcEntry.value}">${fn:replace(bcEntry.key,'_',' ')}</a></li>
                             </c:forEach>
-                            <li class="active">${page.title}</li>
+                            <li class="active">${fn:replace(page.title,'_',' ')}</li>
                         </c:if>
                     </ul>
                 </div>
@@ -116,9 +140,9 @@
 
             <%-- CONTENT FOLDER-LIST --%>
             <c:if test="${page.contents.size() == 0}">
-                <div class="row">
+                <div class="row" id="main-links">
                     <c:forEach items="${page.links}" var="link">
-                        <div class="col-md-3">
+                        <div class="col-md-3 mlink">
                             <div class="thumbnail">
                                 <a href="${contextPath}/${site}/page/${link.getId()}">
                                     <img src="${contextPath}/resource/themes/simple/icons/container.png" alt="Library">
@@ -164,7 +188,7 @@
                             <c:otherwise>
                                 <div class="col-sm-2 col-md-2 col-md-offset-1">
                                     <a href="${contextPath}/proxy/d/${content.id}" >
-                                        <img class="img-thumbnail center-block" src="${contextPath}/proxy/r/doclib/${content.id}" alt="${content.getName()}"/>
+                                        <img class="img-thumbnail center-block" src="${contextPath}/proxy/r/doclib/${content.id}" alt=""/>
                                     </a>
                                 </div>
 
@@ -196,8 +220,8 @@
 </div>
 
 <!-- script references -->
-<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
-<script src="${contextPath}/resource/themes/simple/js/bootstrap.min.js"></script>
-<script src="${contextPath}/resource/themes/simple/js/scripts.js"></script>
+<script src="${contextPath}/resource/themes/default/js/jquery.min.js"></script>
+<script src="${contextPath}/resource/themes/default/js/bootstrap.min.js"></script>
+<script src="${contextPath}/resource/themes/default/js/scripts.js"></script>
 </body>
 </html>

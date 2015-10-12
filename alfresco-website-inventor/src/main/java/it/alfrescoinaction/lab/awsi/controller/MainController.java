@@ -21,8 +21,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 @Controller
 public class MainController {
@@ -30,14 +28,11 @@ public class MainController {
     @Autowired
     WebPageService webPageService;
 
-    @Value("${theme.home_template}")
-    private String homeTemplate;
-
-    @Value("${theme.page_template}")
-    private String pageTemplate;
-
-    @Value("${theme.searchresult_template}")
-    private String searchResultTemplate;
+    private final String homeTemplate = "page";
+    private final String pageTemplate = "page";
+    private String searchResultTemplate = "searchresult";
+    @Value("${alfresco.search.filter1}") String filter1;
+    @Value("${alfresco.search.filter2}") String filter2;
 
     @RequestMapping("/{sitename}")
     public String homepage(Model model, @PathVariable("sitename") String site) {
@@ -47,6 +42,7 @@ public class MainController {
     @RequestMapping("/{sitename}/page/{id}")
     public String pageById( @ModelAttribute("searchFilters") SearchFilters searchFilters, Model model,
                             @PathVariable("sitename") String siteName, @PathVariable("id") String id) {
+        initSearchFilters(searchFilters);
         WebPage wp = webPageService.buildWebPage(siteName, id);
         model.addAttribute("page", wp);
         model.addAttribute("site", siteName);
@@ -61,15 +57,9 @@ public class MainController {
     @RequestMapping(value = "/{sitename}/search", method = RequestMethod.POST)
     public String search( @ModelAttribute("searchFilters") SearchFilters searchFilters, Model model,
                           @PathVariable("sitename") String siteName) {
-        List<String> filters = new ArrayList<>();
-        filters.add(searchFilters.getFilter1());
-        filters.add(searchFilters.getFilter2());
-        filters.add(searchFilters.getFilter3());
-        filters.add(searchFilters.getFilter4());
-        filters.add(searchFilters.getFilter5());
-        filters.add(searchFilters.getFilter6());
+        initSearchFilters(searchFilters);
 
-        WebPage wp = webPageService.buildSearchResultPage(siteName, filters);
+        WebPage wp = webPageService.buildSearchResultPage(siteName, searchFilters);
 
         model.addAttribute("page", wp);
         model.addAttribute("site", siteName);
@@ -97,7 +87,6 @@ public class MainController {
     public ResponseEntity<byte[]> rendition(ServletResponse response,
                                      @PathVariable("type") String type,
                                      @PathVariable("id") String id) throws IOException {
-
         Downloadable<byte[]> rend;
         switch(type) {
             case "thumb": {
@@ -150,4 +139,21 @@ public class MainController {
 
     //------------- PRIVATE -------------
 
+    private void initSearchFilters(SearchFilters searchFilters) {
+
+        String[] filter1Parts;
+        filter1Parts = (filter1 != null?  filter1.split("\\|"):new String[0]);
+        String[] filter2Parts;
+        filter2Parts = (filter2 != null? filter2.split("\\|"): new String[0]);
+
+        // if lenght != 3, the filterData were left uninitialized ("","","")
+        if (filter1Parts.length == 3) {
+            searchFilters.setFilter1Data(filter1Parts[0], filter1Parts[1], filter1Parts[2]);
+        }
+
+        if (filter2Parts.length == 3) {
+            searchFilters.setFilter2Data(filter2Parts[0], filter2Parts[1], filter2Parts[2]);
+        }
+
+    }
 }
