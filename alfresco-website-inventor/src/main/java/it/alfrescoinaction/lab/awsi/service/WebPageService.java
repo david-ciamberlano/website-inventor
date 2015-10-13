@@ -7,14 +7,11 @@ import it.alfrescoinaction.lab.awsi.domain.WebPage;
 import it.alfrescoinaction.lab.awsi.repository.CmisRepository;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
-import org.apache.http.HttpEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 @Service
@@ -29,20 +26,19 @@ public class WebPageService {
      * @return the WebPage object
      * @throws CmisObjectNotFoundException
      */
-    public WebPage buildWebPage(String siteName, String id) throws CmisObjectNotFoundException {
+    public WebPage buildWebPage(String siteId, String id) throws CmisObjectNotFoundException {
 
-        repository.setSiteName(siteName);
-
+        repository.setSite(siteId);
+        Map<String,String> sitesInfo = repository.getSiteInfo();
         Folder folder = repository.getFolderById(id);
         String folderPath = folder.getPath();
-
         boolean isHomepage = repository.isHomePage(folderPath);
 
-        WebPage wp = new WebPage(id, folder.getName(), folder.getParentId(), isHomepage);
+        WebPage wp = new WebPage(id, folder.getName(), folder.getParentId(), isHomepage, sitesInfo.get("name"), sitesInfo.get("description"));
 
         if (!isHomepage) {
             // breadcrumbs
-            String relativeFolderPath = folderPath.replace(repository.getAlfrescoHomePath() + "/", "");
+            String relativeFolderPath = folderPath.replace(repository.getAlfrescoDocLibPath() + "/", "");
             String[] pathItems = relativeFolderPath.split("(?=/)");
 
             String pathAcc = "";
@@ -82,6 +78,10 @@ public class WebPageService {
                     wp.addSpecialContent("text_header", doc);
                     break;
                 }
+                case ".footer.txt": {
+                    wp.addSpecialContent("text_header", doc);
+                    break;
+                }
                 default:{
                     wp.addContent(doc);
                 }
@@ -98,27 +98,20 @@ public class WebPageService {
     }
 
 
-    public WebPage buildSearchResultPage(String siteName, SearchFilters filters) throws CmisObjectNotFoundException {
+    public WebPage buildSearchResultPage(String siteId, SearchFilters filters) throws CmisObjectNotFoundException {
+        repository.setSite(siteId);
+        Map<String,String> sitesInfo = repository.getSiteInfo();
 
-        repository.setSiteName(siteName);
         // the homepage has a relative path = "/"
         String homePageId = repository.getFolderIdByRelativePath("/");
-        WebPage wp = new WebPage("search-result", "Search result", homePageId, false);
+        WebPage wp = new WebPage("search-result", "Search result", homePageId, false, sitesInfo.get("name"),sitesInfo.get("description"));
 
         // get the Contents
         ItemIterable<QueryResult> contents = repository.search(homePageId, filters);
         for (QueryResult qr : contents) {
             CmisObject cmiso = repository.getDocumentById(qr.getPropertyById("cmis:objectId").getFirstValue().toString());
             Document doc = (Document)cmiso;
-            switch (doc.getName()) {
-                case ".header.txt": {
-                    wp.addSpecialContent("text_header", doc);
-                    break;
-                }
-                default:{
-                    wp.addContent(doc);
-                }
-            }
+            wp.addContent(doc);
         }
 
         return wp;

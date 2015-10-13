@@ -2,6 +2,7 @@ package it.alfrescoinaction.lab.awsi.controller;
 
 
 import it.alfrescoinaction.lab.awsi.domain.Downloadable;
+import it.alfrescoinaction.lab.awsi.domain.PropertyTuple;
 import it.alfrescoinaction.lab.awsi.domain.SearchFilters;
 import it.alfrescoinaction.lab.awsi.domain.WebPage;
 import it.alfrescoinaction.lab.awsi.exceptions.ConnectionException;
@@ -21,31 +22,49 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 public class MainController {
 
     @Autowired
-    WebPageService webPageService;
+    private WebPageService webPageService;
 
     private final String homeTemplate = "page";
     private final String pageTemplate = "page";
     private String searchResultTemplate = "searchresult";
-    @Value("${alfresco.search.filter1}") String filter1;
-    @Value("${alfresco.search.filter2}") String filter2;
+    @Value("${alfresco.search.filter1}") private String filter1;
+    @Value("${alfresco.search.filter2}") private String filter2;
 
-    @RequestMapping("/{sitename}")
-    public String homepage(Model model, @PathVariable("sitename") String site) {
+    @Value("${alfresco.document.property1}") String property1;
+    @Value("${alfresco.document.property2}") String property2;
+    @Value("${alfresco.document.property3}") String property3;
+
+
+
+    @RequestMapping("/{siteid}")
+    public String homepage(Model model, @PathVariable("siteid") String site) {
         return "forward:/" + site + "/page/home";
     }
 
-    @RequestMapping("/{sitename}/page/{id}")
+    @RequestMapping("/{siteid}/page/{id}")
     public String pageById( @ModelAttribute("searchFilters") SearchFilters searchFilters, Model model,
-                            @PathVariable("sitename") String siteName, @PathVariable("id") String id) {
+                            @PathVariable("siteid") String siteId, @PathVariable("id") String id) {
+        //Init the search filters
         initSearchFilters(searchFilters);
-        WebPage wp = webPageService.buildWebPage(siteName, id);
+        WebPage wp = webPageService.buildWebPage(siteId, id);
         model.addAttribute("page", wp);
-        model.addAttribute("site", siteName);
+        model.addAttribute("siteid", siteId);
+        model.addAttribute("sitename", wp.getSiteName());
+        model.addAttribute("sitedescription", wp.getSiteDescription());
+
+        List<PropertyTuple> documentProps = new ArrayList<>(3);
+        documentProps.add(new PropertyTuple(property1));
+        documentProps.add(new PropertyTuple(property2));
+        documentProps.add(new PropertyTuple(property3));
+
+        model.addAttribute("documentProps", documentProps);
 
         String view = pageTemplate;
         if (wp.isHomepage()) {
@@ -54,15 +73,24 @@ public class MainController {
         return view;
     }
 
-    @RequestMapping(value = "/{sitename}/search", method = RequestMethod.POST)
+    @RequestMapping(value = "/{siteid}/search", method = RequestMethod.POST)
     public String search( @ModelAttribute("searchFilters") SearchFilters searchFilters, Model model,
-                          @PathVariable("sitename") String siteName) {
+                          @PathVariable("siteid") String siteId) {
         initSearchFilters(searchFilters);
 
-        WebPage wp = webPageService.buildSearchResultPage(siteName, searchFilters);
+        WebPage wp = webPageService.buildSearchResultPage(siteId, searchFilters);
 
         model.addAttribute("page", wp);
-        model.addAttribute("site", siteName);
+        model.addAttribute("siteid", siteId);
+        model.addAttribute("sitename", wp.getSiteName());
+        model.addAttribute("sitedescription", wp.getSiteDescription());
+
+        List<PropertyTuple> documentProps = new ArrayList<>(3);
+        documentProps.add(new PropertyTuple(property1));
+        documentProps.add(new PropertyTuple(property2));
+        documentProps.add(new PropertyTuple(property3));
+
+        model.addAttribute("documentProps", documentProps);
 
         String view = searchResultTemplate;
 

@@ -19,10 +19,10 @@
       <br/>
       <div id="links" class="list-group table-of-contents">
         <c:if test="${!page.homepage}">
-          <a class="list-group-item" href="${contextPath}/${site}/page/${page.parentId}"><span class="glyphicon glyphicon-circle-arrow-up"></span></a>
+          <a class="list-group-item" href="${contextPath}/${siteid}/page/${page.parentId}"><span class="glyphicon glyphicon-circle-arrow-up"></span></a>
         </c:if>
         <c:forEach items="${page.links}" var="link">
-          <a class="list-group-item" href="${contextPath}/${site}/page/${link.getId()}">${fn:replace(link.name,'_',' ')}</a>
+          <a class="list-group-item" href="${contextPath}/${siteid}/page/${link.getId()}">${fn:replace(link.name,'_',' ')}</a>
         </c:forEach>
       </div>
     </fieldset>
@@ -31,7 +31,7 @@
     <fieldset>
       <legend>Ricerca avanzata</legend>
 
-      <form:form modelAttribute="searchFilters" method="POST" action="${pageContext.request.contextPath}/${site}/search" class="form-horizontal">
+      <form:form modelAttribute="searchFilters" method="POST" action="${pageContext.request.contextPath}/${siteid}/search" class="form-horizontal">
 
         <c:if test="${not empty searchFilters.searchFilterItem1.name}">
           <div class="form-group">
