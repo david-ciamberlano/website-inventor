@@ -158,6 +158,10 @@ public class ContentFactory {
                 rends.put(rendition.getTitle(),rendition.getStreamId());
             }
         }
+        else {
+            //Default icon
+
+        }
 
         return rends;
     }

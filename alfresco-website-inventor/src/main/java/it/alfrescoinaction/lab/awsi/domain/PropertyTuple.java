@@ -12,9 +12,15 @@ public class PropertyTuple {
     public PropertyTuple(String tuple) {
         if (!tuple.isEmpty()) {
             String[] attr = tuple.split("\\|");
-           this.label = attr[0];
-           this.id = attr[1];
-           this.type = attr[2];
+
+            if (attr.length == 3) {
+                this.label = attr[0];
+                this.id = attr[1];
+                this.type = attr[2];
+            }
+            else {
+                //TODO manage exception
+            }
         }
         else {
             this.label = "";
