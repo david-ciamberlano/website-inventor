@@ -20,7 +20,7 @@ import java.io.InputStream;
 public class Proxy {
 
     @Autowired
-    WebPageService webPageService;
+    private WebPageService webPageService;
 
     @RequestMapping(value = "proxy/d/{id}", method = RequestMethod.GET)
     @ResponseBody
