@@ -24,7 +24,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import java.net.URI;
-import java.text.MessageFormat;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -38,19 +38,20 @@ public class AlfrescoCmisRepository implements CmisRepository {
     @Value("${alfresco.serverProtocol}") private String alfrescoServerProtocol;
     @Value("${alfresco.serverUrl}") private String alfrescoServer;
     @Value("${alfresco.serviceEntryPoint}") private String alfrescoServiceEntryPoint;
-    @Value("${alfresco.doclibBasePath}") private String alfrescoHomePathTemplate;
+    @Value("${alfresco.sites}") private String alfrescoSites;
+    @Value("${alfresco.doclib}") private String alfrescoDocumentLibrary;
     @Value("${alfresco.search.type}") private String searchType;
     @Value("${alfresco.username}") private String username;
     @Value("${alfresco.password}") private String password;
 
-
-    private String alfrescoHomePath;
+    private String siteId;
+    private String alfrescoDocLibPath;
 
     @Override
     public ItemIterable<CmisObject> getCategories() {
         Session session = connection.getSession();
 
-        CmisObject obj = session.getObjectByPath(alfrescoHomePath);
+        CmisObject obj = session.getObjectByPath(alfrescoDocLibPath);
 
         // procceed only if the node is a folder
         if (obj.getBaseTypeId().value().equals("cmis:folder")){
@@ -62,7 +63,7 @@ public class AlfrescoCmisRepository implements CmisRepository {
             return children;
         }
         else {
-            throw new PageNotFoundException("Home folder not found: " + alfrescoHomePath);
+            throw new PageNotFoundException("Home folder not found: " + alfrescoDocLibPath);
         }
     }
 
@@ -73,7 +74,7 @@ public class AlfrescoCmisRepository implements CmisRepository {
         if (id.equals("home")) {
             OperationContext oc = session.createOperationContext();
             oc.setRenditionFilterString("*");
-            id = session.getObjectByPath(alfrescoHomePath, oc).getId();
+            id = session.getObjectByPath(alfrescoDocLibPath, oc).getId();
         }
 
         CmisObject obj;
@@ -105,7 +106,7 @@ public class AlfrescoCmisRepository implements CmisRepository {
         Session session = connection.getSession();
 
         // delete initial /
-        String fullPath = alfrescoHomePath;
+        String fullPath = alfrescoDocLibPath;
         if (realtivePath.startsWith("/")) {
             fullPath += realtivePath;
         }
@@ -184,51 +185,53 @@ public class AlfrescoCmisRepository implements CmisRepository {
         String queryFilterTemplateNUM = "AND %s =  ";
         String queryFilterTemplateNUM_MIN = "AND %s >=  ";
         String queryFilterTemplateNUM_MAX = "AND %s <=  ";
-        String queryFilterTemplateFULLTEXT = "AND CONTAINS(%s)";
+        String queryFilterTemplateFULLTEXT = "AND CONTAINS('\\'%s\\'')";
 
-        List <SearchFilterItem> filterItems = filters.getAsList();
+        List <SearchFilterItem> filterItems = filters.getFilterItems();
 
         for (SearchFilterItem filter : filterItems) {
 
-            switch (filter.getType()) {
-                case "TEXT": {
-                    queryFilters += String.format(queryFilterTemplateTEXT, filter.getId(), filter.getContent());
-                    break;
-                }
+            if (!filter.getContent().isEmpty()) {
+                switch (filter.getType()) {
+                    case "TEXT": {
+                        queryFilters += String.format(queryFilterTemplateTEXT, filter.getId(), filter.getContent());
+                        break;
+                    }
 
-                case "%TEXT": {
-                    queryFilters += String.format(queryFilterTemplateTEXT, filter.getId(), "%" + filter.getContent());
-                    break;
-                }
+                    case "%TEXT": {
+                        queryFilters += String.format(queryFilterTemplateTEXT, filter.getId(), "%" + filter.getContent());
+                        break;
+                    }
 
-                case "TEXT%": {
-                    queryFilters += String.format(queryFilterTemplateTEXT, filter.getId(), filter.getContent() + "%");
-                    break;
-                }
+                    case "TEXT%": {
+                        queryFilters += String.format(queryFilterTemplateTEXT, filter.getId(), filter.getContent() + "%");
+                        break;
+                    }
 
-                case "%TEXT%": {
-                    queryFilters += String.format(queryFilterTemplateTEXT, filter.getId(), "%" + filter.getContent() + "%");
-                    break;
-                }
+                    case "%TEXT%": {
+                        queryFilters += String.format(queryFilterTemplateTEXT, filter.getId(), "%" + filter.getContent() + "%");
+                        break;
+                    }
 
-                case "DATE": {
-                    queryFilters += String.format(queryFilterTemplateDATE, filter.getId(), filter.getContent());
-                    break;
-                }
+                    case "DATE": {
+                        queryFilters += String.format(queryFilterTemplateDATE, filter.getId(), filter.getContent());
+                        break;
+                    }
 
-                case "DATE_FROM": {
-                    queryFilters += String.format(queryFilterTemplateDATEFROM, filter.getId(), filter.getContent());
-                    break;
-                }
+                    case "DATE_FROM": {
+                        queryFilters += String.format(queryFilterTemplateDATEFROM, filter.getId(), filter.getContent());
+                        break;
+                    }
 
-                case "DATE_TO": {
-                    queryFilters += String.format(queryFilterTemplateDATETO, filter.getId(), filter.getContent());
-                    break;
-                }
+                    case "DATE_TO": {
+                        queryFilters += String.format(queryFilterTemplateDATETO, filter.getId(), filter.getContent());
+                        break;
+                    }
 
-                // always the last item
-                case "FULLTEXT": {
-                    queryFilters += String.format(queryFilterTemplateFULLTEXT, filter.getContent());
+                    // always the last item
+                    case "FULLTEXT": {
+                        queryFilters += String.format(queryFilterTemplateFULLTEXT, filter.getContent());
+                    }
                 }
             }
         }
@@ -237,7 +240,7 @@ public class AlfrescoCmisRepository implements CmisRepository {
 
         String typeName = typeParts[1] != null?typeParts[1]:"cmis:document";
 
-        String queryTemplate = "SELECT * FROM %s WHERE IN_TREE('workspace://SpacesStore/%s') %s and cmis:name <> '.%'";
+        String queryTemplate = "SELECT * FROM %s WHERE IN_TREE('workspace://SpacesStore/%s') %s AND cmis:name <> '.*'";
 
         String query = String.format(queryTemplate, typeName, folderId, queryFilters);
 
@@ -251,13 +254,19 @@ public class AlfrescoCmisRepository implements CmisRepository {
 
     @Override
     public boolean isHomePage(String path) {
-        // the final / in folderPath is necessary to match basepath
-        return alfrescoHomePath.equals(path);
+        return alfrescoDocLibPath.equals(path);
     }
 
+
     @Override
-    public void setSiteName(String siteName) {
-        this.alfrescoHomePath = MessageFormat.format(alfrescoHomePathTemplate,siteName);
+    public Map<String,String> getSiteInfo() {
+        Session session = connection.getSession();
+        CmisObject cmiso = session.getObjectByPath(alfrescoSites + "/" + siteId);
+
+        Map<String,String> siteInfo = new HashMap<>(2);
+        siteInfo.put("name",cmiso.getProperty("cm:title").getValue().toString());
+        siteInfo.put("description",cmiso.getProperty("cm:description").getValue().toString());
+        return siteInfo;
     }
 
 
@@ -324,9 +333,13 @@ public class AlfrescoCmisRepository implements CmisRepository {
 
     //-------------------------- GETTERS/SETTERS --------------------------
 
-    public String getAlfrescoHomePath() {
-        return alfrescoHomePath;
+    public String getAlfrescoDocLibPath() {
+        return alfrescoDocLibPath;
     }
 
-
+    @Override
+    public void setSite(String siteId) {
+        this.siteId = siteId;
+        this.alfrescoDocLibPath = "/" + alfrescoSites + "/" + siteId + "/" + alfrescoDocumentLibrary;
+    }
 }

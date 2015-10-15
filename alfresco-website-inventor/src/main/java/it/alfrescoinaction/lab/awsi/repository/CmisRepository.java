@@ -33,9 +33,11 @@ public interface CmisRepository {
 
     boolean isHomePage(String path);
 
-    String getAlfrescoHomePath();
+    String getAlfrescoDocLibPath();
 
-    void setSiteName(String siteName);
+    void setSite(String siteName);
+
+    Map<String,String> getSiteInfo();
 
     /**
      * Returns the an Inputstream of the selected rendition.

@@ -14,18 +14,24 @@ public class WebPage {
     private final String id;
     private final String title;
     private final String parentId;
+    private final String siteName;
+    private final String siteDescription;
     private final boolean homepage;
+
     private Map<String,Content> specialContent = new HashMap<>(6);
     private List<Link> categories = new ArrayList<>(10);
     private List<Link> links = new ArrayList<>(10);
     private List<Content> contents = new ArrayList<>(20);
     private Map<String,String> breadcrumbs = new LinkedHashMap<>(10);
 
-    public WebPage(String id, String title, String parentId, boolean homepage) {
+    public WebPage(String id, String title, String parentId, boolean homepage,
+                   String siteName, String siteDescription) {
         this.id = id;
         this.title = title;
         this.parentId = parentId;
         this.homepage = homepage;
+        this.siteName = siteName;
+        this.siteDescription = siteDescription;
     }
 
     public void addLinks(String pageName, String id) {
@@ -88,4 +94,11 @@ public class WebPage {
         return breadcrumbs;
     }
 
+    public String getSiteName() {
+        return siteName;
+    }
+
+    public String getSiteDescription() {
+        return siteDescription;
+    }
 }

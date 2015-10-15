@@ -7,7 +7,7 @@ public class SearchFilterItem {
     private String id;
     private String content;
 
-    public SearchFilterItem(String name, String type, String id) {
+    public SearchFilterItem(String name, String id, String type) {
         this.name = name;
         this.type = type;
         this.id = id;
