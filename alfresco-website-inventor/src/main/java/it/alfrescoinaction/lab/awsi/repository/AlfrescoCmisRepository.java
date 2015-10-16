@@ -21,8 +21,13 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Repository;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
@@ -271,7 +276,7 @@ public class AlfrescoCmisRepository implements CmisRepository {
 
 
 
-    public Downloadable getRendition(String type, String objectId, String name) throws ObjectNotFoundException{
+    public Downloadable getRendition(String type, String objectId, String name) throws ObjectNotFoundException {
 
         // I'm not using cmis because it doesn't trigger the thumbnail generetion process
         // The rest service generate the thumbnauk or eventually return the default placeholder
@@ -300,35 +305,28 @@ public class AlfrescoCmisRepository implements CmisRepository {
 
                 RenditionDownloadable rend;
                 //TODO replace magic number
-                if (entity.getContentLength() < 1024*1024) {
-                    byte[] buffer2 = EntityUtils.toByteArray(entity);
+                if (entity.getContentLength() < 1024*1024 || entity.getContentLength() > 0) {
+                    byte[] buffer = EntityUtils.toByteArray(entity);
 //                    byte[] buffer = new byte[((Long)entity.getContentLength()).intValue()];
 //                    entity.getContent().read(buffer);
 
                     String mimetype = entity.getContentType().getValue();
 
-                    rend = new RenditionDownloadable(name,buffer2,entity.getContentLength(),mimetype);
+                    rend = new RenditionDownloadable(name, buffer, entity.getContentLength(), mimetype);
                     return rend;
                 }
                 else {
                     httpget.abort();
-                    throw new Exception("Content too large");
+                    throw new Exception("Content 0 or too large ");
                 }
-
             }
-
-
-
         }
         catch (Exception e) {
             //TODO manage exception
             throw new ObjectNotFoundException(e.getMessage());
         }
 
-
-
     }
-
 
 
     //-------------------------- GETTERS/SETTERS --------------------------
@@ -342,4 +340,5 @@ public class AlfrescoCmisRepository implements CmisRepository {
         this.siteId = siteId;
         this.alfrescoDocLibPath = "/" + alfrescoSites + "/" + siteId + "/" + alfrescoDocumentLibrary;
     }
+
 }

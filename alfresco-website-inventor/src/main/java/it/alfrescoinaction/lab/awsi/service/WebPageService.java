@@ -4,6 +4,7 @@ import it.alfrescoinaction.lab.awsi.domain.Downloadable;
 import it.alfrescoinaction.lab.awsi.domain.FileDownloadable;
 import it.alfrescoinaction.lab.awsi.domain.SearchFilters;
 import it.alfrescoinaction.lab.awsi.domain.WebPage;
+import it.alfrescoinaction.lab.awsi.exceptions.ObjectNotFoundException;
 import it.alfrescoinaction.lab.awsi.repository.CmisRepository;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
@@ -135,5 +136,6 @@ public class WebPageService {
 
         return rendition;
     }
+
 
 }
