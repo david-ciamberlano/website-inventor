@@ -216,8 +216,8 @@
 </div>
 
 <!-- script references -->
-<script src="${contextPath}/resource/themes/default/js/jquery.min.js"></script>
-<script src="${contextPath}/resource/themes/default/js/bootstrap.min.js"></script>
-<script src="${contextPath}/resource/themes/default/js/scripts.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
+<script src="${contextPath}/resource/themes/simple/js/bootstrap.min.js"></script>
+<script src="${contextPath}/resource/themes/simple/js/scripts.js"></script>
 </body>
 </html>
