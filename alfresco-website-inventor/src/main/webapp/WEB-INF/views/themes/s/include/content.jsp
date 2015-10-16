@@ -13,7 +13,7 @@
       <%--IMAGE--%>
       <c:when test="${content.type == 'IMAGE'}">
         <div class="col-md-10 col-md-offset-1">
-          <figure>
+          <figure class="">
             <a href="${contextPath}/proxy/${content.id}" >
               <img class="img-responsive center-block" src="${contextPath}/proxy/r/imgpreview/${content.id}" alt="${content.getName()}"/>
             </a>
@@ -28,14 +28,7 @@
       <c:otherwise>
         <div class="col-sm-2 col-md-2 col-md-offset-1">
           <a href="${contextPath}/proxy/d/${content.id}" target="_blank">
-            <c:choose>
-              <c:when test="${fn:length(content.renditions) > 0}">
-                <img class="img-thumbnail center-block" src="${contextPath}/proxy/r/doclib/${content.id}" alt=""/>
-              </c:when>
-              <c:otherwise>
-                <img class="img-thumbnail center-block" src="${contextPath}/resource/default/img/default-generic-icon.png" alt=""/>
-              </c:otherwise>
-            </c:choose>
+            <img class="img-thumbnail center-block" src="${contextPath}/proxy/r/doclib/${content.id}" alt=""/>
           </a>
         </div>
 
@@ -43,16 +36,16 @@
           <h4 class="media-heading"><a href="${contextPath}/proxy/d/${content.id}" target="_blank">${content.properties['testata']}</a></h4>
 
           <c:forEach items="${documentProps}" var="docprop">
-            <c:choose>
-              <c:when test="${docprop.type == 'TEXT'}">
-                <div><strong>${docprop.label}</strong>: ${content.properties[docprop.id]}</div>
-              </c:when>
-              <c:when test="${docprop.type == 'DATE'}">
-                <jsp:useBean id="dateObject" class="java.util.Date" />
-                <jsp:setProperty name="dateObject" property="time" value="${content.properties[docprop.id]}" />
-                <div><strong>${docprop.label}</strong>: <fmt:formatDate type="date" dateStyle="full" value="${dateObject}" /></div>
-              </c:when>
-            </c:choose>
+              <c:choose>
+                <c:when test="${docprop.type == 'TEXT'}">
+                    <div><strong>${docprop.label}</strong>: ${content.properties[docprop.id]}</div>
+                </c:when>
+                <c:when test="${docprop.type == 'DATE'}">
+                    <jsp:useBean id="dateObject" class="java.util.Date" />
+                    <jsp:setProperty name="dateObject" property="time" value="${content.properties[docprop.id]}" />
+                    <div><strong>${docprop.label}</strong>: <fmt:formatDate type="date" dateStyle="full" value="${dateObject}" /></div>
+                </c:when>
+              </c:choose>
           </c:forEach>
         </div>
       </c:otherwise>

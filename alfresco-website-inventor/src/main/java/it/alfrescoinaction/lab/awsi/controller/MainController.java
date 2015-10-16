@@ -1,7 +1,5 @@
 package it.alfrescoinaction.lab.awsi.controller;
 
-
-import it.alfrescoinaction.lab.awsi.domain.Downloadable;
 import it.alfrescoinaction.lab.awsi.domain.PropertyTuple;
 import it.alfrescoinaction.lab.awsi.domain.SearchFilters;
 import it.alfrescoinaction.lab.awsi.domain.WebPage;
@@ -16,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +26,6 @@ public class MainController {
 
     private final String homeTemplate = "page";
     private final String pageTemplate = "page";
-
     private final String searchResultTemplate = "searchresult";
     @Value("${alfresco.search.filter1}") private String filter1;
     @Value("${alfresco.search.filter2}") private String filter2;
@@ -50,6 +48,7 @@ public class MainController {
     public String pageById(Model model, @PathVariable("siteid") String siteId, @PathVariable("id") String id) {
 
         SearchFilters searchFilters = new SearchFilters();
+
         WebPage wp = webPageService.buildWebPage(siteId, id);
         model.addAttribute("page", wp);
         model.addAttribute("siteid", siteId);
@@ -125,6 +124,7 @@ public class MainController {
 
         return searchFilters;
     }
+
 
 
     //------------- EXCEPTION -------------

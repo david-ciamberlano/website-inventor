@@ -32,6 +32,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 
 @Repository
@@ -187,9 +188,9 @@ public class AlfrescoCmisRepository implements CmisRepository {
         String queryFilterTemplateDATEFROM = "AND %s >= TIMESTAMP '%sT00:00:00.000+00:00' ";
         String queryFilterTemplateDATETO = "AND %s <= TIMESTAMP '%sT00:00:00.000+00:00' ";
         String queryFilterTemplateDATE = "AND %s = TIMESTAMP '%sT00:00:00.000+00:00' ";
-        String queryFilterTemplateNUM = "AND %s =  ";
-        String queryFilterTemplateNUM_MIN = "AND %s >=  ";
-        String queryFilterTemplateNUM_MAX = "AND %s <=  ";
+        String queryFilterTemplateNUM = "AND %s = %d";
+        String queryFilterTemplateNUM_MIN = "AND %s >=  %d";
+        String queryFilterTemplateNUM_MAX = "AND %s <=  %d";
         String queryFilterTemplateFULLTEXT = "AND CONTAINS('\\'%s\\'')";
 
         List <SearchFilterItem> filterItems = filters.getFilterItems();
@@ -224,12 +225,18 @@ public class AlfrescoCmisRepository implements CmisRepository {
                     }
 
                     case "DATE_FROM": {
-                        queryFilters += String.format(queryFilterTemplateDATEFROM, filter.getId(), filter.getContent());
+                        String formattedDate = this.getFormattedDate (filter.getContent(), filter.getType());
+                        if (!formattedDate.isEmpty()) {
+                            queryFilters += String.format(queryFilterTemplateDATEFROM, filter.getId(), formattedDate);
+                        }
                         break;
                     }
 
                     case "DATE_TO": {
-                        queryFilters += String.format(queryFilterTemplateDATETO, filter.getId(), filter.getContent());
+                        String formattedDate = this.getFormattedDate (filter.getContent(), filter.getType());
+                        if (!formattedDate.isEmpty()) {
+                            queryFilters += String.format(queryFilterTemplateDATETO, filter.getId(), formattedDate);
+                        }
                         break;
                     }
 
@@ -341,4 +348,41 @@ public class AlfrescoCmisRepository implements CmisRepository {
         this.alfrescoDocLibPath = "/" + alfrescoSites + "/" + siteId + "/" + alfrescoDocumentLibrary;
     }
 
+
+    //-------------------------- PRIVATE --------------------------
+
+    private String getFormattedDate(String date, String type) {
+        String formattedDate = "";
+
+        if (date.length() == 4) {
+            // it's only the year
+            if ("DATE_TO".equals(type)){
+                formattedDate = date + "-12-31";
+            }
+            else {
+                formattedDate = date + "-01-01";
+            }
+
+        }
+        else if (date.length() == 10) {
+            String [] datePart = date.split("\\-");
+            if (datePart.length == 3) {
+                formattedDate = datePart[2]+"-"+datePart[1]+"-"+datePart[0];
+            }
+        }
+
+        return formattedDate;
+    }
+
+
+    private boolean validateInput(String input, String type) {
+        switch (type) {
+            case "DATE": {
+                //^(\d\d?-\d\d?-[1-2]\d{3})$|^([1-2]\d{3})$
+                Pattern p = Pattern.compile("");
+            }
+        }
+
+        return false;
+    }
 }
