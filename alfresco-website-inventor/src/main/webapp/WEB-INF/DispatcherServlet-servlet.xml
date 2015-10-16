@@ -30,19 +30,8 @@
     </mvc:annotation-driven>
 
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver" >
-        <property name="prefix" value="/WEB-INF/views/themes/default/"/>
+        <property name="prefix" value="/WEB-INF/views/themes/s/"/>
         <property name="suffix" value=".jsp"/>
     </bean>
-
-    <!--freemarker-->
-    <!--<bean id="freemarkerConfig" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">-->
-        <!--<property name="templateLoaderPath" value="/WEB-INF/views/"/>-->
-    <!--</bean>-->
-
-    <!--<bean id="viewResolver" class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">-->
-        <!--<property name="cache" value="true"/>-->
-        <!--<property name="prefix" value="themes/default/"/>-->
-        <!--<property name="suffix" value=".ftl"/>-->
-    <!--</bean>-->
 
 </beans>

@@ -9,29 +9,28 @@
     <c:set var="contextPath" value="${pageContext.request.contextPath}"/>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <meta charset="utf-8">
-    <title>${site}</title>
+    <title>${siteName}</title>
     <meta name="generator" content="Bootply" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <!--[if lt IE 9]>
-    <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-    <link href="${contextPath}/resource/themes/default/css/bootstrap.min.css" rel="stylesheet">
-    <link href="${contextPath}/resource/themes/default/css/custom.css" rel="stylesheet">
+    <link href="${contextPath}/resource/themes/s/css/bootstrap.min.css" rel="stylesheet">
+    <link href="${contextPath}/resource/themes/s/css/custom.css" rel="stylesheet">
 </head>
 <body>
 
 <!-- Begin Body -->
 <div class="container">
-    <div class="row">
-        <div class="col-dm-12">
-            <%@include file="include/header.jsp"%>
-        </div>
-    </div>
+    <header class="row page-header">
+        <%@include file="include/header.jsp"%>
+    </header>
+
     <div class="row">
 
         <%--LINKS--%>
         <div class="col-md-3">
-            <%@include file="include/search_links.jsp"%>
+            <%@include file="include/links_for_search.jsp"%>
         </div>
 
         <%--CONTENT--%>
@@ -41,7 +40,7 @@
             <div class="row">
                 <div class="col-md-12">
                     <ul class="breadcrumb">
-                        <li><a href="${contextPath}/${site}"><span class="glyphicon glyphicon-home"></span> Home</a></li>
+                        <li><a href="${contextPath}/${siteid}"><span class="glyphicon glyphicon-home"></span> Home</a></li>
                     </ul>
                 </div>
             </div>

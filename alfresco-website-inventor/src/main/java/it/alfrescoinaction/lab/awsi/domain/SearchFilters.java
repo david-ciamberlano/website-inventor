@@ -6,39 +6,18 @@ import java.util.List;
 
 public class SearchFilters {
 
-    private SearchFilterItem searchFilterItem1;
-    private SearchFilterItem searchFilterItem2;
+    private List<SearchFilterItem> filterItems;
 
     public SearchFilters(){
-        searchFilterItem1 = new SearchFilterItem("","","");
-        searchFilterItem2 = new SearchFilterItem("","","");
+        filterItems = new ArrayList<>();
     }
 
-    public SearchFilterItem getSearchFilterItem1() {
-        return searchFilterItem1;
-    }
-
-    public SearchFilterItem getSearchFilterItem2() {
-        return searchFilterItem2;
-    }
-
-    public List<SearchFilterItem> getAsList() {
-        List<SearchFilterItem> filterItems = new ArrayList<>();
-        filterItems.add(searchFilterItem1);
-        filterItems.add(searchFilterItem2);
-
+    public List<SearchFilterItem> getFilterItems() {
         return filterItems;
     }
 
-    public void setFilter1Data(String name, String id, String type) {
-        searchFilterItem1.setName(name);
-        searchFilterItem1.setId(id);
-        searchFilterItem1.setType(type);
+    public void addFilterItem(String name, String id, String type) {
+        filterItems.add(new SearchFilterItem(name, id, type));
     }
 
-    public void setFilter2Data(String name, String id, String type) {
-        searchFilterItem2.setName(name);
-        searchFilterItem2.setId(id);
-        searchFilterItem2.setType(type);
-    }
 }

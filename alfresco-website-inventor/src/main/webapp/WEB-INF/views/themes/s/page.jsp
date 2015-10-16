@@ -9,7 +9,7 @@
     <c:set var="contextPath" value="${pageContext.request.contextPath}"/>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <meta charset="utf-8">
-    <title>${site}</title>
+    <title>${sitename}</title>
     <meta name="generator" content="Bootply" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <!--[if lt IE 9]>
@@ -22,9 +22,10 @@
 
 <!-- Begin Body -->
 <div class="container">
-    <header class="row">
+    <header class="row page-header">
         <%@include file="include/header.jsp"%>
     </header>
+
     <div class="row">
 
         <%--LINKS--%>
