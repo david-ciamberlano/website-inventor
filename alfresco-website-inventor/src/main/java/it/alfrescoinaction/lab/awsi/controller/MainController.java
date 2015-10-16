@@ -1,7 +1,5 @@
 package it.alfrescoinaction.lab.awsi.controller;
 
-
-import it.alfrescoinaction.lab.awsi.domain.Downloadable;
 import it.alfrescoinaction.lab.awsi.domain.PropertyTuple;
 import it.alfrescoinaction.lab.awsi.domain.SearchFilters;
 import it.alfrescoinaction.lab.awsi.domain.WebPage;

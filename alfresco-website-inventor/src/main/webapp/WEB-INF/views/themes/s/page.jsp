@@ -30,7 +30,7 @@
 
         <%--LINKS--%>
         <div class="col-md-3">
-            <%@include file="include/links.jsp"%>
+            <%@include file="include/link_search.jsp"%>
         </div>
 
         <%--CONTENT--%>
