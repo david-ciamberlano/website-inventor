@@ -4,6 +4,7 @@ import it.alfrescoinaction.lab.awsi.domain.PropertyTuple;
 import it.alfrescoinaction.lab.awsi.domain.SearchFilters;
 import it.alfrescoinaction.lab.awsi.domain.WebPage;
 import it.alfrescoinaction.lab.awsi.exceptions.ConnectionException;
+import it.alfrescoinaction.lab.awsi.exceptions.InvalidParameterException;
 import it.alfrescoinaction.lab.awsi.exceptions.PageNotFoundException;
 import it.alfrescoinaction.lab.awsi.service.WebPageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -135,7 +136,7 @@ public class MainController {
         mav.addObject("Invalid Page", exc.getPageId());
         mav.addObject("exception", exc);
         mav.addObject("utl",req.getRequestURL());
-        mav.setViewName("themes/simple/pageNotFound");
+        mav.setViewName("themes/s/error_page");
 
         return mav;
     }
@@ -146,7 +147,18 @@ public class MainController {
         mav.addObject("Connection exception", exc.getPageId());
         mav.addObject("exception", exc);
         mav.addObject("utl",req.getRequestURL());
-        mav.setViewName("themes/simple/pageNotFound");
+        mav.setViewName("themes/s/error_page");
+
+        return mav;
+    }
+
+    @ExceptionHandler(InvalidParameterException.class)
+    public ModelAndView handleInvParamException(HttpServletRequest req, InvalidParameterException exc) {
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("Connection exception", exc.getMessage());
+        mav.addObject("exception", exc);
+        mav.addObject("utl",req.getRequestURL());
+        mav.setViewName("themes/s/error_page");
 
         return mav;
     }

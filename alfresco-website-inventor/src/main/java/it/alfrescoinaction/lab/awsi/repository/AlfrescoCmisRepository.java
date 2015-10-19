@@ -4,10 +4,15 @@ import it.alfrescoinaction.lab.awsi.domain.Downloadable;
 import it.alfrescoinaction.lab.awsi.domain.RenditionDownloadable;
 import it.alfrescoinaction.lab.awsi.domain.SearchFilterItem;
 import it.alfrescoinaction.lab.awsi.domain.SearchFilters;
+import it.alfrescoinaction.lab.awsi.exceptions.InvalidParameterException;
 import it.alfrescoinaction.lab.awsi.exceptions.ObjectNotFoundException;
 import it.alfrescoinaction.lab.awsi.exceptions.PageNotFoundException;
 import org.apache.chemistry.opencmis.client.api.*;
+import org.apache.chemistry.opencmis.client.runtime.util.EmptyItemIterable;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisInvalidArgumentException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
+import org.apache.chemistry.opencmis.commons.impl.jaxb.CmisException;
 import org.apache.http.HttpEntity;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -29,6 +34,7 @@ import org.springframework.stereotype.Repository;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -248,6 +254,11 @@ public class AlfrescoCmisRepository implements CmisRepository {
             }
         }
 
+        // check if at least 1 field is valid (otherwise all the repository will be searched)
+        if (queryFilters.isEmpty()) {
+            return new EmptyItemIterable<>();
+        }
+
         String [] typeParts = searchType.split("\\|");
 
         String typeName = typeParts[1] != null?typeParts[1]:"cmis:document";
@@ -259,7 +270,16 @@ public class AlfrescoCmisRepository implements CmisRepository {
         Session session = connection.getSession();
         OperationContext oc = session.createOperationContext();
         oc.setRenditionFilterString("*");
-        ItemIterable<QueryResult> children = session.query(query, false, oc);
+
+        ItemIterable<QueryResult> children;
+        try {
+            children = session.query(query, false, oc);
+            // if the query is invalid, the following row throws an exception
+            children.getTotalNumItems();
+        }
+        catch (Exception e) {
+            children = new EmptyItemIterable<>();
+        }
 
         return children;
     }
