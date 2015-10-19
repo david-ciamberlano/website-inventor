@@ -181,6 +181,9 @@ public class AlfrescoCmisRepository implements CmisRepository {
 
         Session session = connection.getSession();
         OperationContext oc = session.createOperationContext();
+
+
+        
         oc.setRenditionFilterString("*");
         ItemIterable<QueryResult> children = session.query(query, false, oc);
 
