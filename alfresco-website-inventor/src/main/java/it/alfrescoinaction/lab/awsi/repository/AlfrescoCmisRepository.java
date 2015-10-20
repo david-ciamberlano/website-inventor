@@ -182,6 +182,9 @@ public class AlfrescoCmisRepository implements CmisRepository {
 
         Session session = connection.getSession();
         OperationContext oc = session.createOperationContext();
+
+
+        
         oc.setRenditionFilterString("*");
         ItemIterable<QueryResult> children = session.query(query, false, oc);
 
@@ -227,7 +230,10 @@ public class AlfrescoCmisRepository implements CmisRepository {
                     }
 
                     case "DATE": {
-                        queryFilters += String.format(queryFilterTemplateDATE, filter.getId(), filter.getContent());
+                        String formattedDate = this.getFormattedDate (filter.getContent(), filter.getType());
+                        if (!formattedDate.isEmpty()) {
+                            queryFilters += String.format(queryFilterTemplateDATE, filter.getId(), formattedDate);
+                        }
                         break;
                     }
 

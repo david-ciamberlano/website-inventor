@@ -80,7 +80,7 @@ public class WebPageService {
                     break;
                 }
                 case ".footer.txt": {
-                    wp.addSpecialContent("text_header", doc);
+                    wp.addSpecialContent("text_footer", doc);
                     break;
                 }
                 default:{

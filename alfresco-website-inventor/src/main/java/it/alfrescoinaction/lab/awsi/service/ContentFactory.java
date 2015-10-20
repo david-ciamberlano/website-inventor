@@ -96,15 +96,34 @@ public class ContentFactory {
                 Content imageContent = new ContentImpl(doc.getId(),doc.getName(),doc.getContentStreamMimeType(), imgType);
 
                 imageContent.setRenditions(buildRenditions(doc));
+                List<Property<?>> properties = doc.getProperties();
 
                 Map<String,String> props = new HashMap<>();
+                for (Property property : properties) {
+                    switch (property.getType().value()) {
+                        case "datetime": {
+                            GregorianCalendar propertyDate = (GregorianCalendar)property.getFirstValue();
+                            if (propertyDate != null) {
+                                props.put(property.getLocalName(), String.valueOf(propertyDate.getTimeInMillis()));
+                            }
+                            break;
+                        }
 
-                if (doc.getProperty("exif:pixelXDimension") != null) {
-                    props.put("width", doc.getProperty("exif:pixelXDimension").getValueAsString());
+                        default:
+                            props.put(property.getLocalName(), property.getValueAsString());
+                    }
                 }
-                if (doc.getProperty("exif:pixelYDimension") != null) {
-                    props.put("height", doc.getProperty("exif:pixelYDimension").getValueAsString());
-                }
+
+//                if (doc.getProperty("exif:pixelXDimension") != null) {
+//                    props.put("width", doc.getProperty("exif:pixelXDimension").getValueAsString());
+//                }
+//                if (doc.getProperty("exif:pixelYDimension") != null) {
+//                    props.put("height", doc.getProperty("exif:pixelYDimension").getValueAsString());
+//                }
+//                if (doc.getProperty("cm:title") != null) {
+//                    props.put("title", doc.getProperty("cm:title").getValueAsString());
+//                }
+//
                 long contentSizeInMB = Math.round(doc.getContentStreamLength()/1024);
                 props.put("content_size",String.valueOf(contentSizeInMB));
 

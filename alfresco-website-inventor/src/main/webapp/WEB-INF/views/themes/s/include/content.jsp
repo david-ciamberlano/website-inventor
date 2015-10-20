@@ -13,12 +13,13 @@
       <%--IMAGE--%>
       <c:when test="${content.type == 'IMAGE'}">
         <div class="col-md-10 col-md-offset-1">
-          <figure class="">
+          <figure>
             <a href="${contextPath}/proxy/${content.id}" >
               <img class="img-responsive center-block" src="${contextPath}/proxy/r/imgpreview/${content.id}" alt="${content.getName()}"/>
             </a>
             <figcaption class="text-center">
-              <p>${content.name} (${content.properties['width']} x ${content.properties['height']})</p>
+              <p>${content.properties['title']}</p>
+              <p>(${content.properties['pixelXDimension']} x ${content.properties['pixelYDimension']} - ${content.properties['content_size']}MB)</p>
             </figcaption>
           </figure>
         </div>
