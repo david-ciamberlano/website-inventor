@@ -4,10 +4,15 @@ import it.alfrescoinaction.lab.awsi.domain.Downloadable;
 import it.alfrescoinaction.lab.awsi.domain.RenditionDownloadable;
 import it.alfrescoinaction.lab.awsi.domain.SearchFilterItem;
 import it.alfrescoinaction.lab.awsi.domain.SearchFilters;
+import it.alfrescoinaction.lab.awsi.exceptions.InvalidParameterException;
 import it.alfrescoinaction.lab.awsi.exceptions.ObjectNotFoundException;
 import it.alfrescoinaction.lab.awsi.exceptions.PageNotFoundException;
 import org.apache.chemistry.opencmis.client.api.*;
+import org.apache.chemistry.opencmis.client.runtime.util.EmptyItemIterable;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisInvalidArgumentException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
+import org.apache.chemistry.opencmis.commons.impl.jaxb.CmisException;
 import org.apache.http.HttpEntity;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -29,9 +34,11 @@ import org.springframework.stereotype.Repository;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
@@ -248,18 +255,34 @@ public class AlfrescoCmisRepository implements CmisRepository {
             }
         }
 
+        // check if at least 1 field is valid (otherwise all the repository will be searched)
+        if (queryFilters.isEmpty()) {
+            return new EmptyItemIterable<>();
+        }
+
         String [] typeParts = searchType.split("\\|");
 
         String typeName = typeParts[1] != null?typeParts[1]:"cmis:document";
 
+        //TODO convert queryFilters in QueryStatements
         String queryTemplate = "SELECT * FROM %s WHERE IN_TREE('workspace://SpacesStore/%s') %s AND cmis:name <> '.*'";
 
         String query = String.format(queryTemplate, typeName, folderId, queryFilters);
 
         Session session = connection.getSession();
+
         OperationContext oc = session.createOperationContext();
         oc.setRenditionFilterString("*");
-        ItemIterable<QueryResult> children = session.query(query, false, oc);
+
+        ItemIterable<QueryResult> children;
+        try {
+            children = session.query(query, false, oc);
+            // if the query is invalid, the following row throws an exception
+            children.getTotalNumItems();
+        }
+        catch (Exception e) {
+            children = new EmptyItemIterable<>();
+        }
 
         return children;
     }
@@ -364,7 +387,7 @@ public class AlfrescoCmisRepository implements CmisRepository {
             }
 
         }
-        else if (date.length() == 10) {
+        else if (isValid(date,"DATE")) {
             String [] datePart = date.split("\\-");
             if (datePart.length == 3) {
                 formattedDate = datePart[2]+"-"+datePart[1]+"-"+datePart[0];
@@ -375,14 +398,28 @@ public class AlfrescoCmisRepository implements CmisRepository {
     }
 
 
-    private boolean validateInput(String input, String type) {
+    private boolean isValid(String input, String type) {
+
+        boolean isValid = false;
+        Pattern p;
+
         switch (type) {
             case "DATE": {
-                //^(\d\d?-\d\d?-[1-2]\d{3})$|^([1-2]\d{3})$
-                Pattern p = Pattern.compile("");
+                p = Pattern.compile("^(\\d?\\d-\\d?\\d-[1-2]\\d{3})$|^([1-2]\\d{3})$");
+                Matcher m = p.matcher(input);
+                isValid = m.matches();
+                break;
+            }
+
+            case "TEXT": {
+                p = Pattern.compile("^$");
+                Matcher m = p.matcher(input);
+                isValid = m.matches();
+                break;
             }
         }
 
-        return false;
+
+        return isValid;
     }
 }

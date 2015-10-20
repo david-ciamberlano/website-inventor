@@ -48,7 +48,14 @@
             <%--CONTENTS--%>
 
             <%-- CONTENT OBJECT-LIST --%>
+            <p class="text-center">Risultati trovati: ${page.contents.size()}</p>
+            <c:if test="${page.contents.size() == 0}">
+                <p class="text-center text-warning">Nessun risultato ottenuto. Controllare i parametri di ricerca.</p>
+            </c:if>
             <c:if test="${page.contents.size() > 0}">
+                <c:if test="${page.contents.size() > 99}">
+                    <p class="text-center text-warning">Attenzione: la ricerca &egrave; troppo generica. Sono stati prelevati solo i primi 100 risultati</p>
+                </c:if>
                 <%@include file="include/content.jsp"%>
             </c:if>
 

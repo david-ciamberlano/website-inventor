@@ -4,8 +4,11 @@ import it.alfrescoinaction.lab.awsi.domain.PropertyTuple;
 import it.alfrescoinaction.lab.awsi.domain.SearchFilters;
 import it.alfrescoinaction.lab.awsi.domain.WebPage;
 import it.alfrescoinaction.lab.awsi.exceptions.ConnectionException;
+import it.alfrescoinaction.lab.awsi.exceptions.InvalidParameterException;
 import it.alfrescoinaction.lab.awsi.exceptions.PageNotFoundException;
 import it.alfrescoinaction.lab.awsi.service.WebPageService;
+
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -37,6 +40,7 @@ public class MainController {
     @Value("${alfresco.document.property2}") String property2;
     @Value("${alfresco.document.property3}") String property3;
 
+    private static final Logger logger = Logger.getLogger(MainController.class);
 
 
     @RequestMapping("/{siteid}")
@@ -47,7 +51,9 @@ public class MainController {
     @RequestMapping("/{siteid}/page/{id}")
     public String pageById(Model model, @PathVariable("siteid") String siteId, @PathVariable("id") String id) {
 
-        SearchFilters searchFilters = new SearchFilters();
+        if(logger.isDebugEnabled()){
+            logger.debug("Request page: " + id);
+        }
 
         WebPage wp = webPageService.buildWebPage(siteId, id);
         model.addAttribute("page", wp);
@@ -65,12 +71,16 @@ public class MainController {
         if (wp.isHomepage()) {
             view = homeTemplate;
         }
+
+        logger.info ("TEST - Page ready");
         return view;
     }
 
     @RequestMapping(value = "/{siteid}/search", method = RequestMethod.POST)
     public String search( @ModelAttribute("searchFilters") SearchFilters searchFilters, Model model,
                           @PathVariable("siteid") String siteId) {
+
+
         WebPage wp = webPageService.buildSearchResultPage(siteId, searchFilters);
 
         model.addAttribute("page", wp);
@@ -135,7 +145,7 @@ public class MainController {
         mav.addObject("Invalid Page", exc.getPageId());
         mav.addObject("exception", exc);
         mav.addObject("utl",req.getRequestURL());
-        mav.setViewName("themes/simple/pageNotFound");
+        mav.setViewName("themes/s/error_page");
 
         return mav;
     }
@@ -146,7 +156,18 @@ public class MainController {
         mav.addObject("Connection exception", exc.getPageId());
         mav.addObject("exception", exc);
         mav.addObject("utl",req.getRequestURL());
-        mav.setViewName("themes/simple/pageNotFound");
+        mav.setViewName("themes/s/error_page");
+
+        return mav;
+    }
+
+    @ExceptionHandler(InvalidParameterException.class)
+    public ModelAndView handleInvParamException(HttpServletRequest req, InvalidParameterException exc) {
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("Connection exception", exc.getMessage());
+        mav.addObject("exception", exc);
+        mav.addObject("utl",req.getRequestURL());
+        mav.setViewName("themes/s/error_page");
 
         return mav;
     }

@@ -1,10 +1,10 @@
 <ul class="nav nav-tabs voffset-big">
-    <li><a aria-expanded="false" href="#search-tab" data-toggle="tab">
+    <li class="active"><a aria-expanded="false" href="#search-tab" data-toggle="tab">
         <span class="glyphicon glyphicon-search"></span> Ricerca</a>
     </li>
 </ul>
 <div id="myTabContent" class="tab-content">
-    <div class="tab-pane fade in voffset-small" id="search-tab">
+    <div class="tab-pane fade active in voffset-small" id="search-tab">
         <fieldset>
             <legend>Ricerca avanzata</legend>
             <form:form modelAttribute="searchFilters" method="POST" action="${pageContext.request.contextPath}/${siteid}/search" class="form-horizontal">
