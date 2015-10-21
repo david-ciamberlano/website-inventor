@@ -8,6 +8,7 @@ public interface Content {
     String getName();
     String getMimeType();
     ContentType getType();
+    int getPriority();
     Map<String,String> getProperties();
     void setProperties (Map<String,String> props);
     Map<String, String> getRenditions();

@@ -1,6 +1,6 @@
 package it.alfrescoinaction.lab.awsi.domain;
 
-public class RenditionDownloadable implements Downloadable {
+public class RenditionDownloadable implements Downloadable<byte[]> {
 
     private final String name;
     private final byte[] content;

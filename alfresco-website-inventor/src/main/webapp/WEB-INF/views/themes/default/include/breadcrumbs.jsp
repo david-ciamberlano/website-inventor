@@ -1,12 +1,12 @@
-<ul class="breadcrumb">
+<ul>
   <c:if test="${page.homepage}">
-    <li class="active"><span class="glyphicon glyphicon-home"></span> Home</li>
+    <li>Home</li>
   </c:if>
   <c:if test="${!page.homepage}">
-    <li><a href="${contextPath}/${siteid}"><span class="glyphicon glyphicon-home"></span> Home</a></li>
+    <li><a href="${contextPath}/${siteid}">Home</a></li>
     <c:forEach items="${page.breadcrumbs}" var="bcEntry">
-      <li><a href="${contextPath}/${siteid}/page/${bcEntry.value}">${fn:replace(bcEntry.key,'_',' ')}</a></li>
+      <li><a href="${contextPath}/${siteid}/page/${bcEntry.value}">${bcEntry.key}</a></li>
     </c:forEach>
-    <li class="active">${fn:replace(page.title,'_',' ')}</li>
+    <li>${page.title}</li>
   </c:if>
 </ul>

@@ -1,6 +1,6 @@
-<div style="text-align: center" class="col-md-2">
-  <img src="${contextPath}/resource/themes/s/icons/senato_logo_small.png" alt="Logo senato">
+<div>
+  <img src="${contextPath}/resource/themes/default/img/blog.png" alt="Logo del Blog">
 </div>
-<div class="col-md-10">
-  <h1> Archivio giornali storici <br><small>A cura del Servizio Biblioteca del Senato della Repubblica</small></h1>
+<div>
+  <h1>${sitename}<br><small>${sitedescription}</small></h1>
 </div>

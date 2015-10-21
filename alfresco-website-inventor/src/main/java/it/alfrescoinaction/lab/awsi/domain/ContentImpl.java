@@ -10,17 +10,19 @@ public class ContentImpl implements Content{
     private final String name;
     private final String mimeType;
     private final ContentType type;
+    private final int priority;
     private Map<String,String> properties;
     private Map<String,String> renditions;
 
-    public ContentImpl(String id, String name, String mimeType, ContentType type) {
+    public ContentImpl(String id, String name, String mimeType, ContentType type, int priority) {
         this.id = id;
         this.name = name;
         this.mimeType = mimeType;
         this.type = type;
+        this.priority = priority;
 
-        this.properties = new HashMap<>();
-        this.renditions = new HashMap<>();
+        properties = new HashMap<>();
+        renditions = new HashMap<>();
     }
 
     @Override
@@ -41,6 +43,11 @@ public class ContentImpl implements Content{
     @Override
     public ContentType getType() {
         return type;
+    }
+
+    @Override
+    public int getPriority() {
+        return priority;
     }
 
     @Override

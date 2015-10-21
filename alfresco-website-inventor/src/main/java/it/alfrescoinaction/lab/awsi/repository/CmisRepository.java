@@ -6,6 +6,7 @@ import it.alfrescoinaction.lab.awsi.domain.SearchFilters;
 import it.alfrescoinaction.lab.awsi.exceptions.ObjectNotFoundException;
 import org.apache.chemistry.opencmis.client.api.*;
 
+import java.io.InputStream;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -48,6 +49,6 @@ public interface CmisRepository {
      * @param objectId
      * @return
      */
-    Downloadable getRendition(String type, String objectId, String name) throws ObjectNotFoundException;
+    Downloadable<byte[]> getRendition(String type, String objectId, String name) throws ObjectNotFoundException;
 
 }

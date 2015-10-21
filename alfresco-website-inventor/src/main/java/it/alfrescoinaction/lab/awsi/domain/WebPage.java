@@ -18,11 +18,12 @@ public class WebPage {
     private final String siteDescription;
     private final boolean homepage;
 
-    private Map<String,Content> specialContent = new HashMap<>(6);
-    private List<Link> categories = new ArrayList<>(10);
-    private List<Link> links = new ArrayList<>(10);
-    private List<Content> contents = new ArrayList<>(20);
-    private Map<String,String> breadcrumbs = new LinkedHashMap<>(10);
+    private List<Link> categories = Collections.emptyList();
+    private List<Link> links = Collections.emptyList();
+    private Map<String,String> breadcrumbs = Collections.emptyMap();
+    private List<Content> contents = Collections.emptyList();
+    private Map<String,Content> specialContents = Collections.emptyMap();
+
 
     public WebPage(String id, String title, String parentId, boolean homepage,
                    String siteName, String siteDescription) {
@@ -34,27 +35,7 @@ public class WebPage {
         this.siteDescription = siteDescription;
     }
 
-    public void addLinks(String pageName, String id) {
-        Link link = new Link(id, pageName);
-        links.add(link);
-    }
 
-    public void addContent(Document doc) {
-        contents.add (ContentFactory.buildContent(doc));
-    }
-
-    public void addCategory(String categoryName, String id) {
-        Link link = new Link(id, categoryName);
-        categories.add(link);
-    }
-
-    public void addBreadCrumbs(Map<String,String> bc) {
-        this.breadcrumbs.putAll(bc);
-    }
-
-    public void addSpecialContent(String type, Document doc) {
-        specialContent.put(type, ContentFactory.buildContent(doc));
-    }
 
     //===== getters/setters =====
 
@@ -74,24 +55,44 @@ public class WebPage {
         return links;
     }
 
-    public List<Content> getContents() {
-        return contents;
-    }
-
-    public List<Link> getCategories(){
-        return categories;
-    }
-
-    public Map<String,Content> getSpecialContent() {
-        return this.specialContent;
+    public void setLinks(List<Link> links) {
+        this.links = Collections.unmodifiableList(links);
     }
 
     public boolean isHomepage() {
         return homepage;
     }
 
+    public List<Content> getContents() {
+        return contents;
+    }
+
+    public void setContents(List<Content> contents) {
+        this.contents = Collections.unmodifiableList(contents);
+    }
+
+    public List<Link> getCategories(){
+        return categories;
+    }
+
+    public void setCategories(List<Link> categories) {
+        this.categories = Collections.unmodifiableList(categories);
+    }
+
+    public Map<String,Content> getSpecialContents() {
+        return this.specialContents;
+    }
+
+    public void setSpecialContents(Map<String,Content> specialContents) {
+        this.specialContents = Collections.unmodifiableMap(specialContents);
+    }
+
     public Map<String,String> getBreadcrumbs() {
         return breadcrumbs;
+    }
+
+    public void setBreadcrumbs(Map<String,String> breadcrumbs) {
+        this.breadcrumbs = Collections.unmodifiableMap(breadcrumbs);
     }
 
     public String getSiteName() {

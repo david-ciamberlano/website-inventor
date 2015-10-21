@@ -312,7 +312,7 @@ public class AlfrescoCmisRepository implements CmisRepository {
 
 
 
-    public Downloadable getRendition(String type, String objectId, String name) throws ObjectNotFoundException {
+    public Downloadable<byte[]> getRendition(String type, String objectId, String name) throws ObjectNotFoundException {
 
         // I'm not using cmis because it doesn't trigger the thumbnail generetion process
         // The rest service generate the thumbnauk or eventually return the default placeholder
@@ -339,7 +339,7 @@ public class AlfrescoCmisRepository implements CmisRepository {
 
                 HttpEntity entity = response.getEntity();
 
-                RenditionDownloadable rend;
+                Downloadable<byte[]> rend;
                 //TODO replace magic number
                 if (entity.getContentLength() < 1024*1024 || entity.getContentLength() > 0) {
                     byte[] buffer = EntityUtils.toByteArray(entity);
@@ -348,7 +348,7 @@ public class AlfrescoCmisRepository implements CmisRepository {
 
                     String mimetype = entity.getContentType().getValue();
 
-                    rend = new RenditionDownloadable(name, buffer, entity.getContentLength(), mimetype);
+                    rend = new RenditionDownloadable (name, buffer, entity.getContentLength(), mimetype);
                     return rend;
                 }
                 else {

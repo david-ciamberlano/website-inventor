@@ -2,7 +2,7 @@ package it.alfrescoinaction.lab.awsi.domain;
 
 import java.io.InputStream;
 
-public class FileDownloadable implements Downloadable{
+public class FileDownloadable implements Downloadable<InputStream>{
 
     private final String name;
     private final InputStream stream;

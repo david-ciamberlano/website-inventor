@@ -1,9 +1,6 @@
 package it.alfrescoinaction.lab.awsi.service;
 
-import it.alfrescoinaction.lab.awsi.domain.Downloadable;
-import it.alfrescoinaction.lab.awsi.domain.FileDownloadable;
-import it.alfrescoinaction.lab.awsi.domain.SearchFilters;
-import it.alfrescoinaction.lab.awsi.domain.WebPage;
+import it.alfrescoinaction.lab.awsi.domain.*;
 import it.alfrescoinaction.lab.awsi.exceptions.ObjectNotFoundException;
 import it.alfrescoinaction.lab.awsi.repository.CmisRepository;
 import org.apache.chemistry.opencmis.client.api.*;
@@ -11,9 +8,9 @@ import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundExcept
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.io.InputStream;
+import java.util.*;
+import java.util.regex.Matcher;
 
 @Service
 public class WebPageService {
@@ -37,63 +34,74 @@ public class WebPageService {
 
         WebPage wp = new WebPage(id, folder.getName(), folder.getParentId(), isHomepage, sitesInfo.get("name"), sitesInfo.get("description"));
 
+        Map<String, String> breadCrumbs = new LinkedHashMap<>();
         if (!isHomepage) {
             // breadcrumbs
             String relativeFolderPath = folderPath.replace(repository.getAlfrescoDocLibPath() + "/", "");
             String[] pathItems = relativeFolderPath.split("(?=/)");
 
-            String pathAcc = "";
-            Map<String, String> breadCrumbs = new LinkedHashMap<>();
+            StringBuilder pathAcc = new StringBuilder();
             for (String pathItem : pathItems) {
-                pathAcc += pathItem;
+                pathAcc.append(pathItem);
                 String bcName = pathItem.startsWith("/") ? pathItem.substring(1) : pathItem;
-                String currentPathId = repository.getFolderIdByRelativePath(pathAcc);
+                String currentPathId = repository.getFolderIdByRelativePath(pathAcc.toString());
                 breadCrumbs.put(bcName, currentPathId);
             }
 
             // the last item is not part of breadcrumbs
             String lastItem = pathItems[pathItems.length - 1].startsWith("/") ? pathItems[pathItems.length - 1].substring(1) : pathItems[pathItems.length - 1];
             breadCrumbs.remove(lastItem);
-            wp.addBreadCrumbs(breadCrumbs);
         }
+
+        wp.setBreadcrumbs(breadCrumbs);
+
 
         // get the links
         ItemIterable<QueryResult> links = repository.getSubFolders(folder);
+        List<Link> linkList = new ArrayList<>((int)links.getTotalNumItems());
         for (QueryResult qr : links) {
             String type = qr.getPropertyById("cmis:baseTypeId").getFirstValue().toString();
 
-            if (type.equals("cmis:folder")) {
+            if ("cmis:folder".equals(type)) {
                 String folderId = qr.getPropertyById("cmis:objectId").getFirstValue().toString();
                 String folderName = qr.getPropertyById("cmis:name").getFirstValue().toString();
-                wp.addLinks(folderName, folderId);
+                linkList.add(new Link(folderId,folderName));
             }
         }
+        wp.setLinks(linkList);
 
         // get the Contents
-        ItemIterable<QueryResult> contents = repository.getSubDocuments(folder, new HashMap<String, String>());
-        for (QueryResult qr : contents) {
+        ItemIterable<QueryResult> pageContents = repository.getSubDocuments(folder, new HashMap<String, String>());
+
+        List<Content> contents = new ArrayList<>(20);
+        Map<String,Content> specialContents = new HashMap<>(6);
+        for (QueryResult qr : pageContents) {
             CmisObject cmiso = repository.getDocumentById(qr.getPropertyById("cmis:objectId").getFirstValue().toString());
             Document doc = (Document)cmiso;
             switch (doc.getName()) {
                 case ".header.txt": {
-                    wp.addSpecialContent("text_header", doc);
+                    specialContents.put("text_header", ContentFactory.buildContent(doc));
                     break;
                 }
                 case ".footer.txt": {
-                    wp.addSpecialContent("text_footer", doc);
+                    specialContents.put("text_footer", ContentFactory.buildContent(doc));
                     break;
                 }
                 default:{
-                    wp.addContent(doc);
+                    contents.add(ContentFactory.buildContent(doc));
                 }
             }
         }
+        wp.setContents(contents);
+        wp.setSpecialContents(specialContents);
 
         // categories
         ItemIterable<CmisObject> categories = repository.getCategories();
+        List<Link> categoryList = new LinkedList<>();
         for (CmisObject cmiso : categories) {
-            wp.addCategory(cmiso.getName(), cmiso.getId());
+            categoryList.add(new Link(cmiso.getName(), cmiso.getId()));
         }
+        wp.setCategories(categoryList);
 
         return wp;
     }
@@ -108,33 +116,34 @@ public class WebPageService {
         WebPage wp = new WebPage("search-result", "Search result", homePageId, false, sitesInfo.get("name"),sitesInfo.get("description"));
 
         // get the Contents
-        ItemIterable<QueryResult> contents = repository.search(homePageId, filters);
-        for (QueryResult qr : contents) {
+        ItemIterable<QueryResult> searchContents = repository.search(homePageId, filters);
+        List<Content> contents = new ArrayList<>();
+        for (QueryResult qr : searchContents) {
             CmisObject cmiso = repository.getDocumentById(qr.getPropertyById("cmis:objectId").getFirstValue().toString());
             Document doc = (Document)cmiso;
-            wp.addContent(doc);
+            contents.add(ContentFactory.buildContent(doc));
         }
+        wp.setContents(contents);
 
         return wp;
     }
 
     public String getPageIdByPath(String path) {
-        String folderId = repository.getFolderIdByRelativePath(path);
-
-        return folderId;
+        return repository.getFolderIdByRelativePath(path);
     }
 
-    public Downloadable getDownloadable(String id) {
+    public Downloadable<InputStream> getDownloadable(String id) {
          Document doc = repository.getDocumentById(id);
         return new FileDownloadable(doc.getName(),
-                doc.getContentStream().getStream(), doc.getContentStreamLength(), doc.getContentStreamMimeType());
+                    doc.getContentStream().getStream(),
+                    doc.getContentStreamLength(),
+                    doc.getContentStreamMimeType());
     }
 
-    public Downloadable getRendition(String type, String objectId) {
+    public Downloadable<byte[]> getRendition(String type, String objectId) {
         Document doc =  repository.getDocumentById(objectId);
-        Downloadable rendition = repository.getRendition(type, objectId, doc.getName());
 
-        return rendition;
+        return repository.getRendition(type, objectId, doc.getName());
     }
 
 
