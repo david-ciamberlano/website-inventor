@@ -8,10 +8,15 @@ import org.apache.chemistry.opencmis.commons.impl.IOUtils;
 
 import java.io.InputStream;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ContentFactory {
 
     public static Content buildContent(Document doc) {
+
+        int priority = getDocumentPriority(doc);
+        String name = getDocumentName(doc);
 
         switch (doc.getContentStreamMimeType()) {
 
@@ -34,7 +39,7 @@ public class ContentFactory {
                         textType = ContentType.TEXT;
                 }
 
-                Content textContent = new ContentImpl(doc.getId(), doc.getName(), doc.getContentStreamMimeType(), textType);
+                Content textContent = new ContentImpl(doc.getId(), name, doc.getContentStreamMimeType(), textType, priority);
 
                 List<Property<?>> properties = doc.getProperties();
 
@@ -93,7 +98,7 @@ public class ContentFactory {
                         imgType = ContentType.IMAGE;
                 }
 
-                Content imageContent = new ContentImpl(doc.getId(),doc.getName(),doc.getContentStreamMimeType(), imgType);
+                Content imageContent = new ContentImpl(doc.getId(), name,doc.getContentStreamMimeType(), imgType, priority);
 
                 imageContent.setRenditions(buildRenditions(doc));
                 List<Property<?>> properties = doc.getProperties();
@@ -114,17 +119,7 @@ public class ContentFactory {
                     }
                 }
 
-//                if (doc.getProperty("exif:pixelXDimension") != null) {
-//                    props.put("width", doc.getProperty("exif:pixelXDimension").getValueAsString());
-//                }
-//                if (doc.getProperty("exif:pixelYDimension") != null) {
-//                    props.put("height", doc.getProperty("exif:pixelYDimension").getValueAsString());
-//                }
-//                if (doc.getProperty("cm:title") != null) {
-//                    props.put("title", doc.getProperty("cm:title").getValueAsString());
-//                }
-//
-                long contentSizeInMB = Math.round(doc.getContentStreamLength()/1024);
+                long contentSizeInMB = Math.round(doc.getContentStreamLength()/(1024*1024));
                 props.put("content_size",String.valueOf(contentSizeInMB));
 
                 imageContent.setProperties(props);
@@ -134,7 +129,7 @@ public class ContentFactory {
 
             default: {
                 // caso di file generico
-                Content content = new ContentImpl(doc.getId(),doc.getName(),doc.getContentStreamMimeType(), ContentType.GENERIC);
+                Content content = new ContentImpl(doc.getId(), name,doc.getContentStreamMimeType(), ContentType.GENERIC, priority);
 
                 content.setRenditions(buildRenditions(doc));
 
@@ -186,4 +181,32 @@ public class ContentFactory {
     }
 
 
+    private static String getDocumentName(Document doc) {
+
+        String name = doc.getName();
+        String regex = "^(#\\d{1,3} )?(.*)";
+        Pattern p = Pattern.compile(regex);
+        Matcher m = p.matcher(name);
+
+        if (m.find()) {
+            name = m.group(2);
+        }
+
+        return name;
+    }
+
+    private static int getDocumentPriority(Document doc) {
+        int priority = 900;
+
+        String name = doc.getName();
+        String regex = "^#(\\d{1,3}) ";
+        Pattern p = Pattern.compile(regex);
+        Matcher m = p.matcher(name);
+
+        if (m.find()) {
+            priority = Integer.parseInt(m.group(1));
+        }
+
+        return priority;
+    }
 }

@@ -64,8 +64,19 @@ public class WebPage {
     }
 
     public List<Content> getContents() {
-        return contents;
+        // order by priority
+        List<Content> contentList = new ArrayList(contents);
+        Collections.sort(contentList, new Comparator<Content>() {
+            @Override
+            public int compare(Content c1, Content c2) {
+                return  c1.getPriority() - c2.getPriority();
+
+            }
+        });
+
+        return contentList;
     }
+
 
     public void setContents(List<Content> contents) {
         this.contents = Collections.unmodifiableList(contents);
