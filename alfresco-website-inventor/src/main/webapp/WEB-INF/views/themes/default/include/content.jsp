@@ -5,7 +5,7 @@
       <%--TEXT--%>
       <c:when test="${content.type == 'TEXT'}">
         <div>
-          <h2>${content.properties['name']}</h2>
+          <h2>${content.name}</h2>
           <div>${content.properties['text']}</div>
         </div>
       </c:when>
