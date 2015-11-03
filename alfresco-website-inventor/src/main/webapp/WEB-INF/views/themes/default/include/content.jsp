@@ -1,40 +1,31 @@
 <c:forEach items="${page.contents}" var="content">
   <article>
     <c:choose>
-
       <%--TEXT--%>
       <c:when test="${content.type == 'TEXT'}">
-        <div>
-          <h2>${content.properties['name']}</h2>
-          <div>${content.properties['text']}</div>
-        </div>
+      <h2>${content.name}</h2>
+      <div>${content.properties['text']}</div>
       </c:when>
 
       <%--IMAGE--%>
       <c:when test="${content.type == 'IMAGE'}">
-        <div>
-          <figure>
-            <a href="${contextPath}/proxy/${content.id}" >
-              <img src="${contextPath}/proxy/r/imgpreview/${content.id}" alt="${content.getName()}"/>
-            </a>
-            <figcaption>
-              <p>${content.properties['title']}</p>
-              <p>(${content.properties['pixelXDimension']} x ${content.properties['pixelYDimension']} - ${content.properties['content_size']}MB)</p>
-            </figcaption>
-          </figure>
-        </div>
+        <figure>
+          <a href="${contextPath}/proxy/${content.id}" >
+            <img src="${contextPath}/proxy/r/imgpreview/${content.id}" alt="${content.getName()}"/>
+          </a>
+          <figcaption>
+            <p>${content.properties['title']} (${content.properties['pixelXDimension']} x ${content.properties['pixelYDimension']} - ${content.properties['content_size']}MB)</p>
+          </figcaption>
+        </figure>
       </c:when>
 
       <%--GENERIC CONTENT (DOWNLOADABLE)--%>
       <c:otherwise>
+        <a href="${contextPath}/proxy/d/${content.id}" target="_blank">
+          <img src="${contextPath}/proxy/r/doclib/${content.id}" alt=""/>
+        </a>
         <div>
-          <a href="${contextPath}/proxy/d/${content.id}" target="_blank">
-            <img src="${contextPath}/proxy/r/doclib/${content.id}" alt=""/>
-          </a>
-        </div>
-
-        <div>
-          <h4><a href="${contextPath}/proxy/d/${content.id}" target="_blank">${content.properties['testata']}</a></h4>
+          <h4><a href="${contextPath}/proxy/d/${content.id}" target="_blank">${content.properties['title']}</a></h4>
 
           <c:forEach items="${documentProps}" var="docprop">
               <c:choose>
@@ -48,7 +39,7 @@
                 </c:when>
               </c:choose>
           </c:forEach>
-        </div>
+      </div>
       </c:otherwise>
     </c:choose>
   </article>

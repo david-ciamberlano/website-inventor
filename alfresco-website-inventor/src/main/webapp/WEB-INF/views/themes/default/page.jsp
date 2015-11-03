@@ -10,77 +10,45 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <meta charset="utf-8">
     <title>${sitename}</title>
-    <meta name="generator" content="Bootply" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <!--[if lt IE 9]>
-    <!--<script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>-->
+    <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-    <%--<link href="${contextPath}/resource/themes/default/css/bootstrap.min.css" rel="stylesheet">--%>
-    <%--<link href="${contextPath}/resource/themes/default/css/custom.css" rel="stylesheet">--%>
+    <link href="${contextPath}/resource/themes/s/css/bootstrap.min.css" rel="stylesheet">
+    <link href="${contextPath}/resource/themes/s/css/custom.css" rel="stylesheet">
 </head>
 <body>
-
-<!-- Begin Body -->
-<div>
-    <header>
-        <%@include file="include/header.jsp"%>
-    </header>
-
     <div>
+        <header>
+            <%@include file="include/header.jsp"%>
+        </header>
 
-        <%--LINKS--%>
-        <div>
-            <%@include file="include/link_search.jsp"%>
-        </div>
+        <%--NAV--%><%@include file="include/nav.jsp"%>
+
+        <%--BREADCRUMBS--%><%@include file="include/breadcrumbs.jsp"%>
 
         <%--CONTENT--%>
         <div>
-
-            <%--BREADCRUMBS--%>
-            <div>
-                <div>
-                    <%@include file="include/breadcrumbs.jsp"%>
-                </div>
-            </div>
-
             <%-- SPECIAL TEXT HEADER --%>
             <c:if test="${page.specialContents.containsKey('text_header')}">
-                <div >
-                    <div>
-                        <%@include file="include/special_text_header.jsp"%>
-                    </div>
-                </div>
+            <%@include file="include/special_text_header.jsp"%>
             </c:if>
 
             <%--CONTENTS--%>
             <%-- CONTENT FOLDER-LIST --%>
-            <c:if test="${page.contents.size() == 0}">
-                <div id="main-links">
-                    <%@include file="include/content_folders.jsp"%>
-                </div>
-            </c:if>
-
+            <c:if test="${page.contents.size() == 0}"><%@include file="include/main_hav.jsp"%></c:if>
             <%-- CONTENT OBJECT-LIST --%>
-            <c:if test="${page.contents.size() > 0}">
-                <%@include file="include/content.jsp"%>
-            </c:if>
+            <c:if test="${page.contents.size() > 0}"><%@include file="include/content.jsp"%></c:if>
 
             <%-- SPECIAL TEXT FOOTER --%>
             <c:if test="${page.specialContents.containsKey('text_footer')}">
-                <div>
-                    <div class="col-md-12">
-                        <%@include file="include/special_text_footer.jsp"%>
-                    </div>
-                </div>
+            <%@include file="include/special_text_footer.jsp"%>
             </c:if>
-
         </div>
     </div>
-</div>
 
-<!-- script references -->
-<%--<script src="${contextPath}/resource/themes/default/js/jquery.min.js"></script>--%>
-<%--<script src="${contextPath}/resource/themes/default/js/bootstrap.min.js"></script>--%>
-<%--<script src="${contextPath}/resource/themes/default/js/scripts.js"></script>--%>
+    <script src="${contextPath}/resource/themes/default/js/jquery.min.js"></script>
+    <script src="${contextPath}/resource/themes/default/js/bootstrap.min.js"></script>
+    <script src="${contextPath}/resource/themes/default/js/scripts.js"></script>
 </body>
 </html>
