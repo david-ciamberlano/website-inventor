@@ -3,8 +3,8 @@
     <c:choose>
       <%--TEXT--%>
       <c:when test="${content.type == 'TEXT'}">
-      <h2>${content.name}</h2>
-      <div>${content.properties['text']}</div>
+        <h2>${content.name}</h2>
+        <div>${content.properties['text']}</div>
       </c:when>
 
       <%--IMAGE--%>
