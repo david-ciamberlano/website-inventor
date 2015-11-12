@@ -22,6 +22,7 @@ public class Proxy {
     @Autowired
     private WebPageService webPageService;
 
+    //Downloads
     @RequestMapping(value = "proxy/d/{id}", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<InputStreamResource> download(ServletResponse response, @PathVariable("id") String id) throws IOException {
@@ -35,6 +36,7 @@ public class Proxy {
     }
 
 
+    // renditions
     @RequestMapping(value = "proxy/r/{type}/{id}", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<byte[]> rendition(ServletResponse response,

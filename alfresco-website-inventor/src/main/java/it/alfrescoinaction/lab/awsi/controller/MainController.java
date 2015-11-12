@@ -52,7 +52,7 @@ public class MainController {
     public String pageById(Model model, @PathVariable("siteid") String siteId, @PathVariable("id") String id) {
 
         if(logger.isDebugEnabled()){
-            logger.debug("Request page: " + id);
+            logger.debug("Requested page: " + id);
         }
 
         WebPage wp = webPageService.buildWebPage(siteId, id);
@@ -72,7 +72,9 @@ public class MainController {
             view = homeTemplate;
         }
 
-        logger.info ("TEST - Page ready");
+        if(logger.isDebugEnabled()){
+            logger.debug("Page Ready: " + id);
+        }
         return view;
     }
 
@@ -80,6 +82,9 @@ public class MainController {
     public String search( @ModelAttribute("searchFilters") SearchFilters searchFilters, Model model,
                           @PathVariable("siteid") String siteId) {
 
+        if(logger.isDebugEnabled()){
+            logger.debug("Search Request");
+        }
 
         WebPage wp = webPageService.buildSearchResultPage(siteId, searchFilters);
 
@@ -96,6 +101,10 @@ public class MainController {
         model.addAttribute("documentProps", documentProps);
 
         String view = searchResultTemplate;
+
+        if(logger.isDebugEnabled()){
+            logger.debug("Search Result ready");
+        }
 
         return view;
     }

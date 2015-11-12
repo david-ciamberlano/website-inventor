@@ -178,7 +178,7 @@ public class AlfrescoCmisRepository implements CmisRepository {
     @Override
     public ItemIterable<QueryResult> getSubDocuments(Folder folder, Map<String,String> filters) {
 
-        String query = "SELECT D.* FROM cmis:document D WHERE IN_FOLDER('" + folder.getId() + "') ";
+        String query = "SELECT D.* FROM cmis:document D WHERE IN_FOLDER('" + folder.getId() + "') ORDER BY D.cmis:name ";
 
         Session session = connection.getSession();
         OperationContext oc = session.createOperationContext();
@@ -193,15 +193,22 @@ public class AlfrescoCmisRepository implements CmisRepository {
 
     @Override
     public ItemIterable<QueryResult> search(String folderId, SearchFilters filters) {
+
+        boolean withScore = false;
+
+        String queryBaseTemplate = "SELECT D.* FROM %s WHERE IN_TREE(D,'workspace://SpacesStore/%s') %s AND D.cmis:name <> '.*'";
+        String queryWithScoreTemplate = "SELECT D.*, SCORE() rank FROM %s D WHERE IN_TREE(D,'workspace://SpacesStore/%s') %s AND D.cmis:name <> '.*' ORDER BY rank DESC";
+
         String queryFilters = "";
-        String queryFilterTemplateTEXT = "AND %s LIKE '%s' ";
-        String queryFilterTemplateDATEFROM = "AND %s >= TIMESTAMP '%sT00:00:00.000+00:00' ";
-        String queryFilterTemplateDATETO = "AND %s <= TIMESTAMP '%sT00:00:00.000+00:00' ";
-        String queryFilterTemplateDATE = "AND %s = TIMESTAMP '%sT00:00:00.000+00:00' ";
-        String queryFilterTemplateNUM = "AND %s = %d";
-        String queryFilterTemplateNUM_MIN = "AND %s >=  %d";
-        String queryFilterTemplateNUM_MAX = "AND %s <=  %d";
-        String queryFilterTemplateFULLTEXT = "AND CONTAINS('\\'%s\\'')";
+        String queryFilterTemplateTEXT = "AND D.%s LIKE '%s' ";
+        String queryFilterTemplateDATEFROM = "AND D.%s >= TIMESTAMP '%sT00:00:00.000+00:00' ";
+        String queryFilterTemplateDATETO = "AND D.%s <= TIMESTAMP '%sT00:00:00.000+00:00' ";
+        String queryFilterTemplateDATE = "AND D.%s = TIMESTAMP '%sT00:00:00.000+00:00' ";
+        String queryFilterTemplateNUM = "AND D.%s = %d";
+        String queryFilterTemplateNUM_MIN = "AND D.%s >=  %d";
+        String queryFilterTemplateNUM_MAX = "AND D.%s <=  %d";
+        String queryFilterTemplateFULLTEXT = "AND CONTAINS(D,'%s')";
+        String queryFilterTemplateFULLTEXTEXACT = "AND CONTAINS(D,'\\'%s\\'')";
 
         List <SearchFilterItem> filterItems = filters.getFilterItems();
 
@@ -253,10 +260,18 @@ public class AlfrescoCmisRepository implements CmisRepository {
                         break;
                     }
 
-                    // always the last item
+                    // FULLTEXT must be always the last item
                     case "FULLTEXT": {
                         queryFilters += String.format(queryFilterTemplateFULLTEXT, filter.getContent());
+                        withScore = true;
+                        break;
                     }
+
+                    case "FULLTEXT_E": {
+                        queryFilters += String.format(queryFilterTemplateFULLTEXTEXACT, filter.getContent());
+                        break;
+                    }
+
                 }
             }
         }
@@ -270,8 +285,13 @@ public class AlfrescoCmisRepository implements CmisRepository {
 
         String typeName = typeParts[1] != null?typeParts[1]:"cmis:document";
 
-        //TODO convert queryFilters in QueryStatements
-        String queryTemplate = "SELECT * FROM %s WHERE IN_TREE('workspace://SpacesStore/%s') %s AND cmis:name <> '.*'";
+        String queryTemplate;
+        if(withScore) {
+            queryTemplate = queryWithScoreTemplate;
+        }
+        else {
+            queryTemplate = queryBaseTemplate;
+        }
 
         String query = String.format(queryTemplate, typeName, folderId, queryFilters);
 
@@ -384,7 +404,7 @@ public class AlfrescoCmisRepository implements CmisRepository {
         String formattedDate = "";
 
         if (date.length() == 4) {
-            // it's only the year
+            // there's only the year
             if ("DATE_TO".equals(type)){
                 formattedDate = date + "-12-31";
             }
@@ -418,7 +438,7 @@ public class AlfrescoCmisRepository implements CmisRepository {
             }
 
             case "TEXT": {
-                p = Pattern.compile("^$");
+                p = Pattern.compile("^[a-zA-Z0-9'.,]+$");
                 Matcher m = p.matcher(input);
                 isValid = m.matches();
                 break;

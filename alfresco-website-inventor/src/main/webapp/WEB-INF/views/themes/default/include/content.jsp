@@ -10,7 +10,7 @@
       <%--IMAGE--%>
       <c:when test="${content.type == 'IMAGE'}">
         <figure>
-          <a href="${contextPath}/proxy/${content.id}" >
+          <a href="${contextPath}/proxy/d/${content.id}" >
             <img src="${contextPath}/proxy/r/imgpreview/${content.id}" alt="${content.getName()}"/>
           </a>
           <figcaption>

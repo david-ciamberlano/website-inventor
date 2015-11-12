@@ -1,3 +1,3 @@
 <header>
-    ${page.specialContent.get('text_header').properties['text']}
+    ${page.specialContents.get('text_header').properties['text']}
 </header>

@@ -5,6 +5,8 @@ import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.Property;
 import org.apache.chemistry.opencmis.client.api.Rendition;
 import org.apache.chemistry.opencmis.commons.impl.IOUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Whitelist;
 
 import java.io.InputStream;
 import java.util.*;
@@ -17,9 +19,11 @@ public class ContentFactory {
 
         int priority = getDocumentPriority(doc);
         String name = getDocumentName(doc);
+        String mimeType = doc.getContentStreamMimeType();
 
         switch (doc.getContentStreamMimeType()) {
 
+            case "text/html":
             case "text/plain": {
                 ContentType textType;
 
@@ -61,11 +65,20 @@ public class ContentFactory {
 
                 textContent.setProperties(props);
 
-                try (InputStream in =  doc.getContentStream().getStream()) {
+                try (InputStream in = doc.getContentStream().getStream()) {
                     String text = IOUtils.readAllLines(in);
-                    props.put("text", text);
-                }
-                catch (Exception e) {
+
+                    String safeText;
+                    // sanitize html
+                    if ("text/html".equals(mimeType)){
+                       safeText = Jsoup.clean(text, Whitelist.basic());
+                    }
+                    else {
+                        safeText = text2html(text);
+                    }
+
+                    props.put("text", safeText);
+                } catch (Exception e) {
                     //TODO log
                     props.put("text", "");
                 }
@@ -208,5 +221,43 @@ public class ContentFactory {
         }
 
         return priority;
+    }
+
+    /**
+     * convert plain text to html
+     * (snippet copied)
+     */
+    private static String text2html(String text) {
+        StringBuilder builder = new StringBuilder();
+        boolean previousWasASpace = false;
+        for(char c : text.toCharArray()) {
+            if(c == ' ') {
+                if( previousWasASpace ) {
+                    builder.append("&nbsp;");
+                    previousWasASpace = false;
+                    continue;
+                }
+                previousWasASpace = true;
+            } else {
+                previousWasASpace = false;
+            }
+
+            switch(c) {
+                case '<': builder.append("&lt;"); break;
+                case '>': builder.append("&gt;"); break;
+                case '&': builder.append("&amp;"); break;
+                case '"': builder.append("&quot;"); break;
+                case '\n': builder.append("<br>"); break;
+                // We need Tab support here, because we print StackTraces as HTML
+                case '\t': builder.append("&nbsp; &nbsp; &nbsp;"); break;
+                default:
+                    if( c < 128 ) {
+                        builder.append(c);
+                    } else {
+                        builder.append("&#").append((int)c).append(";");
+                    }
+            }
+        }
+        return builder.toString();
     }
 }
