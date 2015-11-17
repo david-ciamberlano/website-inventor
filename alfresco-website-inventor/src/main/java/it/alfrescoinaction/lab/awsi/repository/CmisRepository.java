@@ -3,6 +3,7 @@ package it.alfrescoinaction.lab.awsi.repository;
 
 import it.alfrescoinaction.lab.awsi.domain.Downloadable;
 import it.alfrescoinaction.lab.awsi.domain.SearchFilters;
+import it.alfrescoinaction.lab.awsi.domain.SiteProperties;
 import it.alfrescoinaction.lab.awsi.exceptions.ObjectNotFoundException;
 import org.apache.chemistry.opencmis.client.api.*;
 
@@ -40,6 +41,8 @@ public interface CmisRepository {
     void setSite(String siteName);
 
     Map<String,String> getSiteInfo();
+
+    void getSiteProperties(String siteId);
 
     /**
      * Returns the an Inputstream of the selected rendition.

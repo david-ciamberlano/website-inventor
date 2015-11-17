@@ -1,18 +1,12 @@
 package it.alfrescoinaction.lab.awsi.repository;
 
-import it.alfrescoinaction.lab.awsi.domain.Downloadable;
-import it.alfrescoinaction.lab.awsi.domain.RenditionDownloadable;
-import it.alfrescoinaction.lab.awsi.domain.SearchFilterItem;
-import it.alfrescoinaction.lab.awsi.domain.SearchFilters;
-import it.alfrescoinaction.lab.awsi.exceptions.InvalidParameterException;
+import com.google.gson.Gson;
+import it.alfrescoinaction.lab.awsi.domain.*;
 import it.alfrescoinaction.lab.awsi.exceptions.ObjectNotFoundException;
 import it.alfrescoinaction.lab.awsi.exceptions.PageNotFoundException;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.client.runtime.util.EmptyItemIterable;
-import org.apache.chemistry.opencmis.commons.exceptions.CmisInvalidArgumentException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
-import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
-import org.apache.chemistry.opencmis.commons.impl.jaxb.CmisException;
 import org.apache.http.HttpEntity;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -26,15 +20,10 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.DefaultResourceLoader;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Repository;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,19 +34,22 @@ import java.util.regex.Pattern;
 @Repository
 public class AlfrescoCmisRepository implements CmisRepository {
 
-    @Autowired
-    private RemoteConnection connection;
+    @Autowired private RemoteConnection connection;
+
+    @Autowired private SiteProperties siteProperties;
 
     @Value("${alfresco.serverProtocol}") private String alfrescoServerProtocol;
     @Value("${alfresco.serverUrl}") private String alfrescoServer;
     @Value("${alfresco.serviceEntryPoint}") private String alfrescoServiceEntryPoint;
     @Value("${alfresco.sites}") private String alfrescoSites;
     @Value("${alfresco.doclib}") private String alfrescoDocumentLibrary;
-    @Value("${alfresco.search.type}") private String searchType;
     @Value("${alfresco.username}") private String username;
     @Value("${alfresco.password}") private String password;
 
+    @Value("${alfresco.search.type}") private String searchType;
+
     private String siteId;
+    private String alfrescoSitesRoot;
     private String alfrescoDocLibPath;
 
     @Override
@@ -330,6 +322,35 @@ public class AlfrescoCmisRepository implements CmisRepository {
         return siteInfo;
     }
 
+    public void getSiteProperties(String siteId) throws ObjectNotFoundException {
+        Session session = connection.getSession();
+        CmisObject obj = session.getObjectByPath(alfrescoSitesRoot + "/.awsiconf/site.config");
+
+        if (obj.getBaseTypeId().value().equals("cmis:document")) {
+            Document doc = (Document)obj;
+            InputStream is = doc.getContentStream().getStream();
+
+
+            StringBuilder jsonConf = new StringBuilder();
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    jsonConf.append(line);
+                }
+            }
+            catch (IOException e){
+                throw new ObjectNotFoundException("Cannot read configuration");
+            }
+
+            Gson gson = new Gson();
+
+
+        }
+
+
+
+    }
+
 
 
     public Downloadable<byte[]> getRendition(String type, String objectId, String name) throws ObjectNotFoundException {
@@ -394,7 +415,8 @@ public class AlfrescoCmisRepository implements CmisRepository {
     @Override
     public void setSite(String siteId) {
         this.siteId = siteId;
-        this.alfrescoDocLibPath = "/" + alfrescoSites + "/" + siteId + "/" + alfrescoDocumentLibrary;
+        this.alfrescoSitesRoot = "/" + alfrescoSites + "/" + siteId;
+        this.alfrescoDocLibPath = this.alfrescoSitesRoot + "/" + alfrescoDocumentLibrary;
     }
 
 
