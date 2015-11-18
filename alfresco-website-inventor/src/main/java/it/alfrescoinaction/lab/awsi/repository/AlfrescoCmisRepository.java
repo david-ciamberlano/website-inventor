@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
+import javax.annotation.PostConstruct;
 import java.io.*;
 import java.net.URI;
 import java.util.HashMap;
@@ -36,8 +37,6 @@ public class AlfrescoCmisRepository implements CmisRepository {
 
     @Autowired private RemoteConnection connection;
 
-    @Autowired private SiteProperties siteProperties;
-
     @Value("${alfresco.serverProtocol}") private String alfrescoServerProtocol;
     @Value("${alfresco.serverUrl}") private String alfrescoServer;
     @Value("${alfresco.serviceEntryPoint}") private String alfrescoServiceEntryPoint;
@@ -46,9 +45,10 @@ public class AlfrescoCmisRepository implements CmisRepository {
     @Value("${alfresco.username}") private String username;
     @Value("${alfresco.password}") private String password;
 
-    @Value("${alfresco.search.type}") private String searchType;
+    private String searchType;
 
     private String siteId;
+    private SiteProperties siteProperties;
     private String alfrescoSitesRoot;
     private String alfrescoDocLibPath;
 
@@ -99,6 +99,19 @@ public class AlfrescoCmisRepository implements CmisRepository {
             throw new PageNotFoundException("Folder not found: "  + id);
         }
     }
+
+
+    @Override
+    public Map<String,String> getSiteInfo() {
+        Session session = connection.getSession();
+        CmisObject cmiso = session.getObjectByPath(alfrescoSites + "/" + siteId);
+
+        Map<String,String> siteInfo = new HashMap<>(2);
+        siteInfo.put("name",cmiso.getProperty("cm:title").getValue().toString());
+        siteInfo.put("description",cmiso.getProperty("cm:description").getValue().toString());
+        return siteInfo;
+    }
+
 
     /**
      *
@@ -310,47 +323,12 @@ public class AlfrescoCmisRepository implements CmisRepository {
         return alfrescoDocLibPath.equals(path);
     }
 
-
     @Override
-    public Map<String,String> getSiteInfo() {
-        Session session = connection.getSession();
-        CmisObject cmiso = session.getObjectByPath(alfrescoSites + "/" + siteId);
-
-        Map<String,String> siteInfo = new HashMap<>(2);
-        siteInfo.put("name",cmiso.getProperty("cm:title").getValue().toString());
-        siteInfo.put("description",cmiso.getProperty("cm:description").getValue().toString());
-        return siteInfo;
+    @PostConstruct
+    public void init(String siteId) {
+        this.setSite(siteId);
+        this.getSiteProperties(siteId);
     }
-
-    public void getSiteProperties(String siteId) throws ObjectNotFoundException {
-        Session session = connection.getSession();
-        CmisObject obj = session.getObjectByPath(alfrescoSitesRoot + "/.awsiconf/site.config");
-
-        if (obj.getBaseTypeId().value().equals("cmis:document")) {
-            Document doc = (Document)obj;
-            InputStream is = doc.getContentStream().getStream();
-
-
-            StringBuilder jsonConf = new StringBuilder();
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
-                String line;
-                while ((line = br.readLine()) != null) {
-                    jsonConf.append(line);
-                }
-            }
-            catch (IOException e){
-                throw new ObjectNotFoundException("Cannot read configuration");
-            }
-
-            Gson gson = new Gson();
-
-
-        }
-
-
-
-    }
-
 
 
     public Downloadable<byte[]> getRendition(String type, String objectId, String name) throws ObjectNotFoundException {
@@ -470,4 +448,35 @@ public class AlfrescoCmisRepository implements CmisRepository {
 
         return isValid;
     }
+
+    private void getSiteProperties(String siteId) throws ObjectNotFoundException {
+        Session session = connection.getSession();
+        CmisObject obj = session.getObjectByPath(alfrescoSitesRoot + "/.awsiconf/site.config");
+
+        if (obj.getBaseTypeId().value().equals("cmis:document")) {
+            Document doc = (Document)obj;
+            InputStream is = doc.getContentStream().getStream();
+
+
+            StringBuilder jsonConf = new StringBuilder();
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    jsonConf.append(line);
+                }
+            }
+            catch (IOException e){
+                throw new ObjectNotFoundException("Cannot read configuration");
+            }
+
+            Gson gson = new Gson();
+            this.siteProperties = gson.fromJson(jsonConf.toString(), SiteProperties.class);
+        }
+        else throw new ObjectNotFoundException("Cannot read configuration");
+
+    }
+
+
+
+
 }

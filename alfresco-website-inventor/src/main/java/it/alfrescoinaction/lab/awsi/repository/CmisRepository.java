@@ -40,9 +40,9 @@ public interface CmisRepository {
 
     void setSite(String siteName);
 
-    Map<String,String> getSiteInfo();
+    void init(String siteId);
 
-    void getSiteProperties(String siteId);
+    Map<String,String> getSiteInfo();
 
     /**
      * Returns the an Inputstream of the selected rendition.

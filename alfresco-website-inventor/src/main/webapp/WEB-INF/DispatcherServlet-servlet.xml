@@ -13,7 +13,6 @@
     <context:component-scan base-package="it.alfrescoinaction.lab.awsi.controller"/>
     <context:component-scan base-package="it.alfrescoinaction.lab.awsi.service"/>
     <context:component-scan base-package="it.alfrescoinaction.lab.awsi.repository"/>
-    <context:component-scan base-package="it.alfrescoinaction.lab.awsi.domain"/>
 
     <mvc:resources mapping="/resource/**" location="/resources/" />
 
