@@ -324,10 +324,9 @@ public class AlfrescoCmisRepository implements CmisRepository {
     }
 
     @Override
-    @PostConstruct
     public void init(String siteId) {
         this.setSite(siteId);
-        this.getSiteProperties(siteId);
+        this.getSiteProperties();
     }
 
 
@@ -449,7 +448,7 @@ public class AlfrescoCmisRepository implements CmisRepository {
         return isValid;
     }
 
-    private void getSiteProperties(String siteId) throws ObjectNotFoundException {
+    private void getSiteProperties() throws ObjectNotFoundException {
         Session session = connection.getSession();
         CmisObject obj = session.getObjectByPath(alfrescoSitesRoot + "/.awsiconf/site.config");
 
