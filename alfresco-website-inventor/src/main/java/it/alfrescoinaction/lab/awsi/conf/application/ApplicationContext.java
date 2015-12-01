@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
@@ -34,23 +35,28 @@ public class ApplicationContext extends WebMvcConfigurerAdapter {
         return bean;
     }
 
-    @Override
-    public void configureMessageConverters( List<HttpMessageConverter<?>> converters ) {
-        converters.add(converter());
-    }
+//    @Override
+//    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+//        converters.add(customByteArrayHttpMessageConverter());
+//        super.configureMessageConverters(converters);
+//    }
+//
+//    @Bean
+//    public HttpMessageConverter customByteArrayHttpMessageConverter() {
+//        HttpMessageConverter converter = new ByteArrayHttpMessageConverter();
+//        converter.getSupportedMediaTypes().add("image/jpg");
+//        converter.getSupportedMediaTypes().add("image/png");
+//
+//        return converter;
+//    }
 
-    @Bean
-    ByteArrayHttpMessageConverter converter() {
-        ByteArrayHttpMessageConverter converter = new ByteArrayHttpMessageConverter();
 
-        return converter;
-    }
 
     @Bean
     public PropertyPlaceholderConfigurer getPropertyPlaceholderConfigurer()
     {
         PropertyPlaceholderConfigurer ppc = new PropertyPlaceholderConfigurer();
-        ppc.setLocation(new FileSystemResource("${catalina.home}/conf/awsi.properties"));
+        ppc.setLocation(new FileSystemResource(System.getProperty("catalina.base") + "/conf/awsi.properties"));
         ppc.setIgnoreUnresolvablePlaceholders(false);
         return ppc;
     }

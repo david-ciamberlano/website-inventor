@@ -26,7 +26,7 @@ public class WebPageService {
      */
     public WebPage buildWebPage(String siteId, String id) throws CmisObjectNotFoundException {
 
-        //repository.init(siteId);
+        repository.init(siteId);
         Map<String,String> sitesInfo = repository.getSiteInfo();
         Folder folder = repository.getFolderById(id);
         String folderPath = folder.getPath();
