@@ -27,14 +27,14 @@
         <div>
           <h4><a href="${contextPath}/proxy/d/${content.id}" target="_blank">${content.properties['title']}</a></h4>
 
-          <c:forEach items="${documentProps}" var="docprop">
+          <c:forEach items="${page.siteProperties.metadata}" var="docprop">
               <c:choose>
                 <c:when test="${docprop.type == 'TEXT'}">
-                    <div><strong>${docprop.label}</strong>: ${content.properties[docprop.id]}</div>
+                    <div><strong>${docprop.label}</strong>: ${content.properties[docprop.propertyId]}</div>
                 </c:when>
                 <c:when test="${docprop.type == 'DATE'}">
                     <jsp:useBean id="dateObject" class="java.util.Date" />
-                    <jsp:setProperty name="dateObject" property="time" value="${content.properties[docprop.id]}" />
+                    <jsp:setProperty name="dateObject" property="time" value="${content.properties[docprop.propertyId]}" />
                     <div><strong>${docprop.label}</strong>: <fmt:formatDate type="date" dateStyle="full" value="${dateObject}" /></div>
                 </c:when>
               </c:choose>

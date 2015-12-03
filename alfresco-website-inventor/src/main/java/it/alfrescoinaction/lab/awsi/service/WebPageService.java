@@ -34,6 +34,8 @@ public class WebPageService {
 
         WebPage wp = new WebPage(id, folder.getName(), folder.getParentId(), isHomepage, sitesInfo.get("name"), sitesInfo.get("description"));
 
+        wp.setSiteProperties(repository.getSiteProperties());
+
         Map<String, String> breadCrumbs = new LinkedHashMap<>();
         if (!isHomepage) {
             // breadcrumbs

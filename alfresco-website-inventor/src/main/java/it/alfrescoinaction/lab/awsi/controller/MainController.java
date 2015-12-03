@@ -1,6 +1,5 @@
 package it.alfrescoinaction.lab.awsi.controller;
 
-import it.alfrescoinaction.lab.awsi.domain.PropertyTuple;
 import it.alfrescoinaction.lab.awsi.domain.SearchFilters;
 import it.alfrescoinaction.lab.awsi.domain.WebPage;
 import it.alfrescoinaction.lab.awsi.exceptions.ConnectionException;
@@ -61,12 +60,6 @@ public class MainController {
         model.addAttribute("sitename", wp.getSiteName());
         model.addAttribute("sitedescription", wp.getSiteDescription());
 
-        List<PropertyTuple> documentProps = new ArrayList<>(3);
-        documentProps.add(new PropertyTuple(property1));
-        documentProps.add(new PropertyTuple(property2));
-        documentProps.add(new PropertyTuple(property3));
-        model.addAttribute("documentProps", documentProps);
-
         String view = pageTemplate;
         if (wp.isHomepage()) {
             view = homeTemplate;
@@ -92,13 +85,6 @@ public class MainController {
         model.addAttribute("siteid", siteId);
         model.addAttribute("sitename", wp.getSiteName());
         model.addAttribute("sitedescription", wp.getSiteDescription());
-
-        List<PropertyTuple> documentProps = new ArrayList<>(3);
-        documentProps.add(new PropertyTuple(property1));
-        documentProps.add(new PropertyTuple(property2));
-        documentProps.add(new PropertyTuple(property3));
-
-        model.addAttribute("documentProps", documentProps);
 
         String view = searchResultTemplate;
 

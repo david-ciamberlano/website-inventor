@@ -48,7 +48,6 @@ public class AlfrescoCmisRepository implements CmisRepository {
     private String searchType;
 
     private String siteId;
-    private SiteProperties siteProperties;
     private String alfrescoSitesRoot;
     private String alfrescoDocLibPath;
 
@@ -330,6 +329,35 @@ public class AlfrescoCmisRepository implements CmisRepository {
     }
 
 
+    public SiteProperties getSiteProperties() throws ObjectNotFoundException {
+        Session session = connection.getSession();
+        CmisObject obj = session.getObjectByPath(alfrescoSitesRoot + "/.awsiconf/site.config");
+
+        if (obj.getBaseTypeId().value().equals("cmis:document")) {
+            Document doc = (Document)obj;
+            InputStream is = doc.getContentStream().getStream();
+
+
+            StringBuilder jsonConf = new StringBuilder();
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    jsonConf.append(line);
+                }
+            }
+            catch (IOException e){
+                throw new ObjectNotFoundException("Cannot read configuration");
+            }
+
+            Gson gson = new Gson();
+
+            return gson.fromJson(jsonConf.toString(), SiteProperties.class);
+        }
+        else throw new ObjectNotFoundException("Cannot read configuration");
+
+    }
+
+
     public Downloadable<byte[]> getRendition(String type, String objectId, String name) throws ObjectNotFoundException {
 
         // I'm not using cmis because it doesn't trigger the thumbnail generetion process
@@ -447,35 +475,5 @@ public class AlfrescoCmisRepository implements CmisRepository {
 
         return isValid;
     }
-
-    private void getSiteProperties() throws ObjectNotFoundException {
-        Session session = connection.getSession();
-        CmisObject obj = session.getObjectByPath(alfrescoSitesRoot + "/.awsiconf/site.config");
-
-        if (obj.getBaseTypeId().value().equals("cmis:document")) {
-            Document doc = (Document)obj;
-            InputStream is = doc.getContentStream().getStream();
-
-
-            StringBuilder jsonConf = new StringBuilder();
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
-                String line;
-                while ((line = br.readLine()) != null) {
-                    jsonConf.append(line);
-                }
-            }
-            catch (IOException e){
-                throw new ObjectNotFoundException("Cannot read configuration");
-            }
-
-            Gson gson = new Gson();
-            this.siteProperties = gson.fromJson(jsonConf.toString(), SiteProperties.class);
-        }
-        else throw new ObjectNotFoundException("Cannot read configuration");
-
-    }
-
-
-
 
 }

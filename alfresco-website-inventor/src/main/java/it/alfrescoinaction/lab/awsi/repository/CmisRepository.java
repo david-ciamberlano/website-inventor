@@ -44,6 +44,8 @@ public interface CmisRepository {
 
     Map<String,String> getSiteInfo();
 
+    SiteProperties getSiteProperties() throws ObjectNotFoundException;
+
     /**
      * Returns the an Inputstream of the selected rendition.
      * If the rendition is not found, returns a standard placeholder

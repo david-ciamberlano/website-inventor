@@ -18,6 +18,7 @@ public class WebPage {
     private final String siteDescription;
     private final boolean homepage;
 
+    private SiteProperties siteProperties = null;
     private List<Link> categories = Collections.emptyList();
     private List<Link> links = Collections.emptyList();
     private Map<String,String> breadcrumbs = Collections.emptyMap();
@@ -38,6 +39,15 @@ public class WebPage {
 
 
     //===== getters/setters =====
+
+
+    public SiteProperties getSiteProperties() {
+        return siteProperties;
+    }
+
+    public void setSiteProperties(SiteProperties siteProperties) {
+        this.siteProperties = siteProperties;
+    }
 
     public String getParentId() {
         return parentId;
