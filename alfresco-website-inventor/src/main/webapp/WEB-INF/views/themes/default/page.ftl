@@ -1,12 +1,6 @@
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <c:set var="contextPath" value="${pageContext.request.contextPath}"/>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <meta charset="utf-8">
     <title>${sitename}</title>
@@ -18,6 +12,8 @@
     <link href="${contextPath}/resource/themes/s/css/custom.css" rel="stylesheet">
 </head>
 <body>
+<h1>Hello!</h1>
+<!--
     <div>
         <header>
             <%@include file="include/header.jsp"%>
@@ -45,10 +41,12 @@
             <%@include file="include/special_text_footer.jsp"%>
             </c:if>
         </div>
+        -->
     </div>
 
     <script src="${contextPath}/resource/themes/default/js/jquery.min.js"></script>
     <script src="${contextPath}/resource/themes/default/js/bootstrap.min.js"></script>
-    <script src="${contextPath}/resource/themes/default/js/scripts.js"></script>
+    <script src="${contextPath}/resource/themes/default/js/scripts.js"></script
+-->
 </body>
 </html>
