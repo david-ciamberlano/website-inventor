@@ -30,18 +30,10 @@ public class AppConfiguration extends WebMvcConfigurerAdapter {
         registry.addResourceHandler("/resource/**").addResourceLocations("/resources/");
     }
 
-    @Bean
-    public InternalResourceViewResolver jspViewResolver() {
-        InternalResourceViewResolver bean = new InternalResourceViewResolver();
-        bean.setPrefix("/WEB-INF/views/themes/default/");
-        bean.setSuffix(".jsp");
-        return bean;
-    }
-
     @Bean(name ="freemarkerConfig")
     public FreeMarkerConfigurer freemarkerConfig() {
         FreeMarkerConfigurer configurer = new FreeMarkerConfigurer();
-        configurer.setTemplateLoaderPath("/WEB-INF/views/");
+        configurer.setTemplateLoaderPath("/WEB-INF/views/themes/default/");
         Map<String, Object> map = new HashMap<>();
         map.put("xml_escape", new XmlEscape());
         configurer.setFreemarkerVariables(map);
@@ -61,23 +53,6 @@ public class AppConfiguration extends WebMvcConfigurerAdapter {
     public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
         configurer.enable();
     }
-
-    //    @Override
-//    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-//        converters.add(customByteArrayHttpMessageConverter());
-//        super.configureMessageConverters(converters);
-//    }
-//
-//    @Bean
-//    public HttpMessageConverter customByteArrayHttpMessageConverter() {
-//        HttpMessageConverter converter = new ByteArrayHttpMessageConverter();
-//        converter.getSupportedMediaTypes().add("image/jpg");
-//        converter.getSupportedMediaTypes().add("image/png");
-//
-//        return converter;
-//    }
-
-
 
     @Bean
     public PropertyPlaceholderConfigurer getPropertyPlaceholderConfigurer()

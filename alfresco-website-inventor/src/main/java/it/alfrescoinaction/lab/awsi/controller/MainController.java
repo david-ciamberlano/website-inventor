@@ -29,15 +29,15 @@ public class MainController {
     private final String homeTemplate = "page";
     private final String pageTemplate = "page";
     private final String searchResultTemplate = "searchresult";
-    @Value("${alfresco.search.filter1}") private String filter1;
-    @Value("${alfresco.search.filter2}") private String filter2;
-    @Value("${alfresco.search.filter3}") private String filter3;
-    @Value("${alfresco.search.filter4}") private String filter4;
-    @Value("${alfresco.search.filter5}") private String filter5;
+    private String filter1;
+    private String filter2;
+    private String filter3;
+    private String filter4;
+    private String filter5;
 
-    @Value("${alfresco.document.property1}") String property1;
-    @Value("${alfresco.document.property2}") String property2;
-    @Value("${alfresco.document.property3}") String property3;
+    String property1;
+    String property2;
+    String property3;
 
     private static final Logger logger = Logger.getLogger(MainController.class);
 
@@ -48,7 +48,9 @@ public class MainController {
     }
 
     @RequestMapping("/{siteid}/page/{id}")
-    public String pageById(Model model, @PathVariable("siteid") String siteId, @PathVariable("id") String id) {
+    public String pageById(Model model,
+                           HttpServletRequest request, @PathVariable("siteid") String siteId,
+                           @PathVariable("id") String id) {
 
         if(logger.isDebugEnabled()){
             logger.debug("Requested page: " + id);
@@ -59,6 +61,7 @@ public class MainController {
         model.addAttribute("siteid", siteId);
         model.addAttribute("sitename", wp.getSiteName());
         model.addAttribute("sitedescription", wp.getSiteDescription());
+        model.addAttribute("contextPath",request.getContextPath());
 
         String view = pageTemplate;
         if (wp.isHomepage()) {

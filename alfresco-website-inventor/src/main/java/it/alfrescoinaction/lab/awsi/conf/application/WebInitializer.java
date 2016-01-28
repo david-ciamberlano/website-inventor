@@ -7,7 +7,7 @@ public class WebInitializer extends AbstractAnnotationConfigDispatcherServletIni
 
     @Override
     protected Class<?>[] getServletConfigClasses() {
-    return new Class[] { ApplicationContext.class };
+    return new Class[] { AppConfiguration.class };
     }
 
     @Override
