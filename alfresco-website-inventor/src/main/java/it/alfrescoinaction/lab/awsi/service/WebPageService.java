@@ -101,7 +101,7 @@ public class WebPageService {
         ItemIterable<CmisObject> categories = repository.getCategories();
         List<Link> categoryList = new LinkedList<>();
         for (CmisObject cmiso : categories) {
-            categoryList.add(new Link(cmiso.getName(), cmiso.getId()));
+            categoryList.add(new Link(cmiso.getId(),cmiso.getName()));
         }
         wp.setCategories(categoryList);
 
