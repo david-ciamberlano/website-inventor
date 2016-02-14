@@ -65,6 +65,7 @@
             </div>
         </div>
         <div class="col-lg-9 col-md-9 col-sm-8">
+
             <#list page.contents as content>
                 <article>
                     <#switch content.type>
@@ -75,33 +76,37 @@
 
                         <#case "IMAGE">
                             <figure>
-                                <a href="${contextPath}/proxy/d/${content.id}" >
-                                    <img src="${contextPath}/proxy/r/imgpreview/${content.id}" alt="${content.getName()}"/>
+                                <a href="${contextPath}/proxy/d/${content.id}" class="thumbnail">
+                                    <img src="${contextPath}/proxy/r/imgpreview/${content.id}" alt="${content.getName()}" />
                                 </a>
-                                <figcaption>
+                                <figcaption class="caption">
                                     <p>${content.properties['title']!content.properties['name']} (${content.properties['pixelXDimension']} x ${content.properties['pixelYDimension']} - ${content.properties['content_size']}MB)</p>
                                 </figcaption>
                             </figure>
                         <#break>
 
                         <#default>
-                            <a href="${contextPath}/proxy/d/${content.id}" target="_blank">
-                                <img src="${contextPath}/proxy/r/doclib/${content.id}" alt=""/>
-                            </a>
-                            <div>
-                                <h4><a href="${contextPath}/proxy/d/${content.id}" target="_blank">${content.properties['title']!content.properties['name']}</a></h4>
+                            <div class="media margin-bottom-lg">
+                                <div class="media-left">
+                                    <a href="${contextPath}/proxy/d/${content.id}" target="_blank" class="thumbnail">
+                                        <img class="media-object" src="${contextPath}/proxy/r/doclib/${content.id}" alt=""/>
+                                    </a>
+                                </div>
 
-                                <#list page.siteProperties.metadata as docprop>
-                                    <#switch docprop.type>
-                                        <#case "TEXT">
-                                            <div><strong>${docprop.label}</strong>: ${content.properties[docprop.propertyId]!"-"}</div>
-                                        <#break>
+                                <div class="media-body">
+                                    <h4 class="media-heading"><a href="${contextPath}/proxy/d/${content.id}" target="_blank">${content.properties['title']!content.properties['name']}</a></h4>
+                                    <#list page.siteProperties.metadata as docprop>
+                                        <#switch docprop.type>
+                                            <#case "TEXT">
+                                                <div><strong>${docprop.label}</strong>: ${content.properties[docprop.propertyId]!"-"}</div>
+                                            <#break>
 
-                                        <#case "DATE">
-                                            <div><strong>${docprop.label}</strong>: ${content.properties[docprop.propertyId]?number?number_to_date!"-"}</div>
-                                        <#break>
-                                    </#switch>
-                                </#list>
+                                            <#case "DATE">
+                                                <div><strong>${docprop.label}</strong>: ${content.properties[docprop.propertyId]?number?number_to_date!"-"}</div>
+                                            <#break>
+                                        </#switch>
+                                    </#list>
+                                </div>
                             </div>
                     </#switch>
                 </article>

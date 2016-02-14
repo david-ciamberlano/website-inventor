@@ -35,10 +35,6 @@ public class MainController {
     private String filter4;
     private String filter5;
 
-    String property1;
-    String property2;
-    String property3;
-
     private static final Logger logger = Logger.getLogger(MainController.class);
 
 
