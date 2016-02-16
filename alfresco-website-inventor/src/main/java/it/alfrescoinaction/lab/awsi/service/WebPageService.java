@@ -1,7 +1,6 @@
 package it.alfrescoinaction.lab.awsi.service;
 
 import it.alfrescoinaction.lab.awsi.domain.*;
-import it.alfrescoinaction.lab.awsi.exceptions.ObjectNotFoundException;
 import it.alfrescoinaction.lab.awsi.repository.CmisRepository;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
@@ -10,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
 import java.util.*;
-import java.util.regex.Matcher;
 
 @Service
 public class WebPageService {
@@ -27,12 +25,12 @@ public class WebPageService {
     public WebPage buildWebPage(String siteId, String id) throws CmisObjectNotFoundException {
 
         repository.init(siteId);
-        Map<String,String> sitesInfo = repository.getSiteInfo();
+
         Folder folder = repository.getFolderById(id);
         String folderPath = folder.getPath();
         boolean isHomepage = repository.isHomePage(folderPath);
 
-        WebPage wp = new WebPage(id, folder.getName(), folder.getParentId(), isHomepage, sitesInfo.get("name"), sitesInfo.get("description"));
+        WebPage wp = new WebPage(id, folder.getName(), folder.getParentId(), isHomepage, repository.getSiteName(), repository.getSiteDescription());
 
         wp.setSiteProperties(repository.getSiteProperties());
 
@@ -59,7 +57,7 @@ public class WebPageService {
 
 
         // get the links
-        ItemIterable<QueryResult> links = repository.getSubFolders(folder);
+        ItemIterable<QueryResult> links = repository.getChildrenFolders(folder);
         List<Link> linkList = new ArrayList<>((int)links.getTotalNumItems());
         for (QueryResult qr : links) {
             String type = qr.getPropertyById("cmis:baseTypeId").getFirstValue().toString();
@@ -73,7 +71,7 @@ public class WebPageService {
         wp.setLinks(linkList);
 
         // get the Contents
-        ItemIterable<QueryResult> pageContents = repository.getSubDocuments(folder, new HashMap<String, String>());
+        ItemIterable<QueryResult> pageContents = repository.getChildrenDocuments(folder, new HashMap<String, String>());
 
         List<Content> contents = new ArrayList<>(20);
         Map<String,Content> specialContents = new HashMap<>(6);
@@ -98,11 +96,9 @@ public class WebPageService {
         wp.setSpecialContents(specialContents);
 
         // categories
-        ItemIterable<CmisObject> categories = repository.getCategories();
+        List<Folder> categories = repository.getCategories();
         List<Link> categoryList = new LinkedList<>();
-        for (CmisObject cmiso : categories) {
-            categoryList.add(new Link(cmiso.getId(),cmiso.getName()));
-        }
+        categories.forEach( f -> categoryList.add(new Link( f.getId(), f.getName())));
         wp.setCategories(categoryList);
 
         return wp;
@@ -110,12 +106,10 @@ public class WebPageService {
 
 
     public WebPage buildSearchResultPage(String siteId, SearchFilters filters) throws CmisObjectNotFoundException {
-        repository.setSite(siteId);
-        Map<String,String> sitesInfo = repository.getSiteInfo();
 
         // the homepage has a relative path = "/"
         String homePageId = repository.getFolderIdByRelativePath("/");
-        WebPage wp = new WebPage("search-result", "Search result", homePageId, false, sitesInfo.get("name"),sitesInfo.get("description"));
+        WebPage wp = new WebPage("search-result", "Search result", homePageId, false, repository.getSiteName(),repository.getSiteDescription());
 
         // get the Contents
         ItemIterable<QueryResult> searchContents = repository.search(homePageId, filters);

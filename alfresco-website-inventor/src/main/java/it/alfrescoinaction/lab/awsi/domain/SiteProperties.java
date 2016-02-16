@@ -5,25 +5,16 @@ import java.util.List;
 
 public class SiteProperties {
 
-    private String siteId;
-    private String themeName;
+    private String theme;
     private List<SiteProperty> searchFields;
     private List<SiteProperty> metadata;
 
-    public String getSiteId() {
-        return siteId;
+    public String getTheme() {
+        return theme;
     }
 
-    public void setSiteId(String siteId) {
-        this.siteId = siteId;
-    }
-
-    public String getThemeName() {
-        return themeName;
-    }
-
-    public void setThemeName(String themeName) {
-        this.themeName = themeName;
+    public void setTheme(String theme) {
+        this.theme = theme;
     }
 
     public List<SiteProperty> getSearchFields() {

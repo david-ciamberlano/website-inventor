@@ -8,6 +8,7 @@ import it.alfrescoinaction.lab.awsi.exceptions.ObjectNotFoundException;
 import org.apache.chemistry.opencmis.client.api.*;
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -18,9 +19,9 @@ public interface CmisRepository {
 
     String getFolderIdByRelativePath(String path) throws NoSuchElementException;
 
-    ItemIterable<QueryResult> getSubFolders (Folder folder);
+    ItemIterable<QueryResult> getChildrenFolders(Folder folder);
 
-    ItemIterable<QueryResult> getSubDocuments(Folder folder, Map<String,String> filters);
+    ItemIterable<QueryResult> getChildrenDocuments(Folder folder, Map<String, String> filters);
 
     /**
      * search
@@ -32,17 +33,17 @@ public interface CmisRepository {
 
     Document getDocumentById(String id) throws NoSuchElementException;
 
-    ItemIterable<CmisObject> getCategories();
+    List<Folder> getCategories();
 
     boolean isHomePage(String path);
 
     String getAlfrescoDocLibPath();
 
-    void setSite(String siteName);
-
     void init(String siteId);
 
-    Map<String,String> getSiteInfo();
+    String getSiteName();
+
+    String getSiteDescription();
 
     SiteProperties getSiteProperties() throws ObjectNotFoundException;
 

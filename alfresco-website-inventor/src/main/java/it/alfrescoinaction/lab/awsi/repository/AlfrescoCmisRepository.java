@@ -6,6 +6,7 @@ import it.alfrescoinaction.lab.awsi.exceptions.ObjectNotFoundException;
 import it.alfrescoinaction.lab.awsi.exceptions.PageNotFoundException;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.client.runtime.util.EmptyItemIterable;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisBaseException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.apache.http.HttpEntity;
 import org.apache.http.auth.AuthScope;
@@ -25,12 +26,12 @@ import org.springframework.stereotype.Repository;
 import javax.annotation.PostConstruct;
 import java.io.*;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 
 @Repository
 public class AlfrescoCmisRepository implements CmisRepository {
@@ -40,45 +41,68 @@ public class AlfrescoCmisRepository implements CmisRepository {
     @Value("${alfresco.serverProtocol}") private String alfrescoServerProtocol;
     @Value("${alfresco.serverUrl}") private String alfrescoServer;
     @Value("${alfresco.serviceEntryPoint}") private String alfrescoServiceEntryPoint;
-    @Value("${alfresco.sites}") private String alfrescoSites;
-    @Value("${alfresco.doclib}") private String alfrescoDocumentLibrary;
     @Value("${alfresco.username}") private String username;
     @Value("${alfresco.password}") private String password;
 
     private String searchType;
 
-    private String siteId;
-    private String alfrescoSitesRoot;
     private String alfrescoDocLibPath;
+    private String alfrescoSitePath;
+
+    private String siteName;
+    private String siteDescription;
+
 
     @Override
-    public ItemIterable<CmisObject> getCategories() {
+    public void init(String siteId) {
+
+        // get site & doclib folders
         Session session = connection.getSession();
 
-        CmisObject obj = session.getObjectByPath(alfrescoDocLibPath);
+        String siteFolderquery = "select * from cmis:folder where contains('PATH:\"/app:company_home/st:sites/cm:@@siteid\"')"
+                .replace("@@siteid",siteId);
 
-        // procceed only if the node is a folder
-        if (obj.getBaseTypeId().value().equals("cmis:folder")){
-            Folder folder = (Folder)obj;
-            OperationContext oc = session.createOperationContext();
-            oc.setRenditionFilterString("*");
-            ItemIterable<CmisObject> children = folder.getChildren(oc);
+        ItemIterable<QueryResult> siteFolders = session.query(siteFolderquery, false);
+        if (siteFolders.getTotalNumItems() != 1) {
+            throw new ObjectNotFoundException("Site not found");
+        }
 
-            return children;
-        }
-        else {
-            throw new PageNotFoundException("Home folder not found: " + alfrescoDocLibPath);
-        }
+        QueryResult siteObj = siteFolders.iterator().next();
+
+        this.alfrescoSitePath = siteObj.getPropertyById("cmis:path").getFirstValue().toString();
+        this.alfrescoDocLibPath = alfrescoSitePath + "/documentLibrary";
+        this.siteName = siteObj.getPropertyById("cmis:name").getFirstValue().toString();
+        this.siteDescription = siteObj.getPropertyById("cmis:description").getFirstValue().toString();
+
+//        this.getSiteProperties();
     }
+
+
+    @Override
+    public List<Folder> getCategories() {
+        Session session = connection.getSession();
+        Folder alfrescoDocLibFolder = (Folder)session.getObjectByPath(alfrescoDocLibPath);
+        OperationContext oc = session.createOperationContext();
+        oc.setRenditionFilterString("*");
+        ItemIterable<CmisObject> children = alfrescoDocLibFolder.getChildren(oc);
+
+        List<Folder> categories = new ArrayList<>();
+        children.forEach(o -> {
+            if ("cmis:folder".equals(o.getBaseTypeId().value())){
+                categories.add((Folder)o);
+            }
+        });
+
+        return categories;
+    }
+
 
     @Override
     public Folder getFolderById(String id) throws PageNotFoundException {
         Session session = connection.getSession();
 
         if (id.equals("home")) {
-            OperationContext oc = session.createOperationContext();
-            oc.setRenditionFilterString("*");
-            id = session.getObjectByPath(alfrescoDocLibPath, oc).getId();
+           id = session.getObjectByPath(this.alfrescoDocLibPath).getId();
         }
 
         CmisObject obj;
@@ -97,18 +121,6 @@ public class AlfrescoCmisRepository implements CmisRepository {
         else {
             throw new PageNotFoundException("Folder not found: "  + id);
         }
-    }
-
-
-    @Override
-    public Map<String,String> getSiteInfo() {
-        Session session = connection.getSession();
-        CmisObject cmiso = session.getObjectByPath(alfrescoSites + "/" + siteId);
-
-        Map<String,String> siteInfo = new HashMap<>(2);
-        siteInfo.put("name",cmiso.getProperty("cm:title").getValue().toString());
-        siteInfo.put("description",cmiso.getProperty("cm:description").getValue().toString());
-        return siteInfo;
     }
 
 
@@ -167,7 +179,7 @@ public class AlfrescoCmisRepository implements CmisRepository {
     }
 
     @Override
-    public ItemIterable<QueryResult> getSubFolders(Folder folder) {
+    public ItemIterable<QueryResult> getChildrenFolders(Folder folder) {
         String queryTemplate = "SELECT F.* FROM cmis:folder F WHERE IN_FOLDER('%s')";
         String query = String.format(queryTemplate,folder.getId());
 
@@ -180,15 +192,12 @@ public class AlfrescoCmisRepository implements CmisRepository {
     }
 
     @Override
-    public ItemIterable<QueryResult> getSubDocuments(Folder folder, Map<String,String> filters) {
+    public ItemIterable<QueryResult> getChildrenDocuments(Folder folder, Map<String, String> filters) {
 
         String query = "SELECT D.* FROM cmis:document D WHERE IN_FOLDER('" + folder.getId() + "') ORDER BY D.cmis:name ";
 
         Session session = connection.getSession();
         OperationContext oc = session.createOperationContext();
-
-
-        
         oc.setRenditionFilterString("*");
         ItemIterable<QueryResult> children = session.query(query, false, oc);
 
@@ -322,46 +331,57 @@ public class AlfrescoCmisRepository implements CmisRepository {
         return alfrescoDocLibPath.equals(path);
     }
 
-    @Override
-    public void init(String siteId) {
-        this.setSite(siteId);
-        this.getSiteProperties();
-    }
-
 
     public SiteProperties getSiteProperties() throws ObjectNotFoundException {
+        String propertiesFilePath = alfrescoSitePath + "/awsi.config";
+
         Session session = connection.getSession();
-        CmisObject obj = session.getObjectByPath(alfrescoSitesRoot + "/.awsiconf/site.config");
 
-        if (obj.getBaseTypeId().value().equals("cmis:document")) {
-            Document doc = (Document)obj;
-            InputStream is = doc.getContentStream().getStream();
-
-
-            StringBuilder jsonConf = new StringBuilder();
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
-                String line;
-                while ((line = br.readLine()) != null) {
-                    jsonConf.append(line);
-                }
-            }
-            catch (IOException e){
-                throw new ObjectNotFoundException("Cannot read configuration");
-            }
-
-            Gson gson = new Gson();
-
-            return gson.fromJson(jsonConf.toString(), SiteProperties.class);
+        CmisObject obj = session.getObjectByPath(propertiesFilePath);
+        Document awsiConfig;
+        // procceed only if the node is a document
+        if (obj.getBaseTypeId().value().equals("cmis:document")){
+            awsiConfig = (Document)obj;
         }
-        else throw new ObjectNotFoundException("Cannot read configuration");
+        else {
+            throw new ObjectNotFoundException("Configuration file not found: "  + propertiesFilePath);
+        }
+
+        InputStream is = awsiConfig.getContentStream().getStream();
+
+        StringBuilder jsonConf = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                jsonConf.append(line);
+            }
+        }
+        catch (IOException e){
+            throw new ObjectNotFoundException("Cannot read configuration");
+        }
+
+        Gson gson = new Gson();
+
+        return gson.fromJson(jsonConf.toString(), SiteProperties.class);
 
     }
 
+
+//    public Downloadable<byte[]> getRendition(String type, String objectId, String name) throws ObjectNotFoundException {
+//
+//        List<Rendition> renditions = getDocumentById(objectId).getRenditions();
+//
+//        renditions.get()
+//
+//
+//        return new RenditionDownloadable (name, buffer, entity.getContentLength(), mimetype);
+//
+//    }
 
     public Downloadable<byte[]> getRendition(String type, String objectId, String name) throws ObjectNotFoundException {
 
         // I'm not using cmis because it doesn't trigger the thumbnail generetion process
-        // The rest service generate the thumbnauk or eventually return the default placeholder
+        // The rest service generate the thumbnail or eventually return the default placeholder
         CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
         credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(username, password));
 
@@ -417,13 +437,13 @@ public class AlfrescoCmisRepository implements CmisRepository {
         return alfrescoDocLibPath;
     }
 
-    @Override
-    public void setSite(String siteId) {
-        this.siteId = siteId;
-        this.alfrescoSitesRoot = "/" + alfrescoSites + "/" + siteId;
-        this.alfrescoDocLibPath = this.alfrescoSitesRoot + "/" + alfrescoDocumentLibrary;
+    public String getSiteName() {
+        return siteName;
     }
 
+    public String getSiteDescription() {
+        return siteDescription;
+    }
 
     //-------------------------- PRIVATE --------------------------
 
@@ -475,5 +495,8 @@ public class AlfrescoCmisRepository implements CmisRepository {
 
         return isValid;
     }
+
+
+
 
 }
