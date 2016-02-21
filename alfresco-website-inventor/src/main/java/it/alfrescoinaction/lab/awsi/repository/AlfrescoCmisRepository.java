@@ -6,6 +6,7 @@ import it.alfrescoinaction.lab.awsi.exceptions.ObjectNotFoundException;
 import it.alfrescoinaction.lab.awsi.exceptions.PageNotFoundException;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.client.runtime.util.EmptyItemIterable;
+import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisBaseException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.apache.http.HttpEntity;
@@ -21,15 +22,14 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.bind.annotation.SessionAttributes;
 
 import javax.annotation.PostConstruct;
 import java.io.*;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -49,8 +49,12 @@ public class AlfrescoCmisRepository implements CmisRepository {
     private String alfrescoDocLibPath;
     private String alfrescoSitePath;
 
+    private Folder docLibFolder;
+    private Folder siteFolder;
+
     private String siteName;
     private String siteDescription;
+    private String siteId;
 
 
     @Override
@@ -59,6 +63,7 @@ public class AlfrescoCmisRepository implements CmisRepository {
         // get site & doclib folders
         Session session = connection.getSession();
 
+        // get the site root objectId (in this way I bypass the problem of the translated site folder name in the cmis path)
         String siteFolderquery = "select * from cmis:folder where contains('PATH:\"/app:company_home/st:sites/cm:@@siteid\"')"
                 .replace("@@siteid",siteId);
 
@@ -367,18 +372,32 @@ public class AlfrescoCmisRepository implements CmisRepository {
     }
 
 
-//    public Downloadable<byte[]> getRendition(String type, String objectId, String name) throws ObjectNotFoundException {
-//
-//        List<Rendition> renditions = getDocumentById(objectId).getRenditions();
-//
-//        renditions.get()
-//
-//
-//        return new RenditionDownloadable (name, buffer, entity.getContentLength(), mimetype);
-//
-//    }
+    public Downloadable<byte[]> getRendition(String type, String objectId, String name) {
 
-    public Downloadable<byte[]> getRendition(String type, String objectId, String name) throws ObjectNotFoundException {
+        List<Rendition> renditions = getDocumentById(objectId).getRenditions();
+
+        ContentStream cs;
+        Optional<Rendition> rendition = renditions.stream().filter(r -> r.getTitle().equals(type)).findFirst();
+
+        if (rendition.isPresent()) {
+            cs = rendition.get().getContentStream();
+            byte[] buffer;
+            try {
+                buffer = toByteArray(cs.getStream());
+            }
+            catch (IOException e) {
+                buffer = new byte[0];
+            }
+
+            return  new RenditionDownloadable (name, buffer, cs.getLength(), cs.getMimeType());
+        }
+        else {
+            return getRenditionRest(type,objectId,name);
+        }
+
+    }
+
+    public Downloadable<byte[]> getRenditionRest(String type, String objectId, String name) throws ObjectNotFoundException {
 
         // I'm not using cmis because it doesn't trigger the thumbnail generetion process
         // The rest service generate the thumbnail or eventually return the default placeholder
@@ -492,11 +511,21 @@ public class AlfrescoCmisRepository implements CmisRepository {
             }
         }
 
-
         return isValid;
     }
 
-
+    public static byte[] toByteArray(InputStream in) throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        int read = 0;
+        byte[] buffer = new byte[1024];
+        while (read != -1) {
+            read = in.read(buffer);
+            if (read != -1)
+                out.write(buffer,0,read);
+        }
+        out.close();
+        return out.toByteArray();
+    }
 
 
 }

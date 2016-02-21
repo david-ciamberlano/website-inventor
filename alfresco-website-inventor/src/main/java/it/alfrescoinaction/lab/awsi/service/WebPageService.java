@@ -78,17 +78,18 @@ public class WebPageService {
         for (QueryResult qr : pageContents) {
             CmisObject cmiso = repository.getDocumentById(qr.getPropertyById("cmis:objectId").getFirstValue().toString());
             Document doc = (Document)cmiso;
-            switch (doc.getName()) {
-                case ".header.txt": {
-                    specialContents.put("text_header", ContentFactory.buildContent(doc));
+            Content content = ContentFactory.buildContent(doc);
+            switch (content.getType()) {
+                case TEXT_HEADER: {
+                    specialContents.put("text_header", content);
                     break;
                 }
-                case ".footer.txt": {
-                    specialContents.put("text_footer", ContentFactory.buildContent(doc));
+                case TEXT_FOOTER:{
+                    specialContents.put("text_footer", content);
                     break;
                 }
                 default:{
-                    contents.add(ContentFactory.buildContent(doc));
+                    contents.add(content);
                 }
             }
         }
@@ -139,7 +140,9 @@ public class WebPageService {
     public Downloadable<byte[]> getRendition(String type, String objectId) {
         Document doc =  repository.getDocumentById(objectId);
 
-        return repository.getRendition(type, objectId, doc.getName());
+        Downloadable<byte[]> downloadable = repository.getRendition(type, objectId, doc.getName());
+
+        return downloadable;
     }
 
 

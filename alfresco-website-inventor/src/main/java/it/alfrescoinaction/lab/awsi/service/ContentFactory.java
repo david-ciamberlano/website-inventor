@@ -29,12 +29,16 @@ public class ContentFactory {
 
                 switch (doc.getName()) {
 
-                    case ".header.txt": {
+                    case ".header.txt":
+                    case ".header.html":
+                    case ".header": {
                         textType = ContentType.TEXT_HEADER;
                         break;
                     }
 
-                    case ".footer.txt": {
+                    case ".footer.txt":
+                    case ".footer.html":
+                    case ".footer": {
                         textType = ContentType.TEXT_FOOTER;
                         break;
                     }
@@ -69,9 +73,9 @@ public class ContentFactory {
                     String text = IOUtils.readAllLines(in);
 
                     String safeText;
-                    // sanitize html
+                    // sanitize html (or other text type)
                     if ("text/html".equals(mimeType)){
-                       safeText = Jsoup.clean(text, Whitelist.basic());
+                       safeText = Jsoup.clean(text, Whitelist.relaxed());
                     }
                     else {
                         safeText = text2html(text);
@@ -225,7 +229,7 @@ public class ContentFactory {
 
     /**
      * convert plain text to html
-     * (snippet copied)
+     * (snippet copied from stackoverflow)
      */
     private static String text2html(String text) {
         StringBuilder builder = new StringBuilder();
@@ -248,8 +252,7 @@ public class ContentFactory {
                 case '&': builder.append("&amp;"); break;
                 case '"': builder.append("&quot;"); break;
                 case '\n': builder.append("<br>"); break;
-                // We need Tab support here, because we print StackTraces as HTML
-                case '\t': builder.append("&nbsp; &nbsp; &nbsp;"); break;
+                case '\t': builder.append("&nbsp;&nbsp;&nbsp;&nbsp;"); break;
                 default:
                     if( c < 128 ) {
                         builder.append(c);

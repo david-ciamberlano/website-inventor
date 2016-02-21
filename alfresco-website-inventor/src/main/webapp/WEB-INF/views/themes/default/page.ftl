@@ -39,8 +39,10 @@
                 <h1>${sitename}<br/><small>${sitedescription}</small></h1>
             </div>
         </header>
+    </div>
 
-        <#--BREADCRUMBS-->
+    <div class="row">
+        <#-- BREADCRUMBS -->
         <ol class="breadcrumb">
             <#if page.homepage>
                 <li class="active">Home</li>
@@ -53,18 +55,71 @@
             </#if>
         </ol>
     </div>
+
     <div class="row">
         <div class="col-lg-3 col-md-3 col-sm-4">
-            <div class="list-group table-of-contents">
-                <#if !page.homepage>
-                    <a class="list-group-item" href="${contextPath}/${siteid}/page/${page.parentId}">Up</a>
-                </#if>
-                <#list page.links as link>
-                    <a class="list-group-item" href="${contextPath}/${siteid}/page/${link.getId()}">${link.name}</a>
-                </#list>
+            <#-- NAVIGATION -->
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a aria-expanded="true" href="#link-tab" data-toggle="tab">Links</a>
+                </li>
+                <li>
+                    <a aria-expanded="true" href="#search-tab" data-toggle="tab">Search</a>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+                <div id="link-tab" class="tab-pane fade active in">
+                    <div class="list-group table-of-contents">
+                        <#if !page.homepage>
+                            <a class="list-group-item" href="${contextPath}/${siteid}/page/${page.parentId}">Up</a>
+                        </#if>
+                        <#list page.links as link>
+                            <a class="list-group-item" href="${contextPath}/${siteid}/page/${link.getId()}">${link.name}</a>
+                        </#list>
+                    </div>
+                </div>
+
+                <div id="search-tab" class="tab-pane fade in">
+                    <div>
+                        <#--<form method="POST" action="${pageContext.request.contextPath}/${siteid}/search" class="form-horizontal">-->
+                            <#--<c:forEach varStatus="vs" var="filter" items="${searchFilters.filterItems}" >-->
+                                <#--<c:if test="${not empty filter.name}">-->
+                                    <#--<div class="form-group">-->
+                                        <#--<label>${filter.name}</label>-->
+                                        <#--<c:choose>-->
+                                            <#--<c:when test="${fn:contains(filter.type, 'TEXT')}">-->
+                                                <#--<form:input type="text" class="form-control" path="filterItems[${vs.index}].content" ></form:input>-->
+                                            <#--</c:when>-->
+                                            <#--<c:when test="${fn:contains(filter.type, 'DATE')}">-->
+                                                <#--<form:input type="date" maxlength="10" size="10" class="form-control" path="filterItems[${vs.index}].content" placeholder="gg/mm/aaaa" ></form:input>-->
+                                            <#--</c:when>-->
+                                            <#--<c:when test="${fn:contains(filter.type, 'NUM')}">-->
+                                                <#--<form:input type="number" size="3" class="form-control" path="filterItems[${vs.index}].content" ></form:input>-->
+                                            <#--</c:when>-->
+                                        <#--</c:choose>-->
+
+                                    <#--</div>-->
+                                <#--</c:if>-->
+                            <#--</c:forEach>-->
+                            <#--<div class="text-right">-->
+                                <#--<button type="reset" class="btn btn-default"><span class="glyphicon glyphicon-remove"></span> Cancella</button>-->
+                                <#--<button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-search"></span> Cerca</button>-->
+                            <#--</div>-->
+                        <#--</form>-->
+                    </div>
+                </div>
             </div>
         </div>
+
         <div class="col-lg-9 col-md-9 col-sm-8">
+            <#-- CONTENT -->
+            <#if page.specialContents['text_header']??>
+                <header class="well well-sm">
+                    ${page.specialContents['text_header'].properties['text']}
+                </header>
+            </#if>
+
 
             <#list page.contents as content>
                 <article>
@@ -111,6 +166,12 @@
                     </#switch>
                 </article>
             </#list>
+
+            <#if page.specialContents['text_footer']??>
+            <header class="well well-sm">
+                ${page.specialContents['text_footer'].properties['text']}
+            </header>
+            </#if>
         </div>
     </div>
 </div>
