@@ -82,31 +82,29 @@
 
                 <div id="search-tab" class="tab-pane fade in">
                     <div>
-                        <#--<form method="POST" action="${pageContext.request.contextPath}/${siteid}/search" class="form-horizontal">-->
-                            <#--<c:forEach varStatus="vs" var="filter" items="${searchFilters.filterItems}" >-->
-                                <#--<c:if test="${not empty filter.name}">-->
-                                    <#--<div class="form-group">-->
-                                        <#--<label>${filter.name}</label>-->
-                                        <#--<c:choose>-->
-                                            <#--<c:when test="${fn:contains(filter.type, 'TEXT')}">-->
-                                                <#--<form:input type="text" class="form-control" path="filterItems[${vs.index}].content" ></form:input>-->
-                                            <#--</c:when>-->
-                                            <#--<c:when test="${fn:contains(filter.type, 'DATE')}">-->
-                                                <#--<form:input type="date" maxlength="10" size="10" class="form-control" path="filterItems[${vs.index}].content" placeholder="gg/mm/aaaa" ></form:input>-->
-                                            <#--</c:when>-->
-                                            <#--<c:when test="${fn:contains(filter.type, 'NUM')}">-->
-                                                <#--<form:input type="number" size="3" class="form-control" path="filterItems[${vs.index}].content" ></form:input>-->
-                                            <#--</c:when>-->
-                                        <#--</c:choose>-->
+                        <form method="POST" action="${contextPath}/${siteid}/search" class="form-horizontal">
+                            <#list page.siteProperties.searchFields as filter>
+                                <#switch filter.type>
+                                    <#case "TEXT">
+                                    <#case "%TEXT">
+                                    <#case "%TEXT%">
+                                    <#case "TEXT%">
+                                        <label for="${filter.label}">${filter.label}</label>
+                                        <input id="${filter.label}" type="text" class="form-control" value="-${filter.propertyId}-${filter.type}"></input>
+                                    <#break>
 
-                                    <#--</div>-->
-                                <#--</c:if>-->
-                            <#--</c:forEach>-->
-                            <#--<div class="text-right">-->
-                                <#--<button type="reset" class="btn btn-default"><span class="glyphicon glyphicon-remove"></span> Cancella</button>-->
-                                <#--<button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-search"></span> Cerca</button>-->
-                            <#--</div>-->
-                        <#--</form>-->
+                                <#--</c:when>-->
+                                <#--<c:when test="${fn:contains(filter.type, 'DATE')}">-->
+                                <#--<form:input type="date" maxlength="10" size="10" class="form-control" path="filterItems[${vs.index}].content" placeholder="gg/mm/aaaa" ></form:input>-->
+                                <#--</c:when>-->
+                                <#--<c:when test="${fn:contains(filter.type, 'NUM')}">-->
+                                <#--<form:input type="number" size="3" class="form-control" path="filterItems[${vs.index}].content" ></form:input>-->
+                                <#--</c:when>-->
+                                    <#default>
+                                        *#${filter.label}-${filter.propertyId}-${filter.type}
+                                </#switch>
+                            </#list>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -119,7 +117,6 @@
                     ${page.specialContents['text_header'].properties['text']}
                 </header>
             </#if>
-
 
             <#list page.contents as content>
                 <article>

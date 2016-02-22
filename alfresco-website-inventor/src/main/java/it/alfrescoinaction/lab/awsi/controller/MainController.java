@@ -29,11 +29,6 @@ public class MainController {
     private final String homeTemplate = "page";
     private final String pageTemplate = "page";
     private final String searchResultTemplate = "searchresult";
-    private String filter1;
-    private String filter2;
-    private String filter3;
-    private String filter4;
-    private String filter5;
 
     private static final Logger logger = Logger.getLogger(MainController.class);
 
@@ -92,41 +87,6 @@ public class MainController {
         }
 
         return view;
-    }
-
-
-    @ModelAttribute("searchFilters")
-    public SearchFilters createSeachBean() {
-        SearchFilters searchFilters = new SearchFilters();
-
-        String[] filter1Parts = (filter1 != null? filter1.split("\\|"):new String[0]);
-        String[] filter2Parts = (filter2 != null? filter2.split("\\|"): new String[0]);
-        String[] filter3Parts = (filter3 != null? filter3.split("\\|"): new String[0]);
-        String[] filter4Parts = (filter4 != null? filter4.split("\\|"): new String[0]);
-        String[] filter5Parts = (filter5 != null? filter5.split("\\|"): new String[0]);
-
-        // if lenght != 3, the filterData were left uninitialized ("","","")
-        if (filter1Parts.length == 3) {
-            searchFilters.addFilterItem(filter1Parts[0], filter1Parts[1], filter1Parts[2]);
-        }
-
-        if (filter2Parts.length == 3) {
-            searchFilters.addFilterItem(filter2Parts[0], filter2Parts[1], filter2Parts[2]);
-        }
-
-        if (filter3Parts.length == 3) {
-            searchFilters.addFilterItem(filter3Parts[0], filter3Parts[1], filter3Parts[2]);
-        }
-
-        if (filter4Parts.length == 3) {
-            searchFilters.addFilterItem(filter4Parts[0], filter4Parts[1], filter4Parts[2]);
-        }
-
-        if (filter5Parts.length == 3) {
-            searchFilters.addFilterItem(filter5Parts[0], filter5Parts[1], filter5Parts[2]);
-        }
-
-        return searchFilters;
     }
 
 
