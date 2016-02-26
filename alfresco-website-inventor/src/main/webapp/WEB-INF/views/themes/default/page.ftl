@@ -1,3 +1,4 @@
+<#import "/spring.ftl" as spring />
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,7 +10,6 @@
     <link href="${contextPath}/resource/themes/default/css/custom.css" rel="stylesheet">
 </head>
 <body>
-
 <#--MAIN NAVIGATION-->
 <nav class="navbar navbar-default">
     <div class="container-fluid">
@@ -90,20 +90,27 @@
                                     <#case "%TEXT%">
                                     <#case "TEXT%">
                                         <label for="${filter.label}">${filter.label}</label>
-                                        <input id="${filter.label}" type="text" class="form-control" value="-${filter.propertyId}-${filter.type}"></input>
+                                        <input id="${filter.label}" name="${filter.label}" type="text" class="form-control"></input>
                                     <#break>
 
-                                <#--</c:when>-->
-                                <#--<c:when test="${fn:contains(filter.type, 'DATE')}">-->
-                                <#--<form:input type="date" maxlength="10" size="10" class="form-control" path="filterItems[${vs.index}].content" placeholder="gg/mm/aaaa" ></form:input>-->
-                                <#--</c:when>-->
-                                <#--<c:when test="${fn:contains(filter.type, 'NUM')}">-->
-                                <#--<form:input type="number" size="3" class="form-control" path="filterItems[${vs.index}].content" ></form:input>-->
-                                <#--</c:when>-->
+                                    <#case "DATE">
+                                        <label for="${filter.label}">${filter.label}</label>
+                                        <input id="${filter.label}" name="${filter.label}" type="date" maxlength="10" size="10" class="form-control"  placeholder="gg-mm-aaaa" ></input>
+                                    <#break>
+
+                                    <#case "NUM">
+                                        <label for="${filter.label}">${filter.label}</label>
+                                        <input id="${filter.label}" name="${filter.label}" type="number" size="3" class="form-control" ></input>
+                                    <#break>
+
                                     <#default>
                                         *#${filter.label}-${filter.propertyId}-${filter.type}
                                 </#switch>
                             </#list>
+
+                            <button type="submin" class="btn btn-default" aria-label="Left Align">
+                                <span class="glyphicon glyphicon-search" aria-hidden="true"></span> Search
+                            </button>
                         </form>
                     </div>
                 </div>

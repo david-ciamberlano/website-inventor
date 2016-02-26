@@ -112,6 +112,8 @@ public class WebPageService {
         String homePageId = repository.getFolderIdByRelativePath("/");
         WebPage wp = new WebPage("search-result", "Search result", homePageId, false, repository.getSiteName(),repository.getSiteDescription());
 
+        wp.setSiteProperties(repository.getSiteProperties());
+
         // get the Contents
         ItemIterable<QueryResult> searchContents = repository.search(homePageId, filters);
         List<Content> contents = new ArrayList<>();

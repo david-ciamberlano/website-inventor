@@ -1,5 +1,6 @@
 package it.alfrescoinaction.lab.awsi.controller;
 
+import it.alfrescoinaction.lab.awsi.domain.SearchFilterItem;
 import it.alfrescoinaction.lab.awsi.domain.SearchFilters;
 import it.alfrescoinaction.lab.awsi.domain.WebPage;
 import it.alfrescoinaction.lab.awsi.exceptions.ConnectionException;
@@ -66,19 +67,21 @@ public class MainController {
     }
 
     @RequestMapping(value = "/{siteid}/search", method = RequestMethod.POST)
-    public String search( @ModelAttribute("searchFilters") SearchFilters searchFilters, Model model,
+    public String search( @ModelAttribute("searchFilterItem") SearchFilters searchFilters, Model model,
                           @PathVariable("siteid") String siteId) {
 
         if(logger.isDebugEnabled()){
             logger.debug("Search Request");
         }
 
-        WebPage wp = webPageService.buildSearchResultPage(siteId, searchFilters);
+        model.addAttribute("saluto","Ciao!");
 
-        model.addAttribute("page", wp);
-        model.addAttribute("siteid", siteId);
-        model.addAttribute("sitename", wp.getSiteName());
-        model.addAttribute("sitedescription", wp.getSiteDescription());
+//        WebPage wp = webPageService.buildSearchResultPage(siteId, searchFilters);
+//
+//        model.addAttribute("page", wp);
+//        model.addAttribute("siteid", siteId);
+//        model.addAttribute("sitename", wp.getSiteName());
+//        model.addAttribute("sitedescription", wp.getSiteDescription());
 
         String view = searchResultTemplate;
 
