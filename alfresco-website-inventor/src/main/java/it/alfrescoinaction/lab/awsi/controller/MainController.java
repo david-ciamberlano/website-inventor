@@ -1,6 +1,5 @@
 package it.alfrescoinaction.lab.awsi.controller;
 
-import it.alfrescoinaction.lab.awsi.domain.SearchFilterItem;
 import it.alfrescoinaction.lab.awsi.domain.SearchFilters;
 import it.alfrescoinaction.lab.awsi.domain.WebPage;
 import it.alfrescoinaction.lab.awsi.exceptions.ConnectionException;
@@ -10,7 +9,6 @@ import it.alfrescoinaction.lab.awsi.service.WebPageService;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -18,8 +16,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 
-import java.util.ArrayList;
-import java.util.List;
 
 @Controller
 public class MainController {
@@ -36,6 +32,7 @@ public class MainController {
 
     @RequestMapping("/{siteid}")
     public String homepage(Model model, @PathVariable("siteid") String site) {
+        model.addAttribute("test","test");
         return "forward:/" + site + "/page/home";
     }
 

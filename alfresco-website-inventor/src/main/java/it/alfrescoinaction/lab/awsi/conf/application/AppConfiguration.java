@@ -1,22 +1,14 @@
 package it.alfrescoinaction.lab.awsi.conf.application;
 
-import freemarker.template.utility.XmlEscape;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.http.MediaType;
-import org.springframework.http.converter.ByteArrayHttpMessageConverter;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.*;
-import org.springframework.web.servlet.view.InternalResourceViewResolver;
-import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.thymeleaf.spring4.SpringTemplateEngine;
+import org.thymeleaf.spring4.view.ThymeleafViewResolver;
+import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
 @EnableWebMvc
 @Configuration
@@ -30,29 +22,34 @@ public class AppConfiguration extends WebMvcConfigurerAdapter {
         registry.addResourceHandler("/resource/**").addResourceLocations("/resources/");
     }
 
-    @Bean(name ="freemarkerConfig")
-    public FreeMarkerConfigurer freemarkerConfig() {
-        FreeMarkerConfigurer configurer = new FreeMarkerConfigurer();
-        configurer.setTemplateLoaderPath("/WEB-INF/views/themes/default/");
-        Map<String, Object> map = new HashMap<>();
-        map.put("xml_escape", new XmlEscape());
-        configurer.setFreemarkerVariables(map);
-        return configurer;
+    @Bean
+    public ServletContextTemplateResolver templateResolver() {
+        ServletContextTemplateResolver sctr = new ServletContextTemplateResolver();
+
+        sctr.setPrefix("/WEB-INF/views/themes/default/");
+        sctr.setSuffix(".html");
+        sctr.setTemplateMode("HTML5");
+        sctr.setCacheable(false);
+
+        return sctr;
     }
 
-    @Override
-    public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
-        configurer.ignoreUnknownPathExtensions(false).defaultContentType(MediaType.TEXT_HTML);
-    }
-    @Override
-    public void configureViewResolvers(ViewResolverRegistry registry) {
-        registry.freeMarker();
+    @Bean
+    public SpringTemplateEngine templateEngine() {
+        SpringTemplateEngine ste = new SpringTemplateEngine();
+        ste.setTemplateResolver(templateResolver());
+
+        return ste;
     }
 
-    @Override
-    public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
-        configurer.enable();
+    @Bean
+    public ThymeleafViewResolver thymeleafViewResolver() {
+        ThymeleafViewResolver tlvr = new ThymeleafViewResolver();
+        tlvr.setTemplateEngine(templateEngine());
+
+        return tlvr;
     }
+
 
     @Bean
     public PropertyPlaceholderConfigurer getPropertyPlaceholderConfigurer()
