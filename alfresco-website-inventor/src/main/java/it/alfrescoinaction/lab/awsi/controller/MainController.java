@@ -1,6 +1,9 @@
 package it.alfrescoinaction.lab.awsi.controller;
 
+import com.sun.jndi.toolkit.dir.SearchFilter;
+import it.alfrescoinaction.lab.awsi.domain.SearchFilterItem;
 import it.alfrescoinaction.lab.awsi.domain.SearchFilters;
+import it.alfrescoinaction.lab.awsi.domain.SiteProperty;
 import it.alfrescoinaction.lab.awsi.domain.WebPage;
 import it.alfrescoinaction.lab.awsi.exceptions.ConnectionException;
 import it.alfrescoinaction.lab.awsi.exceptions.InvalidParameterException;
@@ -50,7 +53,15 @@ public class MainController {
         model.addAttribute("siteid", siteId);
         model.addAttribute("sitename", wp.getSiteName());
         model.addAttribute("sitedescription", wp.getSiteDescription());
-        model.addAttribute("contextPath",request.getContextPath());
+
+        // init the model attribute for the form
+        SearchFilters filters = new SearchFilters();
+
+        for (SiteProperty sprop : wp.getSiteProperties().getSearchFields()){
+            filters.addFilterItem(sprop.getLabel(),sprop.getPropertyId(),sprop.getType());
+        }
+
+        model.addAttribute("searchFilters", filters);
 
         String view = pageTemplate;
         if (wp.isHomepage()) {
@@ -64,21 +75,19 @@ public class MainController {
     }
 
     @RequestMapping(value = "/{siteid}/search", method = RequestMethod.POST)
-    public String search( @ModelAttribute("searchFilterItem") SearchFilters searchFilters, Model model,
+    public String search( @ModelAttribute SearchFilters searchFilters, Model model,
                           @PathVariable("siteid") String siteId) {
 
         if(logger.isDebugEnabled()){
             logger.debug("Search Request");
         }
 
-        model.addAttribute("saluto","Ciao!");
+        WebPage wp = webPageService.buildSearchResultPage(siteId, searchFilters);
 
-//        WebPage wp = webPageService.buildSearchResultPage(siteId, searchFilters);
-//
-//        model.addAttribute("page", wp);
-//        model.addAttribute("siteid", siteId);
-//        model.addAttribute("sitename", wp.getSiteName());
-//        model.addAttribute("sitedescription", wp.getSiteDescription());
+        model.addAttribute("page", wp);
+        model.addAttribute("siteid", siteId);
+        model.addAttribute("sitename", wp.getSiteName());
+        model.addAttribute("sitedescription", wp.getSiteDescription());
 
         String view = searchResultTemplate;
 

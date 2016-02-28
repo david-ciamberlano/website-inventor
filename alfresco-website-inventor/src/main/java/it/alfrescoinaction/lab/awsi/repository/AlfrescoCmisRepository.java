@@ -44,8 +44,6 @@ public class AlfrescoCmisRepository implements CmisRepository {
     @Value("${alfresco.username}") private String username;
     @Value("${alfresco.password}") private String password;
 
-    private String searchType;
-
     private String alfrescoDocLibPath;
     private String alfrescoSitePath;
 
@@ -214,7 +212,7 @@ public class AlfrescoCmisRepository implements CmisRepository {
 
         boolean withScore = false;
 
-        String queryBaseTemplate = "SELECT D.* FROM %s WHERE IN_TREE(D,'workspace://SpacesStore/%s') %s AND D.cmis:name <> '.*'";
+        String queryBaseTemplate = "SELECT D.* FROM %s D WHERE IN_TREE(D,'workspace://SpacesStore/%s') %s AND D.cmis:name <> '.*'";
         String queryWithScoreTemplate = "SELECT D.*, SCORE() rank FROM %s D WHERE IN_TREE(D,'workspace://SpacesStore/%s') %s AND D.cmis:name <> '.*' ORDER BY rank DESC";
 
         String queryFilters = "";
@@ -299,9 +297,8 @@ public class AlfrescoCmisRepository implements CmisRepository {
             return new EmptyItemIterable<>();
         }
 
-        String [] typeParts = searchType.split("\\|");
 
-        String typeName = typeParts[1] != null?typeParts[1]:"cmis:document";
+        String typeName = "cmis:document";
 
         String queryTemplate;
         if(withScore) {
@@ -343,6 +340,8 @@ public class AlfrescoCmisRepository implements CmisRepository {
         Session session = connection.getSession();
 
         CmisObject obj = session.getObjectByPath(propertiesFilePath);
+        obj.refresh();
+
         Document awsiConfig;
         // procceed only if the node is a document
         if (obj.getBaseTypeId().value().equals("cmis:document")){
