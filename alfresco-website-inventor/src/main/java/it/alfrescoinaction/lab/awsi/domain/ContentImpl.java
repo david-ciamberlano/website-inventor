@@ -8,15 +8,17 @@ public class ContentImpl implements Content{
 
     private final String id;
     private final String name;
+    private final String title;
     private final String mimeType;
     private final ContentType type;
     private final int priority;
     private Map<String,String> properties;
     private Map<String,String> renditions;
 
-    public ContentImpl(String id, String name, String mimeType, ContentType type, int priority) {
+    public ContentImpl(String id, String name, String title, String mimeType, ContentType type, int priority) {
         this.id = id;
         this.name = name;
+        this.title = title;
         this.mimeType = mimeType;
         this.type = type;
         this.priority = priority;
@@ -34,6 +36,9 @@ public class ContentImpl implements Content{
     public String getName() {
         return this.name;
     }
+
+    @Override
+    public String getTitle() {return this.title;}
 
     @Override
     public String getMimeType() {

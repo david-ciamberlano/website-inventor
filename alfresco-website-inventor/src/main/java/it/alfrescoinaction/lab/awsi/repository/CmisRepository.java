@@ -44,6 +44,8 @@ public interface CmisRepository {
 
     String getSiteName();
 
+    String getSiteTitle();
+
     String getSiteDescription();
 
     SiteProperties getSiteProperties() throws ObjectNotFoundException;

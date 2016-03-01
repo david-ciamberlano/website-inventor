@@ -30,7 +30,8 @@ public class WebPageService {
         String folderPath = folder.getPath();
         boolean isHomepage = repository.isHomePage(folderPath);
 
-        WebPage wp = new WebPage(id, folder.getName(), folder.getParentId(), isHomepage, repository.getSiteName(), repository.getSiteDescription());
+        WebPage wp = new WebPage(id, folder.getName(), folder.getParentId(), isHomepage,
+                repository.getSiteName(), repository.getSiteTitle(), repository.getSiteDescription());
 
         wp.setSiteProperties(repository.getSiteProperties());
 
@@ -71,25 +72,28 @@ public class WebPageService {
         wp.setLinks(linkList);
 
         // get the Contents
-        ItemIterable<QueryResult> pageContents = repository.getChildrenDocuments(folder, new HashMap<String, String>());
+        ItemIterable<QueryResult> pageContents = repository.getChildrenDocuments(folder, new HashMap<>());
 
         List<Content> contents = new ArrayList<>(20);
         Map<String,Content> specialContents = new HashMap<>(6);
         for (QueryResult qr : pageContents) {
             CmisObject cmiso = repository.getDocumentById(qr.getPropertyById("cmis:objectId").getFirstValue().toString());
             Document doc = (Document)cmiso;
-            Content content = ContentFactory.buildContent(doc);
-            switch (content.getType()) {
-                case TEXT_HEADER: {
-                    specialContents.put("text_header", content);
-                    break;
-                }
-                case TEXT_FOOTER:{
-                    specialContents.put("text_footer", content);
-                    break;
-                }
-                default:{
-                    contents.add(content);
+            Optional<Content> content = ContentFactory.buildContent(doc);
+
+            if (content.isPresent()) {
+                switch (content.get().getType()) {
+                    case TEXT_HEADER: {
+                        specialContents.put("text_header", content.get());
+                        break;
+                    }
+                    case TEXT_FOOTER: {
+                        specialContents.put("text_footer", content.get());
+                        break;
+                    }
+                    default: {
+                        contents.add(content.get());
+                    }
                 }
             }
         }
@@ -110,7 +114,7 @@ public class WebPageService {
 
         // the homepage has a relative path = "/"
         String homePageId = repository.getFolderIdByRelativePath("/");
-        WebPage wp = new WebPage("search-result", "Search result", homePageId, false, repository.getSiteName(),repository.getSiteDescription());
+        WebPage wp = new WebPage("search-result", "Search result", homePageId, false, repository.getSiteName(), repository.getSiteTitle(), repository.getSiteDescription());
 
         wp.setSiteProperties(repository.getSiteProperties());
 
@@ -120,7 +124,10 @@ public class WebPageService {
         for (QueryResult qr : searchContents) {
             CmisObject cmiso = repository.getDocumentById(qr.getPropertyById("cmis:objectId").getFirstValue().toString());
             Document doc = (Document)cmiso;
-            contents.add(ContentFactory.buildContent(doc));
+            Optional<Content> content = ContentFactory.buildContent(doc);
+            if (content.isPresent()) {
+                contents.add(content.get());
+            }
         }
         wp.setContents(contents);
 

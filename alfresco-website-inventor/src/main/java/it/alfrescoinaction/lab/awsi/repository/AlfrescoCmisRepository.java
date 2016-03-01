@@ -52,6 +52,7 @@ public class AlfrescoCmisRepository implements CmisRepository {
 
     private String siteName;
     private String siteDescription;
+    private String siteTitle;
     private String siteId;
 
 
@@ -62,7 +63,7 @@ public class AlfrescoCmisRepository implements CmisRepository {
         Session session = connection.getSession();
 
         // get the site root objectId (in this way I bypass the problem of the translated site folder name in the cmis path)
-        String siteFolderquery = "select * from cmis:folder where contains('PATH:\"/app:company_home/st:sites/cm:@@siteid\"')"
+        String siteFolderquery = "select * from cmis:folder F join cm:titled T on F.cmis:objectId = T.cmis:objectId  where contains(F,'PATH:\"/app:company_home/st:sites/cm:@@siteid\"')"
                 .replace("@@siteid",siteId);
 
         ItemIterable<QueryResult> siteFolders = session.query(siteFolderquery, false);
@@ -75,6 +76,7 @@ public class AlfrescoCmisRepository implements CmisRepository {
         this.alfrescoSitePath = siteObj.getPropertyById("cmis:path").getFirstValue().toString();
         this.alfrescoDocLibPath = alfrescoSitePath + "/documentLibrary";
         this.siteName = siteObj.getPropertyById("cmis:name").getFirstValue().toString();
+        this.siteTitle = siteObj.getPropertyById("cm:title").getFirstValue().toString();
         this.siteDescription = siteObj.getPropertyById("cmis:description").getFirstValue().toString();
 
 //        this.getSiteProperties();
@@ -183,7 +185,7 @@ public class AlfrescoCmisRepository implements CmisRepository {
 
     @Override
     public ItemIterable<QueryResult> getChildrenFolders(Folder folder) {
-        String queryTemplate = "SELECT F.* FROM cmis:folder F WHERE IN_FOLDER('%s')";
+        String queryTemplate = "SELECT F.* FROM cmis:folder F WHERE IN_FOLDER('%s') ORDER BY F.cmis:name";
         String query = String.format(queryTemplate,folder.getId());
 
         Session session = connection.getSession();
@@ -457,6 +459,10 @@ public class AlfrescoCmisRepository implements CmisRepository {
 
     public String getSiteName() {
         return siteName;
+    }
+
+    public String getSiteTitle() {
+        return siteTitle;
     }
 
     public String getSiteDescription() {

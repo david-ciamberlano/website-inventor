@@ -15,13 +15,19 @@ import java.util.regex.Pattern;
 
 public class ContentFactory {
 
-    public static Content buildContent(Document doc) {
+    public static Optional<Content> buildContent(Document doc) {
 
         int priority = getDocumentPriority(doc);
         String name = getDocumentName(doc);
+        String title = getDocumentTitle(doc);
         String mimeType = doc.getContentStreamMimeType();
 
-        switch (doc.getContentStreamMimeType()) {
+        // check if the document is hidden and not a special one
+        if (name.startsWith(".") && (!name.startsWith(".header") || !name.startsWith(".footer"))) {
+            return Optional.empty();
+        }
+
+        switch (mimeType) {
 
             case "text/html":
             case "text/plain": {
@@ -47,7 +53,7 @@ public class ContentFactory {
                         textType = ContentType.TEXT;
                 }
 
-                Content textContent = new ContentImpl(doc.getId(), name, doc.getContentStreamMimeType(), textType, priority);
+                Content textContent = new ContentImpl(doc.getId(), name, title, doc.getContentStreamMimeType(), textType, priority);
 
                 List<Property<?>> properties = doc.getProperties();
 
@@ -89,7 +95,7 @@ public class ContentFactory {
 
                 textContent.setProperties(props);
 
-                return textContent;
+                return Optional.of(textContent);
             }
 
 
@@ -115,7 +121,7 @@ public class ContentFactory {
                         imgType = ContentType.IMAGE;
                 }
 
-                Content imageContent = new ContentImpl(doc.getId(), name,doc.getContentStreamMimeType(), imgType, priority);
+                Content imageContent = new ContentImpl(doc.getId(), name, title, doc.getContentStreamMimeType(), imgType, priority);
 
                 imageContent.setRenditions(buildRenditions(doc));
                 List<Property<?>> properties = doc.getProperties();
@@ -141,12 +147,12 @@ public class ContentFactory {
 
                 imageContent.setProperties(props);
 
-                return imageContent;
+                return Optional.of(imageContent);
             }
 
             default: {
                 // caso di file generico
-                Content content = new ContentImpl(doc.getId(), name,doc.getContentStreamMimeType(), ContentType.GENERIC, priority);
+                Content content = new ContentImpl(doc.getId(), name, title, doc.getContentStreamMimeType(), ContentType.GENERIC, priority);
 
                 content.setRenditions(buildRenditions(doc));
 
@@ -172,7 +178,7 @@ public class ContentFactory {
 
                 content.setProperties(props);
 
-                return content;
+                return Optional.of(content);
             }
         }
 
@@ -210,6 +216,12 @@ public class ContentFactory {
         }
 
         return name;
+    }
+
+    private static String getDocumentTitle(Document doc) {
+        String title = doc.getProperty("cm:title")!=null?doc.getProperty("cm:title").getValueAsString():"";
+
+        return title;
     }
 
     private static int getDocumentPriority(Document doc) {

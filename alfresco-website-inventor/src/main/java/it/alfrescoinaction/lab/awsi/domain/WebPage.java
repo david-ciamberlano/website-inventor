@@ -15,6 +15,7 @@ public class WebPage {
     private final String title;
     private final String parentId;
     private final String siteName;
+    private final String siteTitle;
     private final String siteDescription;
     private final boolean homepage;
 
@@ -27,12 +28,13 @@ public class WebPage {
 
 
     public WebPage(String id, String title, String parentId, boolean homepage,
-                   String siteName, String siteDescription) {
+                   String siteName, String siteTitle, String siteDescription) {
         this.id = id;
         this.title = title;
         this.parentId = parentId;
         this.homepage = homepage;
         this.siteName = siteName;
+        this.siteTitle = siteTitle;
         this.siteDescription = siteDescription;
     }
 
@@ -75,14 +77,8 @@ public class WebPage {
 
     public List<Content> getContents() {
         // order by priority
-        List<Content> contentList = new ArrayList(contents);
-        Collections.sort(contentList, new Comparator<Content>() {
-            @Override
-            public int compare(Content c1, Content c2) {
-                return  c1.getPriority() - c2.getPriority();
-
-            }
-        });
+        List<Content> contentList = new ArrayList<>(contents);
+        Collections.sort(contentList, (c1,c2) -> c1.getPriority() - c2.getPriority());
 
         return contentList;
     }
@@ -119,6 +115,8 @@ public class WebPage {
     public String getSiteName() {
         return siteName;
     }
+
+    public String getSiteTitle() { return siteTitle;}
 
     public String getSiteDescription() {
         return siteDescription;

@@ -52,6 +52,7 @@ public class MainController {
         model.addAttribute("page", wp);
         model.addAttribute("siteid", siteId);
         model.addAttribute("sitename", wp.getSiteName());
+        model.addAttribute("sitetitle", wp.getSiteTitle());
         model.addAttribute("sitedescription", wp.getSiteDescription());
 
         // init the model attribute for the form

@@ -90,17 +90,17 @@
                                     <#case "%TEXT%">
                                     <#case "TEXT%">
                                         <label for="${filter.label}">${filter.label}</label>
-                                        <input id="${filter.label}" name="${filter.label}" type="text" class="form-control"></input>
+                                        <input id="${filter.label}" name="${filter.label}" type="text" class="form-control"/>
                                     <#break>
 
                                     <#case "DATE">
                                         <label for="${filter.label}">${filter.label}</label>
-                                        <input id="${filter.label}" name="${filter.label}" type="date" maxlength="10" size="10" class="form-control"  placeholder="gg-mm-aaaa" ></input>
+                                        <input id="${filter.label}" name="${filter.label}" type="date" maxlength="10" size="10" class="form-control"  placeholder="gg-mm-aaaa" />
                                     <#break>
 
                                     <#case "NUM">
                                         <label for="${filter.label}">${filter.label}</label>
-                                        <input id="${filter.label}" name="${filter.label}" type="number" size="3" class="form-control" ></input>
+                                        <input id="${filter.label}" name="${filter.label}" type="number" size="3" class="form-control" />
                                     <#break>
 
                                     <#default>
