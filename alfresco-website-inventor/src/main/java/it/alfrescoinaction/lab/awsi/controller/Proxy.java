@@ -20,8 +20,12 @@ import java.io.InputStreamReader;
 @Controller
 public class Proxy {
 
-    @Autowired
     private WebPageService webPageService;
+
+    @Autowired
+    public Proxy(WebPageService webPageService) {
+        this.webPageService = webPageService;
+    }
 
     //Downloads
     @RequestMapping(value = "proxy/d/{id}", method = RequestMethod.GET)

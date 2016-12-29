@@ -63,9 +63,6 @@
                 <li class="active">
                     <a aria-expanded="true" href="#link-tab" data-toggle="tab">Links</a>
                 </li>
-                <li>
-                    <a aria-expanded="true" href="#search-tab" data-toggle="tab">Search</a>
-                </li>
             </ul>
 
             <div class="tab-content">
@@ -77,41 +74,6 @@
                         <#list page.links as link>
                             <a class="list-group-item" href="${contextPath}/${siteid}/page/${link.getId()}">${link.name}</a>
                         </#list>
-                    </div>
-                </div>
-
-                <div id="search-tab" class="tab-pane fade in">
-                    <div>
-                        <form method="POST" action="${contextPath}/${siteid}/search" class="form-horizontal">
-                            <#list page.siteProperties.searchFields as filter>
-                                <#switch filter.type>
-                                    <#case "TEXT">
-                                    <#case "%TEXT">
-                                    <#case "%TEXT%">
-                                    <#case "TEXT%">
-                                        <label for="${filter.label}">${filter.label}</label>
-                                        <input id="${filter.label}" name="${filter.label}" type="text" class="form-control"/>
-                                    <#break>
-
-                                    <#case "DATE">
-                                        <label for="${filter.label}">${filter.label}</label>
-                                        <input id="${filter.label}" name="${filter.label}" type="date" maxlength="10" size="10" class="form-control"  placeholder="gg-mm-aaaa" />
-                                    <#break>
-
-                                    <#case "NUM">
-                                        <label for="${filter.label}">${filter.label}</label>
-                                        <input id="${filter.label}" name="${filter.label}" type="number" size="3" class="form-control" />
-                                    <#break>
-
-                                    <#default>
-                                        *#${filter.label}-${filter.propertyId}-${filter.type}
-                                </#switch>
-                            </#list>
-
-                            <button type="submin" class="btn btn-default" aria-label="Left Align">
-                                <span class="glyphicon glyphicon-search" aria-hidden="true"></span> Search
-                            </button>
-                        </form>
                     </div>
                 </div>
             </div>

@@ -1,6 +1,7 @@
 package it.alfrescoinaction.lab.awsi.repository;
 
 import com.google.gson.Gson;
+import it.alfrescoinaction.lab.awsi.controller.MainController;
 import it.alfrescoinaction.lab.awsi.domain.*;
 import it.alfrescoinaction.lab.awsi.exceptions.ObjectNotFoundException;
 import it.alfrescoinaction.lab.awsi.exceptions.PageNotFoundException;
@@ -20,6 +21,7 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
@@ -36,7 +38,14 @@ import java.util.regex.Pattern;
 @Repository
 public class AlfrescoCmisRepository implements CmisRepository {
 
-    @Autowired private RemoteConnection connection;
+    private static final Logger logger = Logger.getLogger(AlfrescoCmisRepository.class);
+
+    private RemoteConnection connection;
+
+    @Autowired
+    public AlfrescoCmisRepository (RemoteConnection connection) {
+        this.connection = connection;
+    }
 
     @Value("${alfresco.serverProtocol}") private String alfrescoServerProtocol;
     @Value("${alfresco.serverUrl}") private String alfrescoServer;
@@ -115,11 +124,12 @@ public class AlfrescoCmisRepository implements CmisRepository {
             obj = session.getObject(id);
         }
         catch(CmisObjectNotFoundException e) {
+            logger.error("Page not found. " + e.getMessage());
             throw new PageNotFoundException(id);
         }
 
         // procceed only if the node is a folder
-        if (obj.getBaseTypeId().value().equals("cmis:folder")){
+        if ("cmis:folder".equals(obj.getBaseTypeId().value())){
             Folder folder = (Folder)obj;
             return folder;
         }
@@ -398,7 +408,7 @@ public class AlfrescoCmisRepository implements CmisRepository {
 
     }
 
-    public Downloadable<byte[]> getRenditionRest(String type, String objectId, String name) throws ObjectNotFoundException {
+    private Downloadable<byte[]> getRenditionRest(String type, String objectId, String name) throws ObjectNotFoundException {
 
         // I'm not using cmis because it doesn't trigger the thumbnail generetion process
         // The rest service generate the thumbnail or eventually return the default placeholder
@@ -485,7 +495,7 @@ public class AlfrescoCmisRepository implements CmisRepository {
 
         }
         else if (isValid(date,"DATE")) {
-            String [] datePart = date.split("\\-");
+            String [] datePart = date.split("-");
             if (datePart.length == 3) {
                 formattedDate = datePart[2]+"-"+datePart[1]+"-"+datePart[0];
             }
@@ -519,7 +529,7 @@ public class AlfrescoCmisRepository implements CmisRepository {
         return isValid;
     }
 
-    public static byte[] toByteArray(InputStream in) throws IOException {
+    private static byte[] toByteArray(InputStream in) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         int read = 0;
         byte[] buffer = new byte[1024];

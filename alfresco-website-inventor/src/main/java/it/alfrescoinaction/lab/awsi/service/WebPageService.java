@@ -13,8 +13,12 @@ import java.util.*;
 @Service
 public class WebPageService {
 
+    private CmisRepository repository;
+
     @Autowired
-    CmisRepository repository;
+    public WebPageService (CmisRepository repository) {
+        this.repository = repository;
+    }
 
     /**
      * Build the domain object representing a webpage
@@ -125,9 +129,7 @@ public class WebPageService {
             CmisObject cmiso = repository.getDocumentById(qr.getPropertyById("cmis:objectId").getFirstValue().toString());
             Document doc = (Document)cmiso;
             Optional<Content> content = ContentFactory.buildContent(doc);
-            if (content.isPresent()) {
-                contents.add(content.get());
-            }
+            content.ifPresent(contents::add);
         }
         wp.setContents(contents);
 
@@ -149,9 +151,7 @@ public class WebPageService {
     public Downloadable<byte[]> getRendition(String type, String objectId) {
         Document doc =  repository.getDocumentById(objectId);
 
-        Downloadable<byte[]> downloadable = repository.getRendition(type, objectId, doc.getName());
-
-        return downloadable;
+        return repository.getRendition(type, objectId, doc.getName());
     }
 
 

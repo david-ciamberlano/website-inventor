@@ -1,8 +1,5 @@
 package it.alfrescoinaction.lab.awsi.domain;
 
-import it.alfrescoinaction.lab.awsi.service.ContentFactory;
-import org.apache.chemistry.opencmis.client.api.Document;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 
@@ -78,7 +75,7 @@ public class WebPage {
     public List<Content> getContents() {
         // order by priority
         List<Content> contentList = new ArrayList<>(contents);
-        Collections.sort(contentList, (c1,c2) -> c1.getPriority() - c2.getPriority());
+        contentList.sort(Comparator.comparingInt(Content::getPriority));
 
         return contentList;
     }

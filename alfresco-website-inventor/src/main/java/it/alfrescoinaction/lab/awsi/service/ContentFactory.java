@@ -5,6 +5,9 @@ import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.Property;
 import org.apache.chemistry.opencmis.client.api.Rendition;
 import org.apache.chemistry.opencmis.commons.impl.IOUtils;
+import org.commonmark.node.Node;
+import org.commonmark.parser.Parser;
+import org.commonmark.renderer.html.HtmlRenderer;
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Whitelist;
 
@@ -13,9 +16,9 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class ContentFactory {
+ class ContentFactory {
 
-    public static Optional<Content> buildContent(Document doc) {
+     static Optional<Content> buildContent(Document doc) {
 
         int priority = getDocumentPriority(doc);
         String name = getDocumentName(doc);
@@ -27,9 +30,15 @@ public class ContentFactory {
             return Optional.empty();
         }
 
+        // check if mimetype is not null
+        if (mimeType == null || mimeType.isEmpty()) {
+            return Optional.empty();
+        }
+
         switch (mimeType) {
 
             case "text/html":
+            case "text/markdown":
             case "text/plain": {
                 ContentType textType;
 
@@ -53,25 +62,10 @@ public class ContentFactory {
                         textType = ContentType.TEXT;
                 }
 
-                Content textContent = new ContentImpl(doc.getId(), name, title, doc.getContentStreamMimeType(), textType, priority);
+                Content textContent = new ContentImpl(doc.getId(), name, title,
+                                                        doc.getContentStreamMimeType(), textType, priority);
 
-                List<Property<?>> properties = doc.getProperties();
-
-                Map<String,String> props = new HashMap<>();
-                for (Property property : properties) {
-                    switch (property.getType().value()) {
-                        case "datetime": {
-                            GregorianCalendar propertyDate = (GregorianCalendar)property.getFirstValue();
-                            if (propertyDate != null) {
-                                props.put(property.getLocalName(), String.valueOf(propertyDate.getTimeInMillis()));
-                            }
-                            break;
-                        }
-
-                        default:
-                            props.put(property.getLocalName(), property.getValueAsString());
-                    }
-                }
+                Map<String,String> props = extractProperties(doc.getProperties());
 
                 textContent.setProperties(props);
 
@@ -82,6 +76,12 @@ public class ContentFactory {
                     // sanitize html (or other text type)
                     if ("text/html".equals(mimeType)){
                        safeText = Jsoup.clean(text, Whitelist.relaxed());
+                    }
+                    else if (doc.getName().endsWith(".md")) {
+                        Parser parser = Parser.builder().build();
+                        Node document = parser.parse(text);
+                        HtmlRenderer renderer = HtmlRenderer.builder().build();
+                        safeText = renderer.render(document);
                     }
                     else {
                         safeText = text2html(text);
@@ -124,23 +124,8 @@ public class ContentFactory {
                 Content imageContent = new ContentImpl(doc.getId(), name, title, doc.getContentStreamMimeType(), imgType, priority);
 
                 imageContent.setRenditions(buildRenditions(doc));
-                List<Property<?>> properties = doc.getProperties();
 
-                Map<String,String> props = new HashMap<>();
-                for (Property property : properties) {
-                    switch (property.getType().value()) {
-                        case "datetime": {
-                            GregorianCalendar propertyDate = (GregorianCalendar)property.getFirstValue();
-                            if (propertyDate != null) {
-                                props.put(property.getLocalName(), String.valueOf(propertyDate.getTimeInMillis()));
-                            }
-                            break;
-                        }
-
-                        default:
-                            props.put(property.getLocalName(), property.getValueAsString());
-                    }
-                }
+                Map<String,String> props = extractProperties(doc.getProperties());
 
                 long contentSizeInMB = Math.round(doc.getContentStreamLength()/(1024*1024));
                 props.put("content_size",String.valueOf(contentSizeInMB));
@@ -158,25 +143,7 @@ public class ContentFactory {
 
                 // set all the properties as string---
                 // in this way I can use them in the view without casting
-                List<Property<?>> properties = doc.getProperties();
-
-                Map<String,String> props = new HashMap<>();
-                for (Property property : properties) {
-                    switch (property.getType().value()) {
-                        case "datetime": {
-                            GregorianCalendar propertyDate = (GregorianCalendar)property.getFirstValue();
-                            if (propertyDate != null) {
-                                props.put(property.getLocalName(), String.valueOf(propertyDate.getTimeInMillis()));
-                            }
-                            break;
-                        }
-
-                        default:
-                            props.put(property.getLocalName(), property.getValueAsString());
-                    }
-                }
-
-                content.setProperties(props);
+                content.setProperties(extractProperties(doc.getProperties()));
 
                 return Optional.of(content);
             }
@@ -188,6 +155,27 @@ public class ContentFactory {
 
     //****************** private ********************
 
+    private static Map<String,String> extractProperties(List<Property<?>> properties) {
+        Map<String,String> props = new HashMap<>();
+
+        for (Property property : properties) {
+            switch (property.getType().value()) {
+                case "datetime": {
+                    GregorianCalendar propertyDate = (GregorianCalendar)property.getFirstValue();
+                    if (propertyDate != null) {
+                        props.put(property.getLocalName(), String.valueOf(propertyDate.getTimeInMillis()));
+                    }
+                    break;
+                }
+
+                default:
+                    props.put(property.getLocalName(), property.getValueAsString());
+            }
+        }
+
+        return props;
+    }
+
     private static Map<String,String> buildRenditions(Document doc) {
         Map<String,String> rends = new HashMap<>();
         if (doc.getRenditions().size() > 0) {
@@ -196,7 +184,7 @@ public class ContentFactory {
             }
         }
         else {
-            //Default icon
+            //TODO Default icon
 
         }
 
@@ -219,9 +207,7 @@ public class ContentFactory {
     }
 
     private static String getDocumentTitle(Document doc) {
-        String title = doc.getProperty("cm:title")!=null?doc.getProperty("cm:title").getValueAsString():"";
-
-        return title;
+        return doc.getProperty("cm:title")!=null?doc.getProperty("cm:title").getValueAsString():"";
     }
 
     private static int getDocumentPriority(Document doc) {

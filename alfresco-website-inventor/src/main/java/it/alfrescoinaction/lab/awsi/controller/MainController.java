@@ -1,7 +1,5 @@
 package it.alfrescoinaction.lab.awsi.controller;
 
-import com.sun.jndi.toolkit.dir.SearchFilter;
-import it.alfrescoinaction.lab.awsi.domain.SearchFilterItem;
 import it.alfrescoinaction.lab.awsi.domain.SearchFilters;
 import it.alfrescoinaction.lab.awsi.domain.SiteProperty;
 import it.alfrescoinaction.lab.awsi.domain.WebPage;
@@ -25,6 +23,11 @@ public class MainController {
 
     @Autowired
     private WebPageService webPageService;
+
+    @Autowired
+    public MainController (WebPageService webPageService) {
+        this.webPageService = webPageService;
+    }
 
     private final String homeTemplate = "page";
     private final String pageTemplate = "page";
