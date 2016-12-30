@@ -1,7 +1,5 @@
 package it.alfrescoinaction.lab.awsi.controller;
 
-import it.alfrescoinaction.lab.awsi.domain.SearchFilters;
-import it.alfrescoinaction.lab.awsi.domain.SiteProperty;
 import it.alfrescoinaction.lab.awsi.domain.WebPage;
 import it.alfrescoinaction.lab.awsi.exceptions.ConnectionException;
 import it.alfrescoinaction.lab.awsi.exceptions.InvalidParameterException;
@@ -31,7 +29,6 @@ public class MainController {
 
     private final String homeTemplate = "page";
     private final String pageTemplate = "page";
-    private final String searchResultTemplate = "searchresult";
 
     private static final Logger logger = Logger.getLogger(MainController.class);
 
@@ -58,15 +55,6 @@ public class MainController {
         model.addAttribute("sitetitle", wp.getSiteTitle());
         model.addAttribute("sitedescription", wp.getSiteDescription());
 
-        // init the model attribute for the form
-        SearchFilters filters = new SearchFilters();
-
-        for (SiteProperty sprop : wp.getSiteProperties().getSearchFields()){
-            filters.addFilterItem(sprop.getLabel(),sprop.getPropertyId(),sprop.getType());
-        }
-
-        model.addAttribute("searchFilters", filters);
-
         String view = pageTemplate;
         if (wp.isHomepage()) {
             view = homeTemplate;
@@ -77,31 +65,6 @@ public class MainController {
         }
         return view;
     }
-
-    @RequestMapping(value = "/{siteid}/search", method = RequestMethod.POST)
-    public String search( @ModelAttribute SearchFilters searchFilters, Model model,
-                          @PathVariable("siteid") String siteId) {
-
-        if(logger.isDebugEnabled()){
-            logger.debug("Search Request");
-        }
-
-        WebPage wp = webPageService.buildSearchResultPage(siteId, searchFilters);
-
-        model.addAttribute("page", wp);
-        model.addAttribute("siteid", siteId);
-        model.addAttribute("sitename", wp.getSiteName());
-        model.addAttribute("sitedescription", wp.getSiteDescription());
-
-        String view = searchResultTemplate;
-
-        if(logger.isDebugEnabled()){
-            logger.debug("Search Result ready");
-        }
-
-        return view;
-    }
-
 
 
     //------------- EXCEPTION -------------

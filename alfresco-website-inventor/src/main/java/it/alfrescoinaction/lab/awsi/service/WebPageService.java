@@ -114,28 +114,6 @@ public class WebPageService {
     }
 
 
-    public WebPage buildSearchResultPage(String siteId, SearchFilters filters) throws CmisObjectNotFoundException {
-
-        // the homepage has a relative path = "/"
-        String homePageId = repository.getFolderIdByRelativePath("/");
-        WebPage wp = new WebPage("search-result", "Search result", homePageId, false, repository.getSiteName(), repository.getSiteTitle(), repository.getSiteDescription());
-
-        wp.setSiteProperties(repository.getSiteProperties());
-
-        // get the Contents
-        ItemIterable<QueryResult> searchContents = repository.search(homePageId, filters);
-        List<Content> contents = new ArrayList<>();
-        for (QueryResult qr : searchContents) {
-            CmisObject cmiso = repository.getDocumentById(qr.getPropertyById("cmis:objectId").getFirstValue().toString());
-            Document doc = (Document)cmiso;
-            Optional<Content> content = ContentFactory.buildContent(doc);
-            content.ifPresent(contents::add);
-        }
-        wp.setContents(contents);
-
-        return wp;
-    }
-
     public String getPageIdByPath(String path) {
         return repository.getFolderIdByRelativePath(path);
     }

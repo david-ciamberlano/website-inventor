@@ -23,10 +23,11 @@ import java.util.regex.Pattern;
         int priority = getDocumentPriority(doc);
         String name = getDocumentName(doc);
         String title = getDocumentTitle(doc);
+        String description = getDocumentDescription(doc);
         String mimeType = doc.getContentStreamMimeType();
 
         // check if the document is hidden and not a special one
-        if (name.startsWith(".") && (!name.startsWith(".header") || !name.startsWith(".footer"))) {
+        if (name.startsWith(".") && !name.startsWith(".header") && !name.startsWith(".footer")) {
             return Optional.empty();
         }
 
@@ -45,6 +46,7 @@ import java.util.regex.Pattern;
                 switch (doc.getName()) {
 
                     case ".header.txt":
+                    case ".header.md":
                     case ".header.html":
                     case ".header": {
                         textType = ContentType.TEXT_HEADER;
@@ -52,6 +54,7 @@ import java.util.regex.Pattern;
                     }
 
                     case ".footer.txt":
+                    case ".footer.md":
                     case ".footer.html":
                     case ".footer": {
                         textType = ContentType.TEXT_FOOTER;
@@ -62,7 +65,7 @@ import java.util.regex.Pattern;
                         textType = ContentType.TEXT;
                 }
 
-                Content textContent = new ContentImpl(doc.getId(), name, title,
+                Content textContent = new ContentImpl(doc.getId(), name, title, description,
                                                         doc.getContentStreamMimeType(), textType, priority);
 
                 Map<String,String> props = extractProperties(doc.getProperties());
@@ -121,7 +124,8 @@ import java.util.regex.Pattern;
                         imgType = ContentType.IMAGE;
                 }
 
-                Content imageContent = new ContentImpl(doc.getId(), name, title, doc.getContentStreamMimeType(), imgType, priority);
+                Content imageContent = new ContentImpl(doc.getId(), name, title, description,
+                        doc.getContentStreamMimeType(), imgType, priority);
 
                 imageContent.setRenditions(buildRenditions(doc));
 
@@ -137,7 +141,8 @@ import java.util.regex.Pattern;
 
             default: {
                 // caso di file generico
-                Content content = new ContentImpl(doc.getId(), name, title, doc.getContentStreamMimeType(), ContentType.GENERIC, priority);
+                Content content = new ContentImpl(doc.getId(), name, title, description,
+                        doc.getContentStreamMimeType(), ContentType.GENERIC, priority);
 
                 content.setRenditions(buildRenditions(doc));
 
@@ -208,6 +213,10 @@ import java.util.regex.Pattern;
 
     private static String getDocumentTitle(Document doc) {
         return doc.getProperty("cm:title")!=null?doc.getProperty("cm:title").getValueAsString():"";
+    }
+
+    private static String getDocumentDescription(Document doc) {
+         return doc.getProperty("cm:description")!=null?doc.getProperty("cm:description").getValueAsString():"";
     }
 
     private static int getDocumentPriority(Document doc) {

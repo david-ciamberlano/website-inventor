@@ -7,6 +7,7 @@ public interface Content {
     String getId();
     String getName();
     String getTitle();
+    String getDescription();
     String getMimeType();
     ContentType getType();
     int getPriority();

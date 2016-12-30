@@ -56,9 +56,6 @@ public class AlfrescoCmisRepository implements CmisRepository {
     private String alfrescoDocLibPath;
     private String alfrescoSitePath;
 
-    private Folder docLibFolder;
-    private Folder siteFolder;
-
     private String siteName;
     private String siteDescription;
     private String siteTitle;
@@ -215,127 +212,6 @@ public class AlfrescoCmisRepository implements CmisRepository {
         OperationContext oc = session.createOperationContext();
         oc.setRenditionFilterString("*");
         ItemIterable<QueryResult> children = session.query(query, false, oc);
-
-        return children;
-    }
-
-    @Override
-    public ItemIterable<QueryResult> search(String folderId, SearchFilters filters) {
-
-        boolean withScore = false;
-
-        String queryBaseTemplate = "SELECT D.* FROM %s D WHERE IN_TREE(D,'workspace://SpacesStore/%s') %s AND D.cmis:name <> '.*'";
-        String queryWithScoreTemplate = "SELECT D.*, SCORE() rank FROM %s D WHERE IN_TREE(D,'workspace://SpacesStore/%s') %s AND D.cmis:name <> '.*' ORDER BY rank DESC";
-
-        String queryFilters = "";
-        String queryFilterTemplateTEXT = "AND D.%s LIKE '%s' ";
-        String queryFilterTemplateDATEFROM = "AND D.%s >= TIMESTAMP '%sT00:00:00.000+00:00' ";
-        String queryFilterTemplateDATETO = "AND D.%s <= TIMESTAMP '%sT00:00:00.000+00:00' ";
-        String queryFilterTemplateDATE = "AND D.%s = TIMESTAMP '%sT00:00:00.000+00:00' ";
-        String queryFilterTemplateNUM = "AND D.%s = %d";
-        String queryFilterTemplateNUM_MIN = "AND D.%s >=  %d";
-        String queryFilterTemplateNUM_MAX = "AND D.%s <=  %d";
-        String queryFilterTemplateFULLTEXT = "AND CONTAINS(D,'%s')";
-        String queryFilterTemplateFULLTEXTEXACT = "AND CONTAINS(D,'\\'%s\\'')";
-
-        List <SearchFilterItem> filterItems = filters.getFilterItems();
-
-        for (SearchFilterItem filter : filterItems) {
-
-            if (!filter.getContent().isEmpty()) {
-                switch (filter.getType()) {
-                    case "TEXT": {
-                        queryFilters += String.format(queryFilterTemplateTEXT, filter.getId(), filter.getContent());
-                        break;
-                    }
-
-                    case "%TEXT": {
-                        queryFilters += String.format(queryFilterTemplateTEXT, filter.getId(), "%" + filter.getContent());
-                        break;
-                    }
-
-                    case "TEXT%": {
-                        queryFilters += String.format(queryFilterTemplateTEXT, filter.getId(), filter.getContent() + "%");
-                        break;
-                    }
-
-                    case "%TEXT%": {
-                        queryFilters += String.format(queryFilterTemplateTEXT, filter.getId(), "%" + filter.getContent() + "%");
-                        break;
-                    }
-
-                    case "DATE": {
-                        String formattedDate = this.getFormattedDate (filter.getContent(), filter.getType());
-                        if (!formattedDate.isEmpty()) {
-                            queryFilters += String.format(queryFilterTemplateDATE, filter.getId(), formattedDate);
-                        }
-                        break;
-                    }
-
-                    case "DATE_FROM": {
-                        String formattedDate = this.getFormattedDate (filter.getContent(), filter.getType());
-                        if (!formattedDate.isEmpty()) {
-                            queryFilters += String.format(queryFilterTemplateDATEFROM, filter.getId(), formattedDate);
-                        }
-                        break;
-                    }
-
-                    case "DATE_TO": {
-                        String formattedDate = this.getFormattedDate (filter.getContent(), filter.getType());
-                        if (!formattedDate.isEmpty()) {
-                            queryFilters += String.format(queryFilterTemplateDATETO, filter.getId(), formattedDate);
-                        }
-                        break;
-                    }
-
-                    // FULLTEXT must be always the last item
-                    case "FULLTEXT": {
-                        queryFilters += String.format(queryFilterTemplateFULLTEXT, filter.getContent());
-                        withScore = true;
-                        break;
-                    }
-
-                    case "FULLTEXT_E": {
-                        queryFilters += String.format(queryFilterTemplateFULLTEXTEXACT, filter.getContent());
-                        break;
-                    }
-
-                }
-            }
-        }
-
-        // check if at least 1 field is valid (otherwise all the repository will be searched)
-        if (queryFilters.isEmpty()) {
-            return new EmptyItemIterable<>();
-        }
-
-
-        String typeName = "cmis:document";
-
-        String queryTemplate;
-        if(withScore) {
-            queryTemplate = queryWithScoreTemplate;
-        }
-        else {
-            queryTemplate = queryBaseTemplate;
-        }
-
-        String query = String.format(queryTemplate, typeName, folderId, queryFilters);
-
-        Session session = connection.getSession();
-
-        OperationContext oc = session.createOperationContext();
-        oc.setRenditionFilterString("*");
-
-        ItemIterable<QueryResult> children;
-        try {
-            children = session.query(query, false, oc);
-            // if the query is invalid, the following row throws an exception
-            children.getTotalNumItems();
-        }
-        catch (Exception e) {
-            children = new EmptyItemIterable<>();
-        }
 
         return children;
     }

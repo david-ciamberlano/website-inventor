@@ -59,24 +59,15 @@
     <div class="row">
         <div class="col-lg-3 col-md-3 col-sm-4">
             <#-- NAVIGATION -->
-            <ul class="nav nav-tabs">
-                <li class="active">
-                    <a aria-expanded="true" href="#link-tab" data-toggle="tab">Links</a>
-                </li>
-            </ul>
-
-            <div class="tab-content">
-                <div id="link-tab" class="tab-pane fade active in">
-                    <div class="list-group table-of-contents">
-                        <#if !page.homepage>
-                            <a class="list-group-item" href="${contextPath}/${siteid}/page/${page.parentId}">Up</a>
-                        </#if>
-                        <#list page.links as link>
-                            <a class="list-group-item" href="${contextPath}/${siteid}/page/${link.getId()}">${link.name}</a>
-                        </#list>
-                    </div>
-                </div>
+            <div class="list-group table-of-contents">
+                <#if !page.homepage>
+                    <a class="list-group-item" href="${contextPath}/${siteid}/page/${page.parentId}">Up</a>
+                </#if>
+                <#list page.links as link>
+                    <a class="list-group-item" href="${contextPath}/${siteid}/page/${link.getId()}">${link.name}</a>
+                </#list>
             </div>
+
         </div>
 
         <div class="col-lg-9 col-md-9 col-sm-8">
