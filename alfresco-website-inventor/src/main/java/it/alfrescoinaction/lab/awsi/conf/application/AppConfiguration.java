@@ -33,17 +33,6 @@ public class AppConfiguration extends WebMvcConfigurerAdapter implements Applica
         registry.addResourceHandler("/resource/**").addResourceLocations("/resources/");
     }
 
-//    @Bean
-//    public ServletContextTemplateResolver templateResolver() {
-//        ServletContextTemplateResolver sctr = new ServletContextTemplateResolver();
-//
-//        sctr.setPrefix("/WEB-INF/views/themes/default/");
-//        sctr.setSuffix(".html");
-//        sctr.setTemplateMode("HTML5");
-//        sctr.setCacheable(false);
-//
-//        return sctr;
-//    }
 
 
     @Bean

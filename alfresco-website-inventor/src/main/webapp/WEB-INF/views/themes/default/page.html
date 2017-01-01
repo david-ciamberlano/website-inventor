@@ -84,7 +84,7 @@
                             <!--IMAGES-->
                             <figure th:case="${T(it.alfrescoinaction.lab.awsi.domain.ContentType).IMAGE}">
                                 <a th:href="@{|/proxy/d/${content.id}|}" class="thumbnail">
-                                    <img th:src="@{|/proxy/r/imgpreview/${content.id}|}" th:alt="${content.getName()}" />
+                                    <img th:src="@{|/proxy/r/preview/${content.id}|}" th:alt="${content.getName()}" />
                                 </a>
                                 <figcaption class="caption">
                                     <p>
@@ -98,7 +98,7 @@
                             <div th:case="*" class="media margin-bottom-lg">
                                 <div class="media-left">
                                     <a th:href="@{|/proxy/d/${content.id}|}" target="_blank">
-                                        <img class="media-object" th:src="@{|/proxy/r/doclib/${content.id}|}" th:alt="${content.properties['name']}" />
+                                        <img class="media-object" th:src="@{|/proxy/r/thumb/${content.id}|}" th:alt="${content.properties['name']}" />
                                     </a>
                                 </div>
                                 <div class="media-body">

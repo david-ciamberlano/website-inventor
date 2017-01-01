@@ -19,7 +19,6 @@ import javax.servlet.http.HttpServletRequest;
 @Controller
 public class MainController {
 
-    @Autowired
     private WebPageService webPageService;
 
     @Autowired
@@ -31,7 +30,6 @@ public class MainController {
     private final String pageTemplate = "page";
 
     private static final Logger logger = Logger.getLogger(MainController.class);
-
 
     @RequestMapping("/{siteid}")
     public String homepage(Model model, @PathVariable("siteid") String site) {

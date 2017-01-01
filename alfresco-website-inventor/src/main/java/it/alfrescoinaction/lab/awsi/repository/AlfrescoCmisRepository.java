@@ -1,14 +1,13 @@
 package it.alfrescoinaction.lab.awsi.repository;
 
 import com.google.gson.Gson;
-import it.alfrescoinaction.lab.awsi.controller.MainController;
-import it.alfrescoinaction.lab.awsi.domain.*;
+import it.alfrescoinaction.lab.awsi.domain.Downloadable;
+import it.alfrescoinaction.lab.awsi.domain.RenditionDownloadable;
+import it.alfrescoinaction.lab.awsi.domain.SiteProperties;
 import it.alfrescoinaction.lab.awsi.exceptions.ObjectNotFoundException;
 import it.alfrescoinaction.lab.awsi.exceptions.PageNotFoundException;
 import org.apache.chemistry.opencmis.client.api.*;
-import org.apache.chemistry.opencmis.client.runtime.util.EmptyItemIterable;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
-import org.apache.chemistry.opencmis.commons.exceptions.CmisBaseException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.apache.http.HttpEntity;
 import org.apache.http.auth.AuthScope;
@@ -24,14 +23,15 @@ import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Scope;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.bind.annotation.SessionAttributes;
 
-import javax.annotation.PostConstruct;
 import java.io.*;
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -60,6 +60,8 @@ public class AlfrescoCmisRepository implements CmisRepository {
     private String siteDescription;
     private String siteTitle;
     private String siteId;
+
+    private Resource defaultIcon;
 
 
     @Override
@@ -314,14 +316,14 @@ public class AlfrescoCmisRepository implements CmisRepository {
 
                 Downloadable<byte[]> rend;
                 //TODO replace magic number
-                if (entity.getContentLength() < 1024*1024 || entity.getContentLength() > 0) {
+                if (entity.getContentLength() < 1024*1024 && entity.getContentLength() > 0) {
                     byte[] buffer = EntityUtils.toByteArray(entity);
 //                    byte[] buffer = new byte[((Long)entity.getContentLength()).intValue()];
 //                    entity.getContent().read(buffer);
 
                     String mimetype = entity.getContentType().getValue();
 
-                    rend = new RenditionDownloadable (name, buffer, entity.getContentLength(), mimetype);
+                    rend = new RenditionDownloadable (name, buffer, buffer.length, mimetype);
                     return rend;
                 }
                 else {
