@@ -65,7 +65,7 @@ public class AppConfiguration extends WebMvcConfigurerAdapter implements Applica
 
 
     @Bean
-    public PropertyPlaceholderConfigurer getPropertyPlaceholderConfigurer()
+    public static PropertyPlaceholderConfigurer getPropertyPlaceholderConfigurer()
     {
         PropertyPlaceholderConfigurer ppc = new PropertyPlaceholderConfigurer();
         ppc.setLocation(new FileSystemResource(System.getProperty("catalina.base") + "/conf/awsi.properties"));

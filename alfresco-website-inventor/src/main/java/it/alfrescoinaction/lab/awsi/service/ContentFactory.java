@@ -12,6 +12,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.safety.Whitelist;
 
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -168,7 +170,9 @@ import java.util.regex.Pattern;
                 case "datetime": {
                     GregorianCalendar propertyDate = (GregorianCalendar)property.getFirstValue();
                     if (propertyDate != null) {
-                        props.put(property.getLocalName(), String.valueOf(propertyDate.getTimeInMillis()));
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                        sdf.setCalendar(propertyDate);
+                        props.put(property.getLocalName(), sdf.format(propertyDate.getTime()));
                     }
                     break;
                 }
@@ -183,8 +187,9 @@ import java.util.regex.Pattern;
 
     private static Map<String,String> buildRenditions(Document doc) {
         Map<String,String> rends = new HashMap<>();
-        if (doc.getRenditions().size() > 0) {
-            for (Rendition rendition : doc.getRenditions()) {
+        List<Rendition> renditions = doc.getRenditions();
+        if (renditions!=null && renditions.size() > 0) {
+            for (Rendition rendition : renditions) {
                 rends.put(rendition.getTitle(),rendition.getStreamId());
             }
         }

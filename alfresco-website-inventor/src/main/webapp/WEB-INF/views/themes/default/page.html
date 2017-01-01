@@ -71,57 +71,58 @@
                     </header>
 
                     <article th:each="content : ${page.contents}">
+
                         <th:block th:switch="${content.type}" >
 
-                        <div th:case="${T(it.alfrescoinaction.lab.awsi.domain.ContentType).TEXT}">
-                            <h2 th:text="${content.title}"></h2>
-                            <h3 th:text="${content.description} ?: _"></h3>
-                            <div th:utext="${content.properties['text']}"></div>
-                        </div>
+                            <!--TEXTS-->
+                            <div th:case="${T(it.alfrescoinaction.lab.awsi.domain.ContentType).TEXT}">
+                                <h2 th:text="${content.title}"></h2>
+                                <h3 th:text="${content.description} ?: _"></h3>
+                                <div th:utext="${content.properties['text']}"></div>
+                            </div>
 
-                        <figure th:case="${T(it.alfrescoinaction.lab.awsi.domain.ContentType).IMAGE}">
-                            <a th:href="@{|/proxy/d/${content.id}|}" class="thumbnail">
-                                <img th:src="@{|/proxy/r/imgpreview/${content.id}|}" th:alt="${content.getName()}" />
-                            </a>
-                            <figcaption class="caption">
-                                <p>
-                                    <span th:text="${content.title}"></span>
-                                    <em><span th:if="${!#strings.isEmpty(content.description)}" th:text="| - ${content.description}|" ></span></em>
-                                </p>
-                            </figcaption>
-                        </figure>
-
-                        <div th:case="*" class="media margin-bottom-lg">
-                            <div class="media-left">
-                                <a th:href="@{|/proxy/d/${content.id}|}" target="_blank">
-                                    <img class="media-object" th:src="@{|/proxy/r/doclib/${content.id}|}" th:alt="${content.properties['name']}" />
+                            <!--IMAGES-->
+                            <figure th:case="${T(it.alfrescoinaction.lab.awsi.domain.ContentType).IMAGE}">
+                                <a th:href="@{|/proxy/d/${content.id}|}" class="thumbnail">
+                                    <img th:src="@{|/proxy/r/imgpreview/${content.id}|}" th:alt="${content.getName()}" />
                                 </a>
-                            </div>
-                            <div class="media-body">
-                                <h4 class="media-heading">
-                                    <a th:href="@{|/proxy/d/${content.id}|}" target="_blank" th:text="${content.properties['title']?:content.properties['name']}"></a>
-                                </h4>
-                                <th:block th:each="docprop : ${page.siteProperties.metadata}">
-                                    <th:block th:switch="${docprop.type}">
-                                        <div th:case="TEXT">
-                                            <strong th:text="${docprop.label} + ': '"></strong>
-                                            <span th:text="${content.properties[docprop.propertyId]?:'-'}"></span>
-                                        </div>
-                                        <div th:case="DATE">
-                                            <strong th:text="${docprop.label} + ': '"></strong>
-                                            <span th:text="${content.properties[docprop.propertyId]}"></span>
-                                        </div>
+                                <figcaption class="caption">
+                                    <p>
+                                        <span th:text="${content.title}"></span>
+                                        <em th:if="${not #strings.isEmpty(content.description)}" th:text="| - ${content.description}|"></em>
+                                    </p>
+                                </figcaption>
+                            </figure>
+
+                            <!--OTHERS-->
+                            <div th:case="*" class="media margin-bottom-lg">
+                                <div class="media-left">
+                                    <a th:href="@{|/proxy/d/${content.id}|}" target="_blank">
+                                        <img class="media-object" th:src="@{|/proxy/r/doclib/${content.id}|}" th:alt="${content.properties['name']}" />
+                                    </a>
+                                </div>
+                                <div class="media-body">
+                                    <h4 class="media-heading">
+                                        <a th:href="@{|/proxy/d/${content.id}|}" target="_blank" th:text="${content.properties['title']?:content.properties['name']}"></a>
+                                    </h4>
+                                    <th:block th:each="docprop : ${page.siteProperties.metadata}">
+                                        <th:block th:switch="${docprop.type}">
+                                            <div th:case="TEXT">
+                                                <strong th:text="${docprop.label} + ': '"></strong>
+                                                <span th:text="${content.properties[docprop.propertyId]?:'-'}"></span>
+                                            </div>
+                                            <div th:case="DATE">
+                                                <strong th:text="${docprop.label} + ': '"></strong>
+                                                <span th:text="${content.properties[docprop.propertyId]}"></span>
+                                            </div>
+                                        </th:block>
                                     </th:block>
-                                </th:block>
+                                </div>
                             </div>
-                        </div>
 
                         </th:block>
 
-
-
                     </article>
-
 
                     <header class="well well-sm" th:if="${page.specialContents['text_footer'] != null}"
                             th:utext="${page.specialContents['text_footer'].properties['text']}">

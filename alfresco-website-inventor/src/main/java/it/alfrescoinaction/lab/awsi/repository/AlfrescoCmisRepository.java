@@ -264,7 +264,8 @@ public class AlfrescoCmisRepository implements CmisRepository {
         List<Rendition> renditions = getDocumentById(objectId).getRenditions();
 
         ContentStream cs;
-        Optional<Rendition> rendition = renditions.stream().filter(r -> r.getTitle().equals(type)).findFirst();
+        Optional<Rendition> rendition = renditions!=null?
+                renditions.stream().filter(r -> r.getTitle().equals(type)).findFirst():Optional.empty();
 
         if (rendition.isPresent()) {
             cs = rendition.get().getContentStream();
