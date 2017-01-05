@@ -24,7 +24,6 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
-import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.net.URI;
@@ -35,7 +34,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@Repository
+@org.springframework.stereotype.Repository
 public class AlfrescoCmisRepository implements CmisRepository {
 
     private static final Logger logger = Logger.getLogger(AlfrescoCmisRepository.class);
@@ -43,7 +42,7 @@ public class AlfrescoCmisRepository implements CmisRepository {
     private RemoteConnection connection;
 
     @Autowired
-    public AlfrescoCmisRepository (RemoteConnection connection) {
+    public AlfrescoCmisRepository(RemoteConnection connection) {
         this.connection = connection;
     }
 

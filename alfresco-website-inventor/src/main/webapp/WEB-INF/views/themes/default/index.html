@@ -124,21 +124,15 @@
 
                     </article>
 
-                    <header class="well well-sm" th:if="${page.specialContents['text_footer'] != null}"
-                            th:utext="${page.specialContents['text_footer'].properties['text']}">
-                    </header>
                 </div>
 
             </div>
 
-            <div class="row">
-                <footer>
-                    <div>
-                        footer
-                    </div>
-                </footer>
+        </div>
+        <div class="footer">
+            <div th:if="${page.specialContents['text_footer'] != null}"
+                    th:utext="${page.specialContents['text_footer'].properties['text']}">
             </div>
-
         </div>
 
     <script th:src="@{/resource/themes/default/bootstrap-3.3.6/js/jquery-2.2.1.min.js}"></script>

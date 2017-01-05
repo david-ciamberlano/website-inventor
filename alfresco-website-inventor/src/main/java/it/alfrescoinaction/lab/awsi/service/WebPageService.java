@@ -13,11 +13,11 @@ import java.util.*;
 @Service
 public class WebPageService {
 
-    private CmisRepository repository;
+    private CmisRepository cmisRepository;
 
     @Autowired
-    public WebPageService (CmisRepository repository) {
-        this.repository = repository;
+    public WebPageService (CmisRepository cmisRepository) {
+        this.cmisRepository = cmisRepository;
     }
 
     /**
@@ -28,28 +28,28 @@ public class WebPageService {
      */
     public WebPage buildWebPage(String siteId, String id) throws CmisObjectNotFoundException {
 
-        repository.init(siteId);
+        cmisRepository.init(siteId);
 
-        Folder folder = repository.getFolderById(id);
+        Folder folder = cmisRepository.getFolderById(id);
         String folderPath = folder.getPath();
-        boolean isHomepage = repository.isHomePage(folderPath);
+        boolean isHomepage = cmisRepository.isHomePage(folderPath);
 
         WebPage wp = new WebPage(id, folder.getName(), folder.getParentId(), isHomepage,
-                repository.getSiteName(), repository.getSiteTitle(), repository.getSiteDescription());
+                cmisRepository.getSiteName(), cmisRepository.getSiteTitle(), cmisRepository.getSiteDescription());
 
-        wp.setSiteProperties(repository.getSiteProperties());
+        wp.setSiteProperties(cmisRepository.getSiteProperties());
 
         Map<String, String> breadCrumbs = new LinkedHashMap<>();
         if (!isHomepage) {
             // breadcrumbs
-            String relativeFolderPath = folderPath.replace(repository.getAlfrescoDocLibPath() + "/", "");
+            String relativeFolderPath = folderPath.replace(cmisRepository.getAlfrescoDocLibPath() + "/", "");
             String[] pathItems = relativeFolderPath.split("(?=/)");
 
             StringBuilder pathAcc = new StringBuilder();
             for (String pathItem : pathItems) {
                 pathAcc.append(pathItem);
                 String bcName = pathItem.startsWith("/") ? pathItem.substring(1) : pathItem;
-                String currentPathId = repository.getFolderIdByRelativePath(pathAcc.toString());
+                String currentPathId = cmisRepository.getFolderIdByRelativePath(pathAcc.toString());
                 breadCrumbs.put(bcName, currentPathId);
             }
 
@@ -62,7 +62,7 @@ public class WebPageService {
 
 
         // get the links
-        ItemIterable<QueryResult> links = repository.getChildrenFolders(folder);
+        ItemIterable<QueryResult> links = cmisRepository.getChildrenFolders(folder);
         List<Link> linkList = new ArrayList<>((int)links.getTotalNumItems());
         for (QueryResult qr : links) {
             String type = qr.getPropertyById("cmis:baseTypeId").getFirstValue().toString();
@@ -76,12 +76,12 @@ public class WebPageService {
         wp.setLinks(linkList);
 
         // get the Contents
-        ItemIterable<QueryResult> pageContents = repository.getChildrenDocuments(folder, new HashMap<>());
+        ItemIterable<QueryResult> pageContents = cmisRepository.getChildrenDocuments(folder, new HashMap<>());
 
         List<Content> contents = new ArrayList<>(20);
         Map<String,Content> specialContents = new HashMap<>(6);
         for (QueryResult qr : pageContents) {
-            CmisObject cmiso = repository.getDocumentById(qr.getPropertyById("cmis:objectId").getFirstValue().toString());
+            CmisObject cmiso = cmisRepository.getDocumentById(qr.getPropertyById("cmis:objectId").getFirstValue().toString());
             Document doc = (Document)cmiso;
             Optional<Content> content = ContentFactory.buildContent(doc);
 
@@ -105,7 +105,7 @@ public class WebPageService {
         wp.setSpecialContents(specialContents);
 
         // categories
-        List<Folder> categories = repository.getCategories();
+        List<Folder> categories = cmisRepository.getCategories();
         List<Link> categoryList = new LinkedList<>();
         categories.forEach( f -> categoryList.add(new Link( f.getId(), f.getName())));
         wp.setCategories(categoryList);
@@ -115,11 +115,11 @@ public class WebPageService {
 
 
     public String getPageIdByPath(String path) {
-        return repository.getFolderIdByRelativePath(path);
+        return cmisRepository.getFolderIdByRelativePath(path);
     }
 
     public Downloadable<InputStream> getDownloadable(String id) {
-         Document doc = repository.getDocumentById(id);
+         Document doc = cmisRepository.getDocumentById(id);
         return new FileDownloadable(doc.getName(),
                     doc.getContentStream().getStream(),
                     doc.getContentStreamLength(),
@@ -127,9 +127,9 @@ public class WebPageService {
     }
 
     public Downloadable<byte[]> getRendition(String type, String objectId) {
-        Document doc =  repository.getDocumentById(objectId);
+        Document doc =  cmisRepository.getDocumentById(objectId);
 
-        return repository.getRendition(type, objectId, doc.getName());
+        return cmisRepository.getRendition(type, objectId, doc.getName());
     }
 
 

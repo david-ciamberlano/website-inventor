@@ -19,15 +19,12 @@ import javax.servlet.http.HttpServletRequest;
 @Controller
 public class MainController {
 
-    private WebPageService webPageService;
+    private final WebPageService webPageService;
 
     @Autowired
     public MainController (WebPageService webPageService) {
         this.webPageService = webPageService;
     }
-
-    private final String homeTemplate = "page";
-    private final String pageTemplate = "page";
 
     private static final Logger logger = Logger.getLogger(MainController.class);
 
@@ -53,15 +50,10 @@ public class MainController {
         model.addAttribute("sitetitle", wp.getSiteTitle());
         model.addAttribute("sitedescription", wp.getSiteDescription());
 
-        String view = pageTemplate;
-        if (wp.isHomepage()) {
-            view = homeTemplate;
-        }
-
         if(logger.isDebugEnabled()){
             logger.debug("Page Ready: " + id);
         }
-        return view;
+        return "index.html";
     }
 
 

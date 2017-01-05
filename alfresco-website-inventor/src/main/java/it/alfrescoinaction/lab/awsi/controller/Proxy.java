@@ -20,7 +20,7 @@ import java.io.InputStreamReader;
 @Controller
 public class Proxy {
 
-    private WebPageService webPageService;
+    private final WebPageService webPageService;
 
     @Autowired
     public Proxy(WebPageService webPageService) {
@@ -61,6 +61,10 @@ public class Proxy {
 
             default:
                 rend = webPageService.getRendition(type, id);
+        }
+
+        if (rend.getContentLength() < 1) {
+
         }
 
         return ResponseEntity.ok()
