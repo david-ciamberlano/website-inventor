@@ -30,7 +30,7 @@
             </div>
         </nav>
 
-        <div class="container">
+        <footer class="container">
 
             <div class="row">
                 <header>
@@ -125,15 +125,14 @@
                     </article>
 
                 </div>
-
             </div>
 
+            <footer th:if="${page.specialContents['text_footer'] != null}"
+                     th:utext="${page.specialContents['text_footer'].properties['text']}">
+            </footer>
+
         </div>
-        <div class="footer">
-            <div th:if="${page.specialContents['text_footer'] != null}"
-                    th:utext="${page.specialContents['text_footer'].properties['text']}">
-            </div>
-        </div>
+
 
     <script th:src="@{/resource/themes/default/bootstrap-3.3.6/js/jquery-2.2.1.min.js}"></script>
     <script th:src="@{/resource/themes/default/bootstrap-3.3.6/js/bootstrap.min.js}"></script>

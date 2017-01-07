@@ -1,29 +1,33 @@
 package it.alfrescoinaction.lab.awsi.repository;
 
-
+import it.alfrescoinaction.lab.awsi.domain.Content;
 import it.alfrescoinaction.lab.awsi.domain.Downloadable;
+import it.alfrescoinaction.lab.awsi.domain.Link;
 import it.alfrescoinaction.lab.awsi.domain.SiteProperties;
+import it.alfrescoinaction.lab.awsi.domain.ecm.WSIFolder;
 import it.alfrescoinaction.lab.awsi.exceptions.ObjectNotFoundException;
-import org.apache.chemistry.opencmis.client.api.*;
 
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+public interface WSIRepository {
 
-public interface CmisRepository {
-
-    Folder getFolderById(String id) throws NoSuchElementException;
+    WSIFolder getFolderById(String id) throws NoSuchElementException;
 
     String getFolderIdByRelativePath(String path) throws NoSuchElementException;
 
-    ItemIterable<QueryResult> getChildrenFolders(Folder folder);
+    List<Link> getChildrenFolders(WSIFolder folder);
 
-    ItemIterable<QueryResult> getChildrenDocuments(Folder folder, Map<String, String> filters);
 
-    Document getDocumentById(String id) throws NoSuchElementException;
+    Map<String,Content> getChildrenDocuments(WSIFolder folder);
+//
+//    Document getDocumentById(String id) throws NoSuchElementException;
+//
+    List<Link> getCategories();
 
-    List<Folder> getCategories();
+    Downloadable<InputStream> getDownloadable(String id);
 
     boolean isHomePage(String path);
 
@@ -47,6 +51,6 @@ public interface CmisRepository {
      * @param objectId
      * @return
      */
-    Downloadable<byte[]> getRendition(String type, String objectId, String name);
+    Downloadable<byte[]> getRendition(String type, String objectId);
 
 }

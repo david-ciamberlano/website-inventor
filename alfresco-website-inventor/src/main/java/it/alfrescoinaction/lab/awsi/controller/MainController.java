@@ -53,7 +53,7 @@ public class MainController {
         if(logger.isDebugEnabled()){
             logger.debug("Page Ready: " + id);
         }
-        return "index.html";
+        return "index";
     }
 
 
@@ -65,7 +65,7 @@ public class MainController {
         mav.addObject("Invalid Page", exc.getPageId());
         mav.addObject("exception", exc);
         mav.addObject("utl",req.getRequestURL());
-        mav.setViewName("themes/s/error_page");
+        mav.setViewName("themes/default/error_page");
 
         return mav;
     }
@@ -76,7 +76,7 @@ public class MainController {
         mav.addObject("Connection exception", exc.getPageId());
         mav.addObject("exception", exc);
         mav.addObject("utl",req.getRequestURL());
-        mav.setViewName("themes/s/error_page");
+        mav.setViewName("themes/default/error_page");
 
         return mav;
     }
@@ -87,7 +87,7 @@ public class MainController {
         mav.addObject("Connection exception", exc.getMessage());
         mav.addObject("exception", exc);
         mav.addObject("utl",req.getRequestURL());
-        mav.setViewName("themes/s/error_page");
+        mav.setViewName("themes/default/error_page");
 
         return mav;
     }

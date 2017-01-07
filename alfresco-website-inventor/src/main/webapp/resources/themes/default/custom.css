@@ -18,3 +18,9 @@ ul.nav.navbar-nav {
     text-align: center;
 
 }
+
+article {
+    border-bottom: 1px dashed lightgray;
+    padding-bottom: 30px;
+    margin-bottom: 50px;
+}
