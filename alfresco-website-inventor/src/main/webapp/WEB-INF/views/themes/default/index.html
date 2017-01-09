@@ -75,14 +75,14 @@
                         <th:block th:switch="${content.type}" >
 
                             <!--TEXTS-->
-                            <div th:case="${T(it.alfrescoinaction.lab.awsi.domain.ContentType).TEXT}">
+                            <div th:class="content_text" th:case="${T(it.alfrescoinaction.lab.awsi.domain.ContentType).TEXT}">
                                 <h2 th:text="${content.title}"></h2>
                                 <h3 th:text="${content.description} ?: _"></h3>
                                 <div th:utext="${content.properties['text']}"></div>
                             </div>
 
                             <!--IMAGES-->
-                            <figure th:case="${T(it.alfrescoinaction.lab.awsi.domain.ContentType).IMAGE}">
+                            <figure th:class="content_image" th:case="${T(it.alfrescoinaction.lab.awsi.domain.ContentType).IMAGE}">
                                 <a th:href="@{|/proxy/d/${content.id}|}" class="thumbnail">
                                     <img th:src="@{|/proxy/r/preview/${content.id}|}" th:alt="${content.getName()}" />
                                 </a>
@@ -95,7 +95,7 @@
                             </figure>
 
                             <!--OTHERS-->
-                            <div th:case="*" class="media margin-bottom-lg">
+                            <div th:class="content_other" th:case="*" class="media margin-bottom-lg">
                                 <div class="media-left">
                                     <a th:href="@{|/proxy/d/${content.id}|}" target="_blank">
                                         <img class="media-object" th:src="@{|/proxy/r/thumb/${content.id}|}" th:alt="${content.properties['name']}" />
