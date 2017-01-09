@@ -5,10 +5,9 @@ import it.alfrescoinaction.lab.awsi.domain.*;
 import it.alfrescoinaction.lab.awsi.exceptions.ObjectNotFoundException;
 import it.alfrescoinaction.lab.awsi.exceptions.PageNotFoundException;
 import org.apache.chemistry.opencmis.client.api.*;
-import org.apache.chemistry.opencmis.client.runtime.util.EmptyItemIterable;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
-import org.apache.chemistry.opencmis.commons.exceptions.CmisBaseException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
+import org.apache.chemistry.opencmis.commons.impl.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -20,23 +19,33 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
+import org.commonmark.node.Node;
+import org.commonmark.parser.Parser;
+import org.commonmark.renderer.html.HtmlRenderer;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Whitelist;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Repository;
-import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.core.io.Resource;
 
-import javax.annotation.PostConstruct;
 import java.io.*;
 import java.net.URI;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@Repository
-public class AlfrescoCmisRepository implements CmisRepository {
+@org.springframework.stereotype.Repository
+public class AlfrescoCmisRepository {
 
-    @Autowired private RemoteConnection connection;
+//    private static final Logger logger = Logger.getLogger(AlfrescoCmisRepository.class);
+
+    private RemoteConnection connection;
+
+    @Autowired
+    public AlfrescoCmisRepository(RemoteConnection connection) {
+        this.connection = connection;
+    }
 
     @Value("${alfresco.serverProtocol}") private String alfrescoServerProtocol;
     @Value("${alfresco.serverUrl}") private String alfrescoServer;
@@ -47,16 +56,14 @@ public class AlfrescoCmisRepository implements CmisRepository {
     private String alfrescoDocLibPath;
     private String alfrescoSitePath;
 
-    private Folder docLibFolder;
-    private Folder siteFolder;
-
     private String siteName;
     private String siteDescription;
     private String siteTitle;
     private String siteId;
 
+    private Resource defaultIcon;
 
-    @Override
+
     public void init(String siteId) {
 
         // get site & doclib folders
@@ -83,7 +90,6 @@ public class AlfrescoCmisRepository implements CmisRepository {
     }
 
 
-    @Override
     public List<Folder> getCategories() {
         Session session = connection.getSession();
         Folder alfrescoDocLibFolder = (Folder)session.getObjectByPath(alfrescoDocLibPath);
@@ -102,7 +108,6 @@ public class AlfrescoCmisRepository implements CmisRepository {
     }
 
 
-    @Override
     public Folder getFolderById(String id) throws PageNotFoundException {
         Session session = connection.getSession();
 
@@ -115,11 +120,12 @@ public class AlfrescoCmisRepository implements CmisRepository {
             obj = session.getObject(id);
         }
         catch(CmisObjectNotFoundException e) {
+//            logger.error("Page not found. " + e.getMessage());
             throw new PageNotFoundException(id);
         }
 
         // procceed only if the node is a folder
-        if (obj.getBaseTypeId().value().equals("cmis:folder")){
+        if ("cmis:folder".equals(obj.getBaseTypeId().value())){
             Folder folder = (Folder)obj;
             return folder;
         }
@@ -135,7 +141,6 @@ public class AlfrescoCmisRepository implements CmisRepository {
      * @return
      * @throws PageNotFoundException
      */
-    @Override
     public String getFolderIdByRelativePath(String realtivePath) throws PageNotFoundException {
         Session session = connection.getSession();
 
@@ -160,7 +165,6 @@ public class AlfrescoCmisRepository implements CmisRepository {
 
     }
 
-    @Override
     public Document getDocumentById(String id) throws PageNotFoundException {
         Session session = connection.getSession();
 
@@ -183,10 +187,9 @@ public class AlfrescoCmisRepository implements CmisRepository {
         }
     }
 
-    @Override
-    public ItemIterable<QueryResult> getChildrenFolders(Folder folder) {
+    public ItemIterable<QueryResult> getChildrenFolders(String folderId) {
         String queryTemplate = "SELECT F.* FROM cmis:folder F WHERE IN_FOLDER('%s') ORDER BY F.cmis:name";
-        String query = String.format(queryTemplate,folder.getId());
+        String query = String.format(queryTemplate,folderId);
 
         Session session = connection.getSession();
         OperationContext oc = session.createOperationContext();
@@ -196,141 +199,17 @@ public class AlfrescoCmisRepository implements CmisRepository {
         return children;
     }
 
-    @Override
-    public ItemIterable<QueryResult> getChildrenDocuments(Folder folder, Map<String, String> filters) {
+    public ItemIterable<QueryResult> getChildrenDocuments(String folderId) {
 
-        String query = "SELECT D.* FROM cmis:document D WHERE IN_FOLDER('" + folder.getId() + "') ORDER BY D.cmis:name ";
+        String query = "SELECT D.* FROM cmis:document D WHERE IN_FOLDER('" + folderId + "') ORDER BY D.cmis:name ";
 
         Session session = connection.getSession();
         OperationContext oc = session.createOperationContext();
         oc.setRenditionFilterString("*");
-        ItemIterable<QueryResult> children = session.query(query, false, oc);
 
-        return children;
+        return session.query(query, false, oc);
     }
 
-    @Override
-    public ItemIterable<QueryResult> search(String folderId, SearchFilters filters) {
-
-        boolean withScore = false;
-
-        String queryBaseTemplate = "SELECT D.* FROM %s D WHERE IN_TREE(D,'workspace://SpacesStore/%s') %s AND D.cmis:name <> '.*'";
-        String queryWithScoreTemplate = "SELECT D.*, SCORE() rank FROM %s D WHERE IN_TREE(D,'workspace://SpacesStore/%s') %s AND D.cmis:name <> '.*' ORDER BY rank DESC";
-
-        String queryFilters = "";
-        String queryFilterTemplateTEXT = "AND D.%s LIKE '%s' ";
-        String queryFilterTemplateDATEFROM = "AND D.%s >= TIMESTAMP '%sT00:00:00.000+00:00' ";
-        String queryFilterTemplateDATETO = "AND D.%s <= TIMESTAMP '%sT00:00:00.000+00:00' ";
-        String queryFilterTemplateDATE = "AND D.%s = TIMESTAMP '%sT00:00:00.000+00:00' ";
-        String queryFilterTemplateNUM = "AND D.%s = %d";
-        String queryFilterTemplateNUM_MIN = "AND D.%s >=  %d";
-        String queryFilterTemplateNUM_MAX = "AND D.%s <=  %d";
-        String queryFilterTemplateFULLTEXT = "AND CONTAINS(D,'%s')";
-        String queryFilterTemplateFULLTEXTEXACT = "AND CONTAINS(D,'\\'%s\\'')";
-
-        List <SearchFilterItem> filterItems = filters.getFilterItems();
-
-        for (SearchFilterItem filter : filterItems) {
-
-            if (!filter.getContent().isEmpty()) {
-                switch (filter.getType()) {
-                    case "TEXT": {
-                        queryFilters += String.format(queryFilterTemplateTEXT, filter.getId(), filter.getContent());
-                        break;
-                    }
-
-                    case "%TEXT": {
-                        queryFilters += String.format(queryFilterTemplateTEXT, filter.getId(), "%" + filter.getContent());
-                        break;
-                    }
-
-                    case "TEXT%": {
-                        queryFilters += String.format(queryFilterTemplateTEXT, filter.getId(), filter.getContent() + "%");
-                        break;
-                    }
-
-                    case "%TEXT%": {
-                        queryFilters += String.format(queryFilterTemplateTEXT, filter.getId(), "%" + filter.getContent() + "%");
-                        break;
-                    }
-
-                    case "DATE": {
-                        String formattedDate = this.getFormattedDate (filter.getContent(), filter.getType());
-                        if (!formattedDate.isEmpty()) {
-                            queryFilters += String.format(queryFilterTemplateDATE, filter.getId(), formattedDate);
-                        }
-                        break;
-                    }
-
-                    case "DATE_FROM": {
-                        String formattedDate = this.getFormattedDate (filter.getContent(), filter.getType());
-                        if (!formattedDate.isEmpty()) {
-                            queryFilters += String.format(queryFilterTemplateDATEFROM, filter.getId(), formattedDate);
-                        }
-                        break;
-                    }
-
-                    case "DATE_TO": {
-                        String formattedDate = this.getFormattedDate (filter.getContent(), filter.getType());
-                        if (!formattedDate.isEmpty()) {
-                            queryFilters += String.format(queryFilterTemplateDATETO, filter.getId(), formattedDate);
-                        }
-                        break;
-                    }
-
-                    // FULLTEXT must be always the last item
-                    case "FULLTEXT": {
-                        queryFilters += String.format(queryFilterTemplateFULLTEXT, filter.getContent());
-                        withScore = true;
-                        break;
-                    }
-
-                    case "FULLTEXT_E": {
-                        queryFilters += String.format(queryFilterTemplateFULLTEXTEXACT, filter.getContent());
-                        break;
-                    }
-
-                }
-            }
-        }
-
-        // check if at least 1 field is valid (otherwise all the repository will be searched)
-        if (queryFilters.isEmpty()) {
-            return new EmptyItemIterable<>();
-        }
-
-
-        String typeName = "cmis:document";
-
-        String queryTemplate;
-        if(withScore) {
-            queryTemplate = queryWithScoreTemplate;
-        }
-        else {
-            queryTemplate = queryBaseTemplate;
-        }
-
-        String query = String.format(queryTemplate, typeName, folderId, queryFilters);
-
-        Session session = connection.getSession();
-
-        OperationContext oc = session.createOperationContext();
-        oc.setRenditionFilterString("*");
-
-        ItemIterable<QueryResult> children;
-        try {
-            children = session.query(query, false, oc);
-            // if the query is invalid, the following row throws an exception
-            children.getTotalNumItems();
-        }
-        catch (Exception e) {
-            children = new EmptyItemIterable<>();
-        }
-
-        return children;
-    }
-
-    @Override
     public boolean isHomePage(String path) {
         return alfrescoDocLibPath.equals(path);
     }
@@ -378,7 +257,8 @@ public class AlfrescoCmisRepository implements CmisRepository {
         List<Rendition> renditions = getDocumentById(objectId).getRenditions();
 
         ContentStream cs;
-        Optional<Rendition> rendition = renditions.stream().filter(r -> r.getTitle().equals(type)).findFirst();
+        Optional<Rendition> rendition = renditions!=null?
+                renditions.stream().filter(r -> r.getTitle().equals(type)).findFirst():Optional.empty();
 
         if (rendition.isPresent()) {
             cs = rendition.get().getContentStream();
@@ -398,7 +278,7 @@ public class AlfrescoCmisRepository implements CmisRepository {
 
     }
 
-    public Downloadable<byte[]> getRenditionRest(String type, String objectId, String name) throws ObjectNotFoundException {
+    private Downloadable<byte[]> getRenditionRest(String type, String objectId, String name) throws ObjectNotFoundException {
 
         // I'm not using cmis because it doesn't trigger the thumbnail generetion process
         // The rest service generate the thumbnail or eventually return the default placeholder
@@ -427,14 +307,14 @@ public class AlfrescoCmisRepository implements CmisRepository {
 
                 Downloadable<byte[]> rend;
                 //TODO replace magic number
-                if (entity.getContentLength() < 1024*1024 || entity.getContentLength() > 0) {
+                if (entity.getContentLength() < 1024*1024 && entity.getContentLength() > 0) {
                     byte[] buffer = EntityUtils.toByteArray(entity);
 //                    byte[] buffer = new byte[((Long)entity.getContentLength()).intValue()];
 //                    entity.getContent().read(buffer);
 
                     String mimetype = entity.getContentType().getValue();
 
-                    rend = new RenditionDownloadable (name, buffer, entity.getContentLength(), mimetype);
+                    rend = new RenditionDownloadable (name, buffer, buffer.length, mimetype);
                     return rend;
                 }
                 else {
@@ -485,7 +365,7 @@ public class AlfrescoCmisRepository implements CmisRepository {
 
         }
         else if (isValid(date,"DATE")) {
-            String [] datePart = date.split("\\-");
+            String [] datePart = date.split("-");
             if (datePart.length == 3) {
                 formattedDate = datePart[2]+"-"+datePart[1]+"-"+datePart[0];
             }
@@ -519,7 +399,7 @@ public class AlfrescoCmisRepository implements CmisRepository {
         return isValid;
     }
 
-    public static byte[] toByteArray(InputStream in) throws IOException {
+    private static byte[] toByteArray(InputStream in) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         int read = 0;
         byte[] buffer = new byte[1024];
@@ -530,6 +410,263 @@ public class AlfrescoCmisRepository implements CmisRepository {
         }
         out.close();
         return out.toByteArray();
+    }
+
+
+    static Optional<Content> buildContent(Document doc) {
+
+        int priority = getDocumentPriority(doc);
+        String name = getDocumentName(doc);
+        String title = getDocumentTitle(doc);
+        String description = getDocumentDescription(doc);
+        String mimeType = doc.getContentStreamMimeType();
+
+        // check if the document is hidden and not a special one
+        if (name.startsWith(".") && !name.startsWith(".header") && !name.startsWith(".footer")) {
+            return Optional.empty();
+        }
+
+        // check if mimetype is not null
+        if (mimeType == null || mimeType.isEmpty()) {
+            return Optional.empty();
+        }
+
+        switch (mimeType) {
+
+            case "text/html":
+            case "text/markdown":
+            case "text/plain": {
+                ContentType textType;
+
+                switch (doc.getName()) {
+
+                    case ".header.txt":
+                    case ".header.md":
+                    case ".header.html":
+                    case ".header": {
+                        textType = ContentType.TEXT_HEADER;
+                        break;
+                    }
+
+                    case ".footer.txt":
+                    case ".footer.md":
+                    case ".footer.html":
+                    case ".footer": {
+                        textType = ContentType.TEXT_FOOTER;
+                        break;
+                    }
+
+                    default:
+                        textType = ContentType.TEXT;
+                }
+
+                Content textContent = new ContentImpl(doc.getId(), name, title, description,
+                        doc.getContentStreamMimeType(), textType, priority);
+
+                Map<String,String> props = extractProperties(doc.getProperties());
+
+                textContent.setProperties(props);
+
+                try (InputStream in = doc.getContentStream().getStream()) {
+                    String text = IOUtils.readAllLines(in);
+
+                    String safeText;
+                    // sanitize html (or other text type)
+                    if ("text/html".equals(mimeType)){
+                        safeText = Jsoup.clean(text, Whitelist.relaxed());
+                    }
+                    else if (doc.getName().endsWith(".md")) {
+                        Parser parser = Parser.builder().build();
+                        Node document = parser.parse(text);
+                        HtmlRenderer renderer = HtmlRenderer.builder().build();
+                        safeText = renderer.render(document);
+                    }
+                    else {
+                        safeText = text2html(text);
+                    }
+
+                    props.put("text", safeText);
+                } catch (Exception e) {
+                    //TODO log
+                    props.put("text", "");
+                }
+
+                textContent.setProperties(props);
+
+                return Optional.of(textContent);
+            }
+
+
+            case "image/jpeg":
+            case "image/png": {
+
+                ContentType imgType;
+                switch (doc.getName()) {
+
+                    case ".header.png":
+                    case ".header.jpg": {
+                        imgType = ContentType.IMAGE_HEADER;
+                        break;
+                    }
+
+                    case ".footer.png":
+                    case ".footer.jpg": {
+                        imgType = ContentType.IMAGE_FOOTER;
+                        break;
+                    }
+
+                    default:
+                        imgType = ContentType.IMAGE;
+                }
+
+                Content imageContent = new ContentImpl(doc.getId(), name, title, description,
+                        doc.getContentStreamMimeType(), imgType, priority);
+
+                imageContent.setRenditions(buildRenditions(doc));
+
+                Map<String,String> props = extractProperties(doc.getProperties());
+
+                long contentSizeInMB = Math.round(doc.getContentStreamLength()/(1024*1024));
+                props.put("content_size",String.valueOf(contentSizeInMB));
+
+                imageContent.setProperties(props);
+
+                return Optional.of(imageContent);
+            }
+
+            default: {
+                // caso di file generico
+                Content content = new ContentImpl(doc.getId(), name, title, description,
+                        doc.getContentStreamMimeType(), ContentType.GENERIC, priority);
+
+                content.setRenditions(buildRenditions(doc));
+
+                // set all the properties as string---
+                // in this way I can use them in the view without casting
+                content.setProperties(extractProperties(doc.getProperties()));
+
+                return Optional.of(content);
+            }
+        }
+
+    }
+
+
+
+    //****************** private ********************
+
+    private static Map<String,String> extractProperties(List<Property<?>> properties) {
+        Map<String,String> props = new HashMap<>();
+
+        for (Property property : properties) {
+            switch (property.getType().value()) {
+                case "datetime": {
+                    GregorianCalendar propertyDate = (GregorianCalendar)property.getFirstValue();
+                    if (propertyDate != null) {
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                        sdf.setCalendar(propertyDate);
+                        props.put(property.getLocalName(), sdf.format(propertyDate.getTime()));
+                    }
+                    break;
+                }
+
+                default:
+                    props.put(property.getLocalName(), property.getValueAsString());
+            }
+        }
+
+        return props;
+    }
+
+    private static Map<String,String> buildRenditions(Document doc) {
+        Map<String,String> rends = new HashMap<>();
+        List<Rendition> renditions = doc.getRenditions();
+        if (renditions!=null && renditions.size() > 0) {
+            for (Rendition rendition : renditions) {
+                rends.put(rendition.getTitle(),rendition.getStreamId());
+            }
+        }
+        else {
+            //TODO Default icon
+
+        }
+
+        return rends;
+    }
+
+
+    private static String getDocumentName(Document doc) {
+
+        String name = doc.getName();
+        String regex = "^(#\\d{1,3} )?(.*)";
+        Pattern p = Pattern.compile(regex);
+        Matcher m = p.matcher(name);
+
+        if (m.find()) {
+            name = m.group(2);
+        }
+
+        return name;
+    }
+
+    private static String getDocumentTitle(Document doc) {
+        return doc.getProperty("cm:title")!=null?doc.getProperty("cm:title").getValueAsString():"";
+    }
+
+    private static String getDocumentDescription(Document doc) {
+        return doc.getProperty("cm:description")!=null?doc.getProperty("cm:description").getValueAsString():"";
+    }
+
+    private static int getDocumentPriority(Document doc) {
+        int priority = 900;
+
+        String name = doc.getName();
+        String regex = "^#(\\d{1,3}) ";
+        Pattern p = Pattern.compile(regex);
+        Matcher m = p.matcher(name);
+
+        if (m.find()) {
+            priority = Integer.parseInt(m.group(1));
+        }
+
+        return priority;
+    }
+
+    /**
+     * convert plain text to html
+     * (snippet copied from stackoverflow)
+     */
+    private static String text2html(String text) {
+        StringBuilder builder = new StringBuilder();
+        boolean previousWasASpace = false;
+        for(char c : text.toCharArray()) {
+            if(c == ' ') {
+                if( previousWasASpace ) {
+                    builder.append("&nbsp;");
+                    previousWasASpace = false;
+                    continue;
+                }
+                previousWasASpace = true;
+            } else {
+                previousWasASpace = false;
+            }
+
+            switch(c) {
+                case '<': builder.append("&lt;"); break;
+                case '>': builder.append("&gt;"); break;
+                case '&': builder.append("&amp;"); break;
+                case '"': builder.append("&quot;"); break;
+                case '\n': builder.append("<br>"); break;
+                case '\t': builder.append("&nbsp;&nbsp;&nbsp;&nbsp;"); break;
+                default:
+                    if( c < 128 ) {
+                        builder.append(c);
+                    } else {
+                        builder.append("&#").append((int)c).append(";");
+                    }
+            }
+        }
+        return builder.toString();
     }
 
 

@@ -11,7 +11,7 @@ public class ConnectionException extends CmisBaseException {
 
     @Override
     public String getExceptionName() {
-        return "Repository not found";
+        return "CmisRepository not found";
     }
 
 }

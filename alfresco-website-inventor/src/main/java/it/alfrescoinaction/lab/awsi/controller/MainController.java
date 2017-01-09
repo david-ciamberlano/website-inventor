@@ -1,9 +1,5 @@
 package it.alfrescoinaction.lab.awsi.controller;
 
-import com.sun.jndi.toolkit.dir.SearchFilter;
-import it.alfrescoinaction.lab.awsi.domain.SearchFilterItem;
-import it.alfrescoinaction.lab.awsi.domain.SearchFilters;
-import it.alfrescoinaction.lab.awsi.domain.SiteProperty;
 import it.alfrescoinaction.lab.awsi.domain.WebPage;
 import it.alfrescoinaction.lab.awsi.exceptions.ConnectionException;
 import it.alfrescoinaction.lab.awsi.exceptions.InvalidParameterException;
@@ -23,15 +19,14 @@ import javax.servlet.http.HttpServletRequest;
 @Controller
 public class MainController {
 
-    @Autowired
-    private WebPageService webPageService;
+    private final WebPageService webPageService;
 
-    private final String homeTemplate = "page";
-    private final String pageTemplate = "page";
-    private final String searchResultTemplate = "searchresult";
+    @Autowired
+    public MainController (WebPageService webPageService) {
+        this.webPageService = webPageService;
+    }
 
     private static final Logger logger = Logger.getLogger(MainController.class);
-
 
     @RequestMapping("/{siteid}")
     public String homepage(Model model, @PathVariable("siteid") String site) {
@@ -55,50 +50,11 @@ public class MainController {
         model.addAttribute("sitetitle", wp.getSiteTitle());
         model.addAttribute("sitedescription", wp.getSiteDescription());
 
-        // init the model attribute for the form
-        SearchFilters filters = new SearchFilters();
-
-        for (SiteProperty sprop : wp.getSiteProperties().getSearchFields()){
-            filters.addFilterItem(sprop.getLabel(),sprop.getPropertyId(),sprop.getType());
-        }
-
-        model.addAttribute("searchFilters", filters);
-
-        String view = pageTemplate;
-        if (wp.isHomepage()) {
-            view = homeTemplate;
-        }
-
         if(logger.isDebugEnabled()){
             logger.debug("Page Ready: " + id);
         }
-        return view;
+        return "index";
     }
-
-    @RequestMapping(value = "/{siteid}/search", method = RequestMethod.POST)
-    public String search( @ModelAttribute SearchFilters searchFilters, Model model,
-                          @PathVariable("siteid") String siteId) {
-
-        if(logger.isDebugEnabled()){
-            logger.debug("Search Request");
-        }
-
-        WebPage wp = webPageService.buildSearchResultPage(siteId, searchFilters);
-
-        model.addAttribute("page", wp);
-        model.addAttribute("siteid", siteId);
-        model.addAttribute("sitename", wp.getSiteName());
-        model.addAttribute("sitedescription", wp.getSiteDescription());
-
-        String view = searchResultTemplate;
-
-        if(logger.isDebugEnabled()){
-            logger.debug("Search Result ready");
-        }
-
-        return view;
-    }
-
 
 
     //------------- EXCEPTION -------------
@@ -109,7 +65,7 @@ public class MainController {
         mav.addObject("Invalid Page", exc.getPageId());
         mav.addObject("exception", exc);
         mav.addObject("utl",req.getRequestURL());
-        mav.setViewName("themes/s/error_page");
+        mav.setViewName("themes/default/error_page");
 
         return mav;
     }
@@ -120,7 +76,7 @@ public class MainController {
         mav.addObject("Connection exception", exc.getPageId());
         mav.addObject("exception", exc);
         mav.addObject("utl",req.getRequestURL());
-        mav.setViewName("themes/s/error_page");
+        mav.setViewName("themes/default/error_page");
 
         return mav;
     }
@@ -131,7 +87,7 @@ public class MainController {
         mav.addObject("Connection exception", exc.getMessage());
         mav.addObject("exception", exc);
         mav.addObject("utl",req.getRequestURL());
-        mav.setViewName("themes/s/error_page");
+        mav.setViewName("themes/default/error_page");
 
         return mav;
     }

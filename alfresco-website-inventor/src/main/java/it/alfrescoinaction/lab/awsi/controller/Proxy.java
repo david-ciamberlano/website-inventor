@@ -20,8 +20,12 @@ import java.io.InputStreamReader;
 @Controller
 public class Proxy {
 
+    private final WebPageService webPageService;
+
     @Autowired
-    private WebPageService webPageService;
+    public Proxy(WebPageService webPageService) {
+        this.webPageService = webPageService;
+    }
 
     //Downloads
     @RequestMapping(value = "proxy/d/{id}", method = RequestMethod.GET)
@@ -57,6 +61,10 @@ public class Proxy {
 
             default:
                 rend = webPageService.getRendition(type, id);
+        }
+
+        if (rend.getContentLength() < 1) {
+
         }
 
         return ResponseEntity.ok()
