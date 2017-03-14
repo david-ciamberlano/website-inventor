@@ -27,7 +27,7 @@ public class WebPageService {
      * @return the WebPage object
      * @throws ObjectNotFoundException
      */
-    public WebPage buildWebPage(String siteId, String id) throws ObjectNotFoundException {
+    public WebPage  buildWebPage(String siteId, String id) throws ObjectNotFoundException {
 
         wsiRepository.init(siteId);
 

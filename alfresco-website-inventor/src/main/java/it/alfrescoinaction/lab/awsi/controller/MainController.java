@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 
 
 @Controller
@@ -83,6 +84,17 @@ public class MainController {
 
     @ExceptionHandler(InvalidParameterException.class)
     public ModelAndView handleInvParamException(HttpServletRequest req, InvalidParameterException exc) {
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("Connection exception", exc.getMessage());
+        mav.addObject("exception", exc);
+        mav.addObject("utl",req.getRequestURL());
+        mav.setViewName("themes/default/error_page");
+
+        return mav;
+    }
+
+    @ExceptionHandler(IOException.class)
+    public ModelAndView handleIOException(HttpServletRequest req, IOException exc) {
         ModelAndView mav = new ModelAndView();
         mav.addObject("Connection exception", exc.getMessage());
         mav.addObject("exception", exc);

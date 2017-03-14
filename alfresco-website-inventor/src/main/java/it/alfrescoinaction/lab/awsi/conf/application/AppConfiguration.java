@@ -15,6 +15,8 @@ import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ITemplateResolver;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
+import java.io.FileNotFoundException;
+
 @EnableWebMvc
 @Configuration
 @ComponentScan(basePackages = { "it.alfrescoinaction.lab.awsi.controller",
