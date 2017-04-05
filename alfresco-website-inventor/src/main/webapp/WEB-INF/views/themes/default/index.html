@@ -5,7 +5,7 @@
         <meta charset="utf-8"/>
         <title th:text="${sitetitle?:sitename}"></title>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-        <link th:href="@{/resource/themes/default/bootstrap-3.3.6/css/bootstrap.min.css}" rel="stylesheet" />
+        <link th:href="@{/resource/themes/default/bootstrap-3.3.6/css/bootstrap.2.min.css}" rel="stylesheet" />
         <link th:href="@{/resource/themes/default/custom.css}" rel="stylesheet" />
     </head>
     <body>
@@ -30,24 +30,28 @@
             </div>
         </nav>
 
-        <footer class="container">
+        <div class="container">
 
             <div class="row">
-                <header>
-                    <div>
-                        <h1><span th:text="${sitetitle?:sitename}"/><br/><small th:text="${sitedescription}"></small></h1>
-                    </div>
-                </header>
+                <div class="col-md-12">
+                    <header>
+                        <div>
+                            <h1><span th:text="${sitetitle?:sitename}"/><br/><small th:text="${sitedescription}"></small></h1>
+                        </div>
+                    </header>
+                </div>
             </div>
 
             <div class="row">
-                <!-- BREADCRUMBS -->
-                <ol class="breadcrumb">
-                    <li class="active" th:if="${page.homepage}">Home</li>
-                    <li th:if="${not page.homepage}"><a th:href="@{|/${siteid}|}">Home</a></li>
-                    <li th:each="bcEntry : ${page.breadcrumbs}"><a th:href="@{|/${siteid}/page/${bcEntry.value}|}" th:text="${bcEntry.key}"></a></li>
-                    <li class="active" th:text="${page.title}"></li>
-                </ol>
+                <div class="col-md-12">
+                    <!-- BREADCRUMBS -->
+                    <ol class="breadcrumb">
+                        <li class="active" th:if="${page.homepage}">Home</li>
+                        <li th:if="${not page.homepage}"><a th:href="@{|/${siteid}|}">Home</a></li>
+                        <li th:each="bcEntry : ${page.breadcrumbs}"><a th:href="@{|/${siteid}/page/${bcEntry.value}|}" th:text="${bcEntry.key}"></a></li>
+                        <li class="active" th:text="${page.title}"></li>
+                    </ol>
+                </div>
             </div>
 
             <div class="row">

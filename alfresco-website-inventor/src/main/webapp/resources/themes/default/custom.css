@@ -20,7 +20,9 @@ ul.nav.navbar-nav {
 }
 
 article {
-    border-bottom: 1px dashed lightgray;
-    padding-bottom: 30px;
-    margin-bottom: 50px;
+    margin-bottom: 30px;
+    background: #3e444c;
+    padding: 20px;
+    border-radius: 3px;
+    border: 1px solid rgba(0,0,0,0.6);
 }

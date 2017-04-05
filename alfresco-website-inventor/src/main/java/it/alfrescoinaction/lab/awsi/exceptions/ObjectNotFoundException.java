@@ -1,5 +1,6 @@
 package it.alfrescoinaction.lab.awsi.exceptions;
 
+
 public class ObjectNotFoundException extends RuntimeException {
     private static final long serialVersionUID = 3584325872912318L;
 

@@ -80,11 +80,11 @@ public class AlfrescoCmisRepository {
 
         QueryResult siteObj = siteFolders.iterator().next();
 
-        this.alfrescoSitePath = siteObj.getPropertyById("cmis:path").getFirstValue().toString();
-        this.alfrescoDocLibPath = alfrescoSitePath + "/documentLibrary";
-        this.siteName = siteObj.getPropertyById("cmis:name").getFirstValue().toString();
-        this.siteTitle = siteObj.getPropertyById("cm:title").getFirstValue().toString();
-        this.siteDescription = siteObj.getPropertyById("cmis:description").getFirstValue().toString();
+        alfrescoSitePath = siteObj.getPropertyById("cmis:path").getFirstValue().toString();
+        alfrescoDocLibPath = alfrescoSitePath + "/documentLibrary";
+        siteName = siteObj.getPropertyById("cmis:name").getFirstValue().toString();
+        siteTitle = siteObj.getPropertyById("cm:title").getFirstValue().toString();
+        siteDescription = siteObj.getPropertyById("cmis:description").getFirstValue().toString();
 
 //        this.getSiteProperties();
     }
