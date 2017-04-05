@@ -3,6 +3,7 @@ package it.alfrescoinaction.lab.awsi.controller;
 import it.alfrescoinaction.lab.awsi.domain.WebPage;
 import it.alfrescoinaction.lab.awsi.exceptions.ConnectionException;
 import it.alfrescoinaction.lab.awsi.exceptions.InvalidParameterException;
+import it.alfrescoinaction.lab.awsi.exceptions.ObjectNotFoundException;
 import it.alfrescoinaction.lab.awsi.exceptions.PageNotFoundException;
 import it.alfrescoinaction.lab.awsi.service.WebPageService;
 
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 
 
 @Controller
@@ -65,7 +67,18 @@ public class MainController {
         mav.addObject("Invalid Page", exc.getPageId());
         mav.addObject("exception", exc);
         mav.addObject("utl",req.getRequestURL());
-        mav.setViewName("themes/default/error_page");
+        mav.setViewName("error");
+
+        return mav;
+    }
+
+    @ExceptionHandler(ObjectNotFoundException.class)
+    public ModelAndView handlePageNotFoundError(HttpServletRequest req, ObjectNotFoundException exc) {
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("Invalid Page", exc.getPageId());
+        mav.addObject("exception", exc);
+        mav.addObject("utl",req.getRequestURL());
+        mav.setViewName("error");
 
         return mav;
     }
@@ -76,7 +89,7 @@ public class MainController {
         mav.addObject("Connection exception", exc.getPageId());
         mav.addObject("exception", exc);
         mav.addObject("utl",req.getRequestURL());
-        mav.setViewName("themes/default/error_page");
+        mav.setViewName("error");
 
         return mav;
     }
@@ -87,7 +100,18 @@ public class MainController {
         mav.addObject("Connection exception", exc.getMessage());
         mav.addObject("exception", exc);
         mav.addObject("utl",req.getRequestURL());
-        mav.setViewName("themes/default/error_page");
+        mav.setViewName("error");
+
+        return mav;
+    }
+
+    @ExceptionHandler(IOException.class)
+    public ModelAndView handleIOException(HttpServletRequest req, IOException exc) {
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("Connection exception", exc.getMessage());
+        mav.addObject("exception", exc);
+        mav.addObject("utl",req.getRequestURL());
+        mav.setViewName("error");
 
         return mav;
     }
