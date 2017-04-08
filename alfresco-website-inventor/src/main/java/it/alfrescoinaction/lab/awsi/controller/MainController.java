@@ -7,7 +7,13 @@ import it.alfrescoinaction.lab.awsi.exceptions.ObjectNotFoundException;
 import it.alfrescoinaction.lab.awsi.exceptions.PageNotFoundException;
 import it.alfrescoinaction.lab.awsi.service.WebPageService;
 
+import org.apache.chemistry.opencmis.commons.exceptions.CmisBaseException;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisUnauthorizedException;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.beans.factory.UnsatisfiedDependencyException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -83,10 +89,32 @@ public class MainController {
         return mav;
     }
 
+    @ExceptionHandler(CmisBaseException.class)
+    public ModelAndView handlePageNotFoundError(HttpServletRequest req, CmisObjectNotFoundException exc) {
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("Invalid Page", exc.getMessage());
+        mav.addObject("exception", exc);
+        mav.addObject("utl",req.getRequestURL());
+        mav.setViewName("error");
+
+        return mav;
+    }
+
+    @ExceptionHandler(CmisRuntimeException.class)
+    public ModelAndView handlePageNotFoundError(HttpServletRequest req, CmisRuntimeException exc) {
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("Invalid Page", exc.getMessage());
+        mav.addObject("exception", exc);
+        mav.addObject("utl",req.getRequestURL());
+        mav.setViewName("error");
+
+        return mav;
+    }
+
     @ExceptionHandler(ConnectionException.class)
     public ModelAndView handleConnectionError(HttpServletRequest req, PageNotFoundException exc) {
         ModelAndView mav = new ModelAndView();
-        mav.addObject("Connection exception", exc.getPageId());
+        mav.addObject("Connection exception", exc.getMessage());
         mav.addObject("exception", exc);
         mav.addObject("utl",req.getRequestURL());
         mav.setViewName("error");
@@ -115,6 +143,18 @@ public class MainController {
 
         return mav;
     }
+
+    @ExceptionHandler(BeanCreationException.class)
+    public ModelAndView handleIOException(HttpServletRequest req, BeanCreationException exc) {
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("Connection exception", exc.getMessage());
+        mav.addObject("exception", exc);
+        mav.addObject("utl",req.getRequestURL());
+        mav.setViewName("error");
+
+        return mav;
+    }
+
 
 
 

@@ -216,7 +216,7 @@ public class AlfrescoCmisRepository {
 
 
     public SiteProperties getSiteProperties() throws ObjectNotFoundException {
-        String propertiesFilePath = alfrescoSitePath + "/awsi.config";
+        String propertiesFilePath = alfrescoDocLibPath + "/.awsi.config";
 
         Session session = connection.getSession();
 
@@ -439,6 +439,11 @@ public class AlfrescoCmisRepository {
                 ContentType textType;
 
                 switch (doc.getName()) {
+
+                    case ".awsi.config": {
+                        textType = ContentType.HIDDEN;
+                        break;
+                    }
 
                     case ".header.txt":
                     case ".header.md":

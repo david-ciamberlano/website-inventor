@@ -49,7 +49,7 @@
                         <li class="active" th:if="${page.homepage}">Home</li>
                         <li th:if="${not page.homepage}"><a th:href="@{|/${siteid}|}">Home</a></li>
                         <li th:each="bcEntry : ${page.breadcrumbs}"><a th:href="@{|/${siteid}/page/${bcEntry.value}|}" th:text="${bcEntry.key}"></a></li>
-                        <li class="active" th:text="${page.title}"></li>
+                        <li class="active" th:if="${not page.homepage}" th:text="${page.title}"></li>
                     </ol>
                 </div>
             </div>
@@ -71,7 +71,8 @@
                 <!-- CONTENT -->
                 <div class="col-lg-9 col-md-9 col-sm-8">
 
-                    <header class="well well-sm" th:if="${page.specialContents['text_header'] != null}" th:utext="${page.specialContents['text_header'].properties['text']}">
+                    <header class="well well-sm" th:if="${page.specialContents['text_header'] != null}"
+                            th:utext="${page.specialContents['text_header'].properties['text']}">
                     </header>
 
                     <article th:each="content : ${page.contents}">
@@ -131,7 +132,7 @@
                 </div>
             </div>
 
-            <footer th:if="${page.specialContents['text_footer'] != null}"
+            <footer class="well well-sm" th:if="${page.specialContents['text_footer'] != null}"
                      th:utext="${page.specialContents['text_footer'].properties['text']}">
             </footer>
 

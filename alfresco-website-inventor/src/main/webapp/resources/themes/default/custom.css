@@ -14,13 +14,13 @@ ul.nav.navbar-nav {
 
 .caption {
     position: relative;
-    top: -20px;
+    /*top: -20px;*/
     text-align: center;
 
 }
 
 article {
-    margin-bottom: 30px;
+    margin-bottom: 10px;
     background: #3e444c;
     padding: 20px;
     border-radius: 3px;
