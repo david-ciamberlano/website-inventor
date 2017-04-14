@@ -5,8 +5,21 @@ import java.util.List;
 
 public class SiteProperties {
 
+    private String siteName;
     private String theme;
     private List<SiteProperty> metadata;
+
+
+
+    //    GETTER & SETTER
+
+    public String getSiteName() {
+        return this.siteName;
+    }
+
+    public void setSiteName(String siteName) {
+        this.siteName = siteName;
+    }
 
     public String getTheme() {
         return theme;

@@ -10,10 +10,9 @@ import it.alfrescoinaction.lab.awsi.service.WebPageService;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisBaseException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
-import org.apache.chemistry.opencmis.commons.exceptions.CmisUnauthorizedException;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.BeanCreationException;
-import org.springframework.beans.factory.UnsatisfiedDependencyException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,14 +26,14 @@ import java.io.IOException;
 @Controller
 public class MainController {
 
+    private static final Logger logger = LogManager.getLogger(MainController.class);
+
     private final WebPageService webPageService;
 
     @Autowired
     public MainController (WebPageService webPageService) {
         this.webPageService = webPageService;
     }
-
-    private static final Logger logger = Logger.getLogger(MainController.class);
 
     @RequestMapping("/{siteid}")
     public String homepage(Model model, @PathVariable("siteid") String site) {

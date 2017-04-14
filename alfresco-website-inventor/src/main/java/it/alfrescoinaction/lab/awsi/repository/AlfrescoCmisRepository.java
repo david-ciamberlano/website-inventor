@@ -19,6 +19,8 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
@@ -38,7 +40,7 @@ import java.util.regex.Pattern;
 @org.springframework.stereotype.Repository
 public class AlfrescoCmisRepository {
 
-//    private static final Logger logger = Logger.getLogger(AlfrescoCmisRepository.class);
+    private static final Logger logger = LogManager.getLogger(AlfrescoCmisRepository.class);
 
     private RemoteConnection connection;
 
@@ -70,7 +72,9 @@ public class AlfrescoCmisRepository {
         Session session = connection.getSession();
 
         // get the site root objectId (in this way I bypass the problem of the translated site folder name in the cmis path)
-        String siteFolderquery = "select * from cmis:folder F join cm:titled T on F.cmis:objectId = T.cmis:objectId  where contains(F,'PATH:\"/app:company_home/st:sites/cm:@@siteid\"')"
+        String siteFolderquery = ("select * from cmis:folder F join cm:titled T " +
+                "on F.cmis:objectId = T.cmis:objectId  " +
+                "where contains(F,'PATH:\"/app:company_home/st:sites/cm:@@siteid\"')")
                 .replace("@@siteid",siteId);
 
         ItemIterable<QueryResult> siteFolders = session.query(siteFolderquery, false);
@@ -111,8 +115,8 @@ public class AlfrescoCmisRepository {
     public Folder getFolderById(String id) throws PageNotFoundException {
         Session session = connection.getSession();
 
-        if (id.equals("home")) {
-           id = session.getObjectByPath(this.alfrescoDocLibPath).getId();
+        if ("home".equals(id)) {
+           id = session.getObjectByPath(alfrescoDocLibPath).getId();
         }
 
         CmisObject obj;
@@ -178,7 +182,8 @@ public class AlfrescoCmisRepository {
             throw new PageNotFoundException("Document not found: "  + id);
         }
 
-        if (obj.getBaseTypeId().value().equals("cmis:document") || obj.getBaseTypeId().value().equals("D:cm:thumbnail")){
+        if (obj.getBaseTypeId().value().equals("cmis:document") ||
+                obj.getBaseTypeId().value().equals("D:cm:thumbnail")){
             Document doc = (Document)obj;
             return doc;
         }
@@ -201,7 +206,8 @@ public class AlfrescoCmisRepository {
 
     public ItemIterable<QueryResult> getChildrenDocuments(String folderId) {
 
-        String query = "SELECT D.* FROM cmis:document D WHERE IN_FOLDER('" + folderId + "') ORDER BY D.cmis:name ";
+        String query = "SELECT D.* FROM cmis:document D WHERE IN_FOLDER('"
+                + folderId + "') ORDER BY D.cmis:name ";
 
         Session session = connection.getSession();
         OperationContext oc = session.createOperationContext();
@@ -256,13 +262,14 @@ public class AlfrescoCmisRepository {
 
         List<Rendition> renditions = getDocumentById(objectId).getRenditions();
 
-        ContentStream cs;
-        Optional<Rendition> rendition = renditions!=null?
-                renditions.stream().filter(r -> r.getTitle().equals(type)).findFirst():Optional.empty();
+        Optional<Rendition> rendition = renditions!=null ?
+                renditions.stream().filter(r -> type.equals(r.getTitle())).findFirst() : Optional.empty();
 
         if (rendition.isPresent()) {
-            cs = rendition.get().getContentStream();
+            ContentStream cs = rendition.get().getContentStream();
+
             byte[] buffer;
+
             try {
                 buffer = toByteArray(cs.getStream());
             }
@@ -278,14 +285,16 @@ public class AlfrescoCmisRepository {
 
     }
 
-    private Downloadable<byte[]> getRenditionRest(String type, String objectId, String name) throws ObjectNotFoundException {
+    private Downloadable<byte[]> getRenditionRest(String type, String objectId, String name)
+            throws ObjectNotFoundException {
 
         // I'm not using cmis because it doesn't trigger the thumbnail generetion process
         // The rest service generate the thumbnail or eventually return the default placeholder
         CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
         credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(username, password));
 
-        try (CloseableHttpClient httpclient = HttpClientBuilder.create().setDefaultCredentialsProvider(credentialsProvider).build()) {
+        try (CloseableHttpClient httpclient = HttpClientBuilder.create()
+                .setDefaultCredentialsProvider(credentialsProvider).build()) {
 
             String alfrescoServerUrl = alfrescoServer;
             String requestPath = alfrescoServiceEntryPoint + "/api/node/workspace/SpacesStore/" + objectId +
@@ -435,15 +444,11 @@ public class AlfrescoCmisRepository {
 
             case "text/html":
             case "text/markdown":
+            case "text/x-markdown":
             case "text/plain": {
                 ContentType textType;
 
                 switch (doc.getName()) {
-
-                    case ".awsi.config": {
-                        textType = ContentType.HIDDEN;
-                        break;
-                    }
 
                     case ".header.txt":
                     case ".header.md":
@@ -476,11 +481,14 @@ public class AlfrescoCmisRepository {
                     String text = IOUtils.readAllLines(in);
 
                     String safeText;
-                    // sanitize html (or other text type)
-                    if ("text/html".equals(mimeType)){
+
+                    if ("text/html".equals(mimeType) || doc.getName().endsWith(".html")){
+                        // sanitize html
                         safeText = Jsoup.clean(text, Whitelist.relaxed());
                     }
-                    else if (doc.getName().endsWith(".md")) {
+                    else if ("text/markdown".equals(mimeType) || "text/x-markdown".equals(mimeType)
+                            || doc.getName().endsWith(".md")) {
+                        // convert markdown
                         Parser parser = Parser.builder().build();
                         Node document = parser.parse(text);
                         HtmlRenderer renderer = HtmlRenderer.builder().build();
@@ -657,12 +665,24 @@ public class AlfrescoCmisRepository {
             }
 
             switch(c) {
-                case '<': builder.append("&lt;"); break;
-                case '>': builder.append("&gt;"); break;
-                case '&': builder.append("&amp;"); break;
-                case '"': builder.append("&quot;"); break;
-                case '\n': builder.append("<br>"); break;
-                case '\t': builder.append("&nbsp;&nbsp;&nbsp;&nbsp;"); break;
+                case '<':
+                    builder.append("&lt;");
+                    break;
+                case '>':
+                    builder.append("&gt;");
+                    break;
+                case '&':
+                    builder.append("&amp;");
+                    break;
+                case '"':
+                    builder.append("&quot;");
+                    break;
+                case '\n':
+                    builder.append("<br>");
+                    break;
+                case '\t':
+                    builder.append("&nbsp;&nbsp;&nbsp;&nbsp;");
+                    break;
                 default:
                     if( c < 128 ) {
                         builder.append(c);

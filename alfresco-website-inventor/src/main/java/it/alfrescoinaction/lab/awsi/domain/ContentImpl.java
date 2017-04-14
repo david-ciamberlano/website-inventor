@@ -13,8 +13,8 @@ public class ContentImpl implements Content{
     private final String mimeType;
     private final ContentType type;
     private final int priority;
-    private Map<String,String> properties;
-    private Map<String,String> renditions;
+    private Map<String,String> properties = new HashMap<>(0);
+    private Map<String,String> renditions = new HashMap<>(0);
 
     public ContentImpl(String id, String name, String title, String description,
                        String mimeType, ContentType type, int priority) {
@@ -25,9 +25,6 @@ public class ContentImpl implements Content{
         this.mimeType = mimeType;
         this.type = type;
         this.priority = priority;
-
-        properties = new HashMap<>();
-        renditions = new HashMap<>();
     }
 
     @Override
@@ -66,23 +63,24 @@ public class ContentImpl implements Content{
     @Override
     public Map<String, String> getProperties() {
         // defensive copy
-        Map<String,String> props = new HashMap<>();
-        props.putAll(this.properties);
-        return props;
+        return new HashMap<>(properties);
     }
 
     @Override
     public void setProperties(Map<String, String> props) {
         // defensive copy
-        this.properties.putAll(props);
+        properties.putAll(props);
     }
 
 
     public Map<String, String> getRenditions() {
         // defensive copy
-        Map<String,String> renditions = new HashMap<>();
-        renditions.putAll(this.renditions);
-        return renditions;
+        return new HashMap<>(renditions);
+    }
+
+    public void setRenditions(Map<String, String> renditions) {
+        // defensive copy
+        this.renditions.putAll(renditions);
     }
 
     public String getRenditionStreamIdbyType(String type) {
@@ -92,8 +90,5 @@ public class ContentImpl implements Content{
         else return renditions.get("default");
     }
 
-    public void setRenditions(Map<String, String> renditions) {
-        // defensive copy
-        this.renditions.putAll(renditions);
-    }
+
 }

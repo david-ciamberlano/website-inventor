@@ -66,7 +66,9 @@ public class WebPageService {
 
         Map<String,Content> contents = wsiRepository.getChildrenDocuments(folder);
         List<Content> genericContents = contents.entrySet().stream()
-                .filter(e -> e.getKey().startsWith("content")).map(p->p.getValue()).collect(Collectors.toList());
+                .filter(e -> e.getKey().startsWith("content")).map(p->p.getValue())
+                .sorted(Comparator.comparingInt(e -> e.getPriority()))
+                .collect(Collectors.toList());
         wp.setContents(genericContents);
 
         Map<String, Content> specialContents = contents.entrySet().stream()

@@ -19,6 +19,16 @@ ul.nav.navbar-nav {
 
 }
 
+.breadcrumb {
+    font-size: large;
+}
+
+.breadcrumb > li + li:before {
+    color: #ccc;
+    content: "\00BB";
+    padding: 0 5px;
+}
+
 article {
     margin-bottom: 10px;
     background: #3e444c;

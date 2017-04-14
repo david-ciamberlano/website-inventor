@@ -36,7 +36,7 @@ public class AppConfiguration extends WebMvcConfigurerAdapter implements Applica
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/resource/**").addResourceLocations("/resources/");
+        registry.addResourceHandler("/resources/**").addResourceLocations("/resources/");
     }
 
 

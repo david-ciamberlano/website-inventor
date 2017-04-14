@@ -4,6 +4,8 @@ import it.alfrescoinaction.lab.awsi.domain.*;
 import it.alfrescoinaction.lab.awsi.domain.ecm.WSIFolder;
 import it.alfrescoinaction.lab.awsi.exceptions.ObjectNotFoundException;
 import org.apache.chemistry.opencmis.client.api.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -17,6 +19,8 @@ import java.util.*;
  */
 @Repository
 public class AlfrescoWSICMISRepositoryAdapter implements WSIRepository {
+
+    private static final Logger logger = LogManager.getLogger(AlfrescoWSICMISRepositoryAdapter.class);
 
     private AlfrescoCmisRepository alfrescoCmisRepository;
 
@@ -71,7 +75,8 @@ public class AlfrescoWSICMISRepositoryAdapter implements WSIRepository {
         int index=0;
         for (QueryResult qr : pageContents) {
             index++;
-            CmisObject cmiso = alfrescoCmisRepository.getDocumentById(qr.getPropertyById("cmis:objectId").getFirstValue().toString());
+            CmisObject cmiso = alfrescoCmisRepository
+                    .getDocumentById(qr.getPropertyById("cmis:objectId").getFirstValue().toString());
             Document doc = (Document)cmiso;
             Optional<Content> content = AlfrescoCmisRepository.buildContent(doc);
 
