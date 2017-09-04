@@ -7,7 +7,7 @@ import it.alfrescoinaction.lab.awsi.exceptions.PageNotFoundException;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
-import org.apache.chemistry.opencmis.commons.impl.IOUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -28,6 +28,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.safety.Whitelist;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import java.io.*;
@@ -88,7 +89,7 @@ public class AlfrescoCmisRepository {
         alfrescoDocLibPath = alfrescoSitePath + "/documentLibrary";
         siteName = siteObj.getPropertyById("cmis:name").getFirstValue().toString();
         siteTitle = siteObj.getPropertyById("cm:title").getFirstValue().toString();
-        siteDescription = siteObj.getPropertyById("cmis:description").getFirstValue().toString();
+        siteDescription = siteObj.getPropertyById("cm:description").getFirstValue().toString();
 
 //        this.getSiteProperties();
     }
@@ -222,11 +223,18 @@ public class AlfrescoCmisRepository {
 
 
     public SiteProperties getSiteProperties() throws ObjectNotFoundException {
-        String propertiesFilePath = alfrescoDocLibPath + "/.awsi.config";
+        String propertiesFilePath = alfrescoSitePath + "/.awsi.config";
 
         Session session = connection.getSession();
 
-        CmisObject obj = session.getObjectByPath(propertiesFilePath);
+        CmisObject obj;
+
+        try {
+            obj = session.getObjectByPath(propertiesFilePath);
+        }
+        catch (Exception e) {
+            throw new ObjectNotFoundException("Configuration file not found: "  + propertiesFilePath);
+        }
         obj.refresh();
 
         Document awsiConfig;
@@ -265,23 +273,29 @@ public class AlfrescoCmisRepository {
         Optional<Rendition> rendition = renditions!=null ?
                 renditions.stream().filter(r -> type.equals(r.getTitle())).findFirst() : Optional.empty();
 
+        InputStream is;
+        String mimeType;
         if (rendition.isPresent()) {
             ContentStream cs = rendition.get().getContentStream();
-
-            byte[] buffer;
-
-            try {
-                buffer = toByteArray(cs.getStream());
-            }
-            catch (IOException e) {
-                buffer = new byte[0];
-            }
-
-            return  new RenditionDownloadable (name, buffer, cs.getLength(), cs.getMimeType());
+            is = cs.getStream();
+            mimeType = cs.getMimeType();
         }
         else {
-            return getRenditionRest(type,objectId,name);
+            is = getClass().getResourceAsStream("resources/img/default-generic-icon.png");
+            mimeType = "image/png";
         }
+
+
+        byte[] buffer;
+        try {
+            buffer = IOUtils.toByteArray(is);
+        }
+        catch (IOException e) {
+            // rendition non trovata
+            buffer = new byte[0];
+        }
+
+        return new RenditionDownloadable (name, buffer, buffer.length, mimeType);
 
     }
 
@@ -318,8 +332,6 @@ public class AlfrescoCmisRepository {
                 //TODO replace magic number
                 if (entity.getContentLength() < 1024*1024 && entity.getContentLength() > 0) {
                     byte[] buffer = EntityUtils.toByteArray(entity);
-//                    byte[] buffer = new byte[((Long)entity.getContentLength()).intValue()];
-//                    entity.getContent().read(buffer);
 
                     String mimetype = entity.getContentType().getValue();
 
@@ -408,18 +420,18 @@ public class AlfrescoCmisRepository {
         return isValid;
     }
 
-    private static byte[] toByteArray(InputStream in) throws IOException {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        int read = 0;
-        byte[] buffer = new byte[1024];
-        while (read != -1) {
-            read = in.read(buffer);
-            if (read != -1)
-                out.write(buffer,0,read);
-        }
-        out.close();
-        return out.toByteArray();
-    }
+//    private static byte[] toByteArray(InputStream in) throws IOException {
+//        ByteArrayOutputStream out = new ByteArrayOutputStream();
+//        int read = 0;
+//        byte[] buffer = new byte[1024];
+//        while (read != -1) {
+//            read = in.read(buffer);
+//            if (read != -1)
+//                out.write(buffer,0,read);
+//        }
+//        out.close();
+//        return out.toByteArray();
+//    }
 
 
     static Optional<Content> buildContent(Document doc) {
@@ -478,7 +490,7 @@ public class AlfrescoCmisRepository {
                 textContent.setProperties(props);
 
                 try (InputStream in = doc.getContentStream().getStream()) {
-                    String text = IOUtils.readAllLines(in);
+                    String text = IOUtils.toString (in, "UTF-8");
 
                     String safeText;
 

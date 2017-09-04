@@ -33,4 +33,9 @@ public class FileDownloadable implements Downloadable<InputStream>{
     public String getMimeType() {
         return mimeType;
     }
+
+    @Override
+    public boolean hasContent() {
+        return contentLength > 0;
+    }
 }

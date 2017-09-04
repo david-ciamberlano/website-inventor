@@ -31,7 +31,7 @@ public class AlfrescoWSICMISRepositoryAdapter implements WSIRepository {
 
 
     @Override
-    public WSIFolder getFolderById(String id) throws NoSuchElementException {
+    public WSIFolder getFolderById(String id) {
         Folder folder = alfrescoCmisRepository.getFolderById(id);
         WSIFolder wsiFolder = new WSIFolder();
 
@@ -44,7 +44,7 @@ public class AlfrescoWSICMISRepositoryAdapter implements WSIRepository {
     }
 
     @Override
-    public String getFolderIdByRelativePath(String path) throws NoSuchElementException {
+    public String getFolderIdByRelativePath(String path) {
         return alfrescoCmisRepository.getFolderIdByRelativePath(path);
     }
 
@@ -158,7 +158,9 @@ public class AlfrescoWSICMISRepositoryAdapter implements WSIRepository {
     public Downloadable<byte[]> getRendition(String type, String objectId) {
         Document doc =  alfrescoCmisRepository.getDocumentById(objectId);
 
-        return alfrescoCmisRepository.getRendition(type, objectId, doc.getName());
+        Downloadable<byte[]> rend = alfrescoCmisRepository.getRendition(type, objectId, doc.getName());
+
+        return rend;
     }
 
 

@@ -10,4 +10,6 @@ public interface Downloadable<T>  {
     long getContentLength();
 
     String getMimeType();
+
+    boolean hasContent();
 }

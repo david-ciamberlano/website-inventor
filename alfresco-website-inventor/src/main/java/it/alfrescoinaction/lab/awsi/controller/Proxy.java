@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.ServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 
 @Controller
 public class Proxy {
@@ -63,9 +62,7 @@ public class Proxy {
                 rend = webPageService.getRendition(type, id);
         }
 
-        if (rend.getContentLength() < 1) {
 
-        }
 
         return ResponseEntity.ok()
                 .contentLength(rend.getContentLength())

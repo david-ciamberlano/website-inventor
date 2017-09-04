@@ -1,173 +1,176 @@
-    <!DOCTYPE html>
-    <html lang="en" xmlns:th="http://www.thymeleaf.org">
-    <head>
-        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-        <title th:text="${sitetitle?:sitename}"></title>
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-        <link th:href="@{/resources/themes/default/bootstrap-3.3.6/css/bootstrap.2.min.css}" rel="stylesheet" />
-        <link th:href="@{/resources/themes/default/custom.css}" rel="stylesheet" />
-    </head>
-    <body>
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <title th:text="${sitetitle?:sitename}"></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <link th:href="@{/resources/themes/default/bootstrap-3.3.6/css/bootstrap.2.min.css}" rel="stylesheet" />
+    <link th:href="@{/resources/themes/default/custom.css}" rel="stylesheet" />
+</head>
+<body class="linearBg">
 
-        <!--MAIN NAVIGATION-->
-        <nav class="navbar navbar-default">
-            <div class="container-fluid">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand" th:href="@{|/${siteid}|}" th:text="${sitetitle?:sitename}"></a>
-                </div>
-                <div class="collapse navbar-collapse" id="main-nav">
-                    <ul class="nav navbar-nav" th:each="category : ${page.categories}">
-                        <li><a th:href="@{|/${siteid}/page/${category.getId()}|}" th:text="${category.name}"></a></li>
-                    </ul>
-                </div>
+    <!--MAIN NAVIGATION-->
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" th:href="@{|/${siteid}|}" th:text="${sitetitle?:sitename}"></a>
             </div>
-        </nav>
-
-        <div class="container">
-
-            <div class="row margin-bottom-lg">
-                <div class="col-md-12">
-                    <header>
-                        <div>
-                            <h1><span th:text="${sitetitle?:sitename}"/> <small th:text="${sitedescription}"></small></h1>
-                        </div>
-                    </header>
-                </div>
+            <div class="collapse navbar-collapse" id="main-nav">
+                <ul class="nav navbar-nav" th:each="category : ${page.categories}">
+                    <li><a th:href="@{|/${siteid}/page/${category.getId()}|}" th:text="${category.name}"></a></li>
+                </ul>
             </div>
+        </div>
+    </nav>
 
-            <div class="row">
-                <div class="col-md-12 col-lg-12 col-sm-12">
-                    <!-- BREADCRUMBS -->
-                    <ol class="breadcrumb">
-                        <li class="active" th:if="${page.homepage}">
-                            <span class="glyphicon glyphicon-home"></span>
-                        </li>
-                        <li th:if="${not page.homepage}"><a th:href="@{|/${siteid}|}">
-                            <span class="glyphicon glyphicon-home"></span></a>
-                        </li>
-                        <li th:each="bcEntry : ${page.breadcrumbs}"><a th:href="@{|/${siteid}/page/${bcEntry.value}|}" th:text="${bcEntry.key}"></a></li>
-                        <li class="active" th:if="${not page.homepage}" th:text="${page.title}"></li>
-                    </ol>
-                </div>
+    <div class="container">
+
+        <div class="row margin-bottom-lg">
+            <div class="col-md-12">
+                <header>
+                    <div>
+                        <h1><span th:text="${sitetitle?:sitename}"/> <small th:text="${sitedescription}"></small></h1>
+                    </div>
+                </header>
             </div>
-
-            <div class="row">
-                <!-- NAVIGATION -->
-                <div class="col-lg-3 col-md-3 col-sm-4">
-                    <div class="tab-content">
-                        <div class="list-group table-of-contents">
-                            <a th:if="not ${page.homepage}" class="list-group-item active"
-                               th:href="@{|/${siteid}/page/${page.parentId}|}">
-                                <span class="glyphicon glyphicon-collapse-up"></span> Up
-                            </a>
-                            <a th:each="link : ${page.links}" class="list-group-item" th:href="@{|/${siteid}/page/${link.id}|}" th:text="${link.name}"></a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- CONTENT -->
-                <div class="col-lg-9 col-md-9 col-sm-8">
-
-                    <!-- HEADER TEXT -->
-                    <div class="row">
-                        <div class="col-lg-12 col-md-12 col-sm-12">
-                            <header class="well well-sm" th:if="${page.specialContents['text_header'] != null}"
-                                    th:utext="${page.specialContents['text_header'].properties['text']}">
-                            </header>
-                        </div>
-                    </div>
-
-                    <div class="row" th:if="${page.contents.size() == 0 && page.links.size() > 0}">
-                        <div class="col-lg-4 col-md-6 col-sm-12" th:each="link : ${page.links}">
-                            <a  class="thumbnail" th:href="@{|/${siteid}/page/${link.id}|}">
-                                <img th:src="@{/resources/themes/img/generic-folder-1.png}" th:alt="${link.name}" height="128" width="128"/>
-                                <div class="caption">
-                                    <p th:text="${link.name}"></p>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="row" th:if="${page.contents.size() == 0 && page.links.size() == 0}">
-                        <div class="col-lg-10 col-md-10 col-sm-10 thumbnail" >
-                            <img th:src="@{/resources/themes/img/awsi_logo.png}" alt="empty page"
-                            />
-                        </div>
-                    </div>
-
-                    <div th:if="${page.contents.size() > 0}" class="row">
-                        <div class="col-lg-10 col-md-10 col-sm-10 col-lg-offset-1">
-                            <article th:each="content : ${page.contents}">
-
-                                <th:block th:switch="${content.type}" >
-
-                                    <!--TEXTS-->
-                                    <div th:class="content_text" th:case="${T(it.alfrescoinaction.lab.awsi.domain.ContentType).TEXT}">
-                                        <h2 th:text="${content.title}"></h2>
-                                        <h3 th:text="${content.description} ?: _"></h3>
-                                        <div th:utext="${content.properties['text']}"></div>
-                                    </div>
-
-                                    <!--IMAGES-->
-                                    <figure th:class="content_image" th:case="${T(it.alfrescoinaction.lab.awsi.domain.ContentType).IMAGE}">
-                                        <a th:href="@{|/proxy/d/${content.id}|}" class="thumbnail">
-                                            <img th:src="@{|/proxy/r/preview/${content.id}|}" th:alt="${content.getName()}" />
-                                        </a>
-                                        <figcaption class="caption">
-                                            <p>
-                                                <span th:text="${content.title}"></span>
-                                                <em th:if="${not #strings.isEmpty(content.description)}" th:text="| - ${content.description}|"></em>
-                                            </p>
-                                        </figcaption>
-                                    </figure>
-
-                                    <!--OTHERS-->
-                                    <div th:class="content_other" th:case="*" class="media margin-bottom-lg">
-                                        <div class="media-left">
-                                            <a th:href="@{|/proxy/d/${content.id}|}" target="_blank">
-                                                <img class="media-object" th:src="@{|/proxy/r/thumb/${content.id}|}" th:alt="${content.properties['name']}" />
-                                            </a>
-                                        </div>
-                                        <div class="media-body">
-                                            <h4 class="media-heading">
-                                                <a th:href="@{|/proxy/d/${content.id}|}" target="_blank" th:text="${content.properties['title']?:content.properties['name']}"></a>
-                                            </h4>
-                                            <th:block th:each="docprop : ${page.siteProperties.metadata}">
-                                                <th:block th:switch="${docprop.type}">
-                                                    <div th:case="TEXT">
-                                                        <strong th:text="${docprop.label} + ': '"></strong>
-                                                        <span th:text="${content.properties[docprop.propertyId]?:'-'}"></span>
-                                                    </div>
-                                                    <div th:case="DATE">
-                                                        <strong th:text="${docprop.label} + ': '"></strong>
-                                                        <span th:text="${content.properties[docprop.propertyId]}"></span>
-                                                    </div>
-                                                </th:block>
-                                            </th:block>
-                                        </div>
-                                    </div>
-
-                                </th:block>
-
-                            </article>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <footer class="well well-sm" th:if="${page.specialContents['text_footer'] != null}"
-                     th:utext="${page.specialContents['text_footer'].properties['text']}">
-            </footer>
         </div>
 
+        <div class="row">
+            <div class="col-md-12 col-lg-12 col-sm-12">
+                <!-- BREADCRUMBS -->
+                <ol class="breadcrumb">
+                    <li class="active" th:if="${page.homepage}">
+                        <span class="glyphicon glyphicon-home"></span>
+                    </li>
+                    <li th:if="${not page.homepage}"><a th:href="@{|/${siteid}|}">
+                        <span class="glyphicon glyphicon-home"></span></a>
+                    </li>
+                    <li th:each="bcEntry : ${page.breadcrumbs}"><a th:href="@{|/${siteid}/page/${bcEntry.value}|}" th:text="${bcEntry.key}"></a></li>
+                    <li class="active" th:if="${not page.homepage}" th:text="${page.title}"></li>
+                </ol>
+            </div>
+        </div>
 
-    <script th:src="@{/resources/themes/default/bootstrap-3.3.6/js/jquery-2.2.1.min.js}"></script>
-    <script th:src="@{/resources/themes/default/bootstrap-3.3.6/js/bootstrap.min.js}"></script>
-    </body>
-    </html>
+        <div class="row">
+            <!-- NAVIGATION -->
+            <div class="col-lg-3 col-md-3 col-sm-4">
+                <div class="tab-content">
+                    <div class="list-group table-of-contents">
+                        <a th:if="not ${page.homepage}" class="list-group-item active"
+                           th:href="@{|/${siteid}/page/${page.parentId}|}">
+                            <span class="glyphicon glyphicon-collapse-up"></span> Up
+                        </a>
+                        <a th:each="link : ${page.links}" class="list-group-item" th:href="@{|/${siteid}/page/${link.id}|}" th:text="${link.name}"></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONTENT -->
+            <div class="col-lg-9 col-md-9 col-sm-8">
+
+                <!-- HEADER TEXT -->
+                <div class="row margin-bottom-lg" th:if="${page.specialContents['text_header'] != null}">
+                    <div class="col-lg-12 col-md-12 col-sm-12">
+                        <header class="well well-sm"
+                                th:utext="${page.specialContents['text_header'].properties['text']}">
+                        </header>
+                    </div>
+                </div>
+
+                <div class="row" th:if="${page.contents.size() == 0 && page.links.size() > 0}">
+                    <div class="col-lg-4 col-md-6 col-sm-12" th:each="link : ${page.links}">
+                        <a th:href="@{|/${siteid}/page/${link.id}|}">
+                            <img  class="img-responsive center-block margin-top-sm margin-lg" th:src="@{/resources/themes/img/generic-folder.png}" th:alt="${link.name}">
+                            <div class="caption">
+                                <p th:text="${link.name}"></p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="row" th:if="${page.contents.size() == 0 && page.links.size() == 0}">
+                    <div class="col-lg-12 col-md-12 col-sm-12" >
+                        <img class="img-responsive center-block margin-top-sm margin-lg" th:src="@{/resources/themes/img/awsi_logo.png}" alt="empty page"
+                        />
+                    </div>
+                </div>
+
+                <div th:if="${page.contents.size() > 0}" class="row">
+                    <div class="col-lg-10 col-md-10 col-sm-10 col-lg-offset-1">
+                        <article th:each="content : ${page.contents}">
+
+                            <th:block th:switch="${content.type}" >
+
+                                <!--TEXTS-->
+                                <div th:class="content_text" th:case="${T(it.alfrescoinaction.lab.awsi.domain.ContentType).TEXT}">
+                                    <h2 th:text="${content.title}"></h2>
+                                    <h3 th:text="${content.description} ?: _"></h3>
+                                    <div th:utext="${content.properties['text']}"></div>
+                                </div>
+
+                                <!--IMAGES-->
+                                <figure th:class="content_image" th:case="${T(it.alfrescoinaction.lab.awsi.domain.ContentType).IMAGE}">
+                                    <a th:href="@{|/proxy/d/${content.id}|}" class="thumbnail">
+                                        <img class="img-responsive" th:src="@{|/proxy/r/preview/${content.id}|}" th:alt="${content.getName()}" />
+                                    </a>
+                                    <figcaption class="caption">
+                                        <p>
+                                            <span th:text="${content.title}"></span>
+                                            <em th:if="${not #strings.isEmpty(content.description)}" th:text="| - ${content.description}|"></em>
+                                        </p>
+                                    </figcaption>
+                                </figure>
+
+                                <!--OTHERS-->
+                                <div th:class="content_other" th:case="*" class="media margin-bottom-lg">
+                                    <div class="media-left">
+                                        <a th:href="@{|/proxy/d/${content.id}|}" target="_blank">
+                                            <img class="media-object" th:src="@{|/proxy/r/thumb/${content.id}|}" th:alt="${content.properties['name']}" />
+                                        </a>
+                                    </div>
+                                    <div class="media-body">
+                                        <h4 class="media-heading">
+                                            <a th:href="@{|/proxy/d/${content.id}|}" target="_blank" th:text="${content.properties['title']?:content.properties['name']}"></a>
+                                        </h4>
+                                        <th:block th:each="docprop : ${page.siteProperties.metadata}">
+                                            <th:block th:switch="${docprop.type}">
+                                                <div th:case="TEXT">
+                                                    <strong th:text="${docprop.label} + ': '"></strong>
+                                                    <span th:text="${content.properties[docprop.propertyId]?:'-'}"></span>
+                                                </div>
+                                                <div th:case="DATE">
+                                                    <strong th:text="${docprop.label} + ': '"></strong>
+                                                    <span th:text="${content.properties[docprop.propertyId]}"></span>
+                                                </div>
+                                            </th:block>
+                                        </th:block>
+                                    </div>
+                                </div>
+
+                            </th:block>
+
+                        </article>
+                    </div>
+                </div>
+                <div class="row margin-top-lg" th:if="${page.specialContents['text_footer'] != null}">
+                    <div class="col-lg-12 col-md-12 col-sm-12">
+                        <footer class="well well-sm"
+                                th:utext="${page.specialContents['text_footer'].properties['text']}">
+                        </footer>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<script th:src="@{/resources/themes/default/bootstrap-3.3.6/js/jquery-2.2.1.min.js}"></script>
+<script th:src="@{/resources/themes/default/bootstrap-3.3.6/js/bootstrap.min.js}"></script>
+</body>
+</html>

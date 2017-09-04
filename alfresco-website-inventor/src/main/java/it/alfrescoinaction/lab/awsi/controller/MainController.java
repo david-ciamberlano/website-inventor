@@ -69,7 +69,7 @@ public class MainController {
     @ExceptionHandler(PageNotFoundException.class)
     public ModelAndView handlePageNotFoundError(HttpServletRequest req, PageNotFoundException exc) {
         ModelAndView mav = new ModelAndView();
-        mav.addObject("Invalid Page", exc.getPageId());
+        mav.addObject("", exc.getPageId());
         mav.addObject("exception", exc);
         mav.addObject("utl",req.getRequestURL());
         mav.setViewName("error");
@@ -78,18 +78,18 @@ public class MainController {
     }
 
     @ExceptionHandler(ObjectNotFoundException.class)
-    public ModelAndView handlePageNotFoundError(HttpServletRequest req, ObjectNotFoundException exc) {
+    public ModelAndView handleObjectNotFoundError(HttpServletRequest req, ObjectNotFoundException exc) {
         ModelAndView mav = new ModelAndView();
-        mav.addObject("Invalid Page", exc.getPageId());
+        mav.addObject("invalid_page", exc.getPageId());
         mav.addObject("exception", exc);
-        mav.addObject("utl",req.getRequestURL());
+        mav.addObject("url",req.getRequestURL());
         mav.setViewName("error");
 
         return mav;
     }
 
     @ExceptionHandler(CmisBaseException.class)
-    public ModelAndView handlePageNotFoundError(HttpServletRequest req, CmisObjectNotFoundException exc) {
+    public ModelAndView handleCmisBaseError(HttpServletRequest req, CmisObjectNotFoundException exc) {
         ModelAndView mav = new ModelAndView();
         mav.addObject("Invalid Page", exc.getMessage());
         mav.addObject("exception", exc);
@@ -100,7 +100,7 @@ public class MainController {
     }
 
     @ExceptionHandler(CmisRuntimeException.class)
-    public ModelAndView handlePageNotFoundError(HttpServletRequest req, CmisRuntimeException exc) {
+    public ModelAndView handleCmisRuntimeError(HttpServletRequest req, CmisRuntimeException exc) {
         ModelAndView mav = new ModelAndView();
         mav.addObject("Invalid Page", exc.getMessage());
         mav.addObject("exception", exc);
@@ -144,7 +144,7 @@ public class MainController {
     }
 
     @ExceptionHandler(BeanCreationException.class)
-    public ModelAndView handleIOException(HttpServletRequest req, BeanCreationException exc) {
+    public ModelAndView handleBeanCreationException(HttpServletRequest req, BeanCreationException exc) {
         ModelAndView mav = new ModelAndView();
         mav.addObject("Connection exception", exc.getMessage());
         mav.addObject("exception", exc);

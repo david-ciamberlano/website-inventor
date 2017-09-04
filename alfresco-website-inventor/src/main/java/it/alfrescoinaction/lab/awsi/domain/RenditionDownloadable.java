@@ -35,4 +35,8 @@ public class RenditionDownloadable implements Downloadable<byte[]> {
         return mimeType;
     }
 
+    @Override
+    public boolean hasContent() {
+        return contentLenght > 0;
+    }
 }

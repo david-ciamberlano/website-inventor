@@ -27,7 +27,7 @@ public class WebPageService {
      * @return the WebPage object
      * @throws ObjectNotFoundException
      */
-    public WebPage  buildWebPage(String siteId, String id) throws ObjectNotFoundException {
+    public WebPage buildWebPage(String siteId, String id) {
 
         wsiRepository.init(siteId);
 
@@ -94,7 +94,10 @@ public class WebPageService {
     }
 
     public Downloadable<byte[]> getRendition(String type, String objectId) {
-        return wsiRepository.getRendition(type,objectId);
+
+        Downloadable<byte[]> rendition = wsiRepository.getRendition(type,objectId);
+
+        return  rendition;
     }
 
 
