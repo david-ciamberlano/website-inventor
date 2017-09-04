@@ -1,6 +1,6 @@
 # website-inventor
 
-## Navigate the Alfresco repository "the easy way"
+### Navigate the Alfresco repository "the easy way"
 
 **Alfresco Website Inventor** is an open-source project that aims to build a fully functional website on top of an Alfresco Share Site.
 In that way  you can navigate the repository contents as if it were a website. 
